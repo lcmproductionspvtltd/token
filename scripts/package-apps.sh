@@ -43,7 +43,7 @@ EOF
 
   cat > "$D/HOW TO BUILD.txt" <<EOF
 $display – app version ${version%%+*} (build ${version##*+}) – app id $appid
-Works with the BQuee server https://salonq-8t3f.onrender.com
+Works with the BQuee server https://bquee.com
 
 What's inside
   $name/                 the app's full source code (Flutter, no extra packages)

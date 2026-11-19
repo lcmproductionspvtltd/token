@@ -12,7 +12,7 @@ import 'package:bquee_shared/core/native.dart';
 import 'package:bquee_shared/ui/theme.dart';
 import 'package:material_ui/material_ui.dart';
 
-const String kDefaultServer = 'https://salonq-8t3f.onrender.com';
+const String kDefaultServer = 'https://bquee.com';
 
 class Session extends ChangeNotifier {
   final Api api = Api(kDefaultServer);

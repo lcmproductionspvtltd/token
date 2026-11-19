@@ -28,7 +28,7 @@ voucher-style offers.
 | BQuee team    | Same as super admin, limited to the permissions the super admin ticked                                                                                                                                                                                                                                                           |
 
 Every user can edit their profile, change their password and sign out from the account menu (tap
-the avatar at the top right). The app always uses the live server `https://salonq-8t3f.onrender.com`. To point it at another server,
+the avatar at the top right). The app always uses the live server `https://bquee.com`. To point it at another server,
 change `kDefaultServer` in `lib/core/session.dart` and rebuild.
 
 ## Build it

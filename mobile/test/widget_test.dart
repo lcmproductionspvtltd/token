@@ -32,7 +32,7 @@ Uint8List _render(QrMatrix qr, int scale, int quiet) {
 void main() {
   test('QR round trip (encoder → decoder)', () {
     for (final text in [
-      'https://salonq-8t3f.onrender.com/t/3f9a12bc4d5e',
+      'https://bquee.com/t/3f9a12bc4d5e',
       'A',
       'Lotus Salon & Spa – token A-007 ✓',
       'x' * 300,
