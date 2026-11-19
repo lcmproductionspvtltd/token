@@ -1,6 +1,7 @@
 // Sign-in for every role, then two-step sign-in for super admins, the BQuee team and owners.
 // The app always uses the live BQuee server over HTTPS (kDefaultServer).
 
+import 'package:bquee_shared/screens/legal.dart';
 import 'package:bquee_shared/core/api.dart';
 import 'package:bquee_shared/core/json.dart';
 import 'package:bquee_shared/ui/icons.dart';
@@ -238,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(color: Tk.ink3, fontSize: 12.5, height: 1.45),
                       ),
                       const SizedBox(height: 6),
-                      LegalLinks(site: session.api.base),
+                      const LegalLinks(),
                     ],
                   ),
                 ),

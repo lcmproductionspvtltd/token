@@ -964,6 +964,7 @@ const login = async (username, password) => {
       missing.html.includes('noindex'),
   );
   check('files still load normally', (await page('/manifest.webmanifest')).status === 200);
+  await deny('unknown legal page', [404], 'GET', '/api/public/legal/cookies');
   for (const [p, title] of [
     ['/terms', 'Terms and Conditions'],
     ['/privacy', 'Privacy Policy'],
@@ -981,6 +982,15 @@ const login = async (username, password) => {
         legalPage.html.includes('Al Hamra Industrial Zone-FZ'),
     );
     check(`${title} is in the sitemap`, sitemapXml.html.includes(`${p}</loc>`));
+    const forApp = await ok(`${title} for the apps`, 'GET', `/api/public/legal${p}`);
+    check(
+      `${title}: the apps get the same text as the website, with the contact details`,
+      forApp.title === title &&
+        forApp.sections.length > 5 &&
+        forApp.sections.every((x) => legalPage.html.includes(x.h.replace(/&/g, '&amp;').replace(/'/g, '&#39;'))) &&
+        forApp.contact.company === 'IBILL Software and Consultancy FZ-LLC' &&
+        forApp.contact.email === 'info@bquee.com',
+    );
   }
 
   const su = {

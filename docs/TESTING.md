@@ -68,7 +68,7 @@ Waiting time:       21 passed, 0 failed
 Static files:       12 passed, 0 failed
 Address rules:      18 passed, 0 failed
 Database client:    38 passed, 0 failed
-API audit:         519 passed, 0 failed
+API audit:         524 passed, 0 failed
 Security:           72 passed, 0 failed
 Account requests:   86 passed, 0 failed
 Sign-in security:   57 passed, 0 failed

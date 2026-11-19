@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:bquee_shared/screens/legal.dart';
 import 'package:bquee_shared/core/api.dart';
 import 'package:bquee_shared/core/json.dart';
 import 'package:bquee_shared/screens/account_request.dart';
@@ -407,11 +408,11 @@ Future<void> showAccountSheet(BuildContext context) {
                 }),
               item('eye', 'Privacy Policy', () {
                 Navigator.pop(ctx);
-                openPrivacy(context, session.api.base);
+                openPrivacy(context);
               }),
               item('list', 'Terms and Conditions', () {
                 Navigator.pop(ctx);
-                openTerms(context, session.api.base);
+                openTerms(context);
               }),
               item('logout', 'Sign out', () async {
                 Navigator.pop(ctx);

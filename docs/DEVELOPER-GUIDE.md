@@ -531,7 +531,7 @@ app-shared/lib/
   ui/theme.dart        colours (Tk), fonts, buildTheme(brandColour), brandOf(context)
   ui/widgets.dart      exports all shared widgets (ui/widgets/*.dart: buttons, cards, forms, filters, …)
   ui/steps.dart        StepBar + StepFormPage (long forms in steps)
-  screens/             screens both apps use (account deletion request)
+  screens/             screens both apps use (account deletion request, Privacy Policy and Terms)
 mobile/lib/screens/    login, signup, mfa, shell, scanner, reports, support, profile, token_detail
                        admin/ (businesses, business_form, business_features, team, website, catalog…),
                        owner/ (overview, tokens, branches, services, staff, marketing, settings), staff/

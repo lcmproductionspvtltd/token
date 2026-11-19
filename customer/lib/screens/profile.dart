@@ -1,5 +1,6 @@
 // Profile: photo, name, mobile, email; change password; sign out; delete / deactivate request.
 
+import 'package:bquee_shared/screens/legal.dart';
 import 'package:bquee_shared/core/native.dart';
 import 'package:bquee_shared/screens/account_request.dart';
 import 'package:bquee_shared/ui/icons.dart';
@@ -194,8 +195,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   item('ticket', 'My tokens', () => session.goTab?.call('tokens')),
                   item('lock', 'Change password', _password),
-                  item('eye', 'Privacy Policy', () => openPrivacy(context, session.api.base)),
-                  item('list', 'Terms and Conditions', () => openTerms(context, session.api.base)),
+                  item('eye', 'Privacy Policy', () => openPrivacy(context)),
+                  item('list', 'Terms and Conditions', () => openTerms(context)),
                   item('logout', 'Sign out', () async {
                     final ok = await confirmDialog(
                       context,

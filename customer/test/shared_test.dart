@@ -3,6 +3,7 @@
 
 import 'package:bquee_shared/core/api.dart';
 import 'package:bquee_shared/core/native.dart';
+import 'package:bquee_shared/screens/legal.dart';
 import 'package:bquee_shared/ui/steps.dart';
 import 'package:bquee_shared/ui/theme.dart';
 import 'package:bquee_shared/ui/widgets.dart';
@@ -53,9 +54,21 @@ void main() {
   });
 
   testWidgets('Privacy Policy and Terms links are shown (app stores need them)', (tester) async {
-    await tester.pumpWidget(_app(const Scaffold(body: LegalLinks(site: 'https://bquee.example'))));
+    await tester.pumpWidget(_app(const Scaffold(body: LegalLinks())));
     expect(find.text('Privacy Policy'), findsOneWidget);
     expect(find.text('Terms and Conditions'), findsOneWidget);
+  });
+
+  testWidgets('Privacy Policy opens inside the app, with "Try again" when it can’t load', (tester) async {
+    final before = serverApi;
+    serverApi = Api('http://offline.example'); // refused (not HTTPS), like having no connection
+    addTearDown(() => serverApi = before);
+    await tester.pumpWidget(_app(const Scaffold(body: LegalLinks())));
+    await tester.tap(find.text('Privacy Policy'));
+    await tester.pumpAndSettle();
+    expect(find.text('Privacy Policy'), findsWidgets, reason: 'the policy screen opened');
+    expect(find.text('Couldn’t load the Privacy Policy'), findsOneWidget);
+    expect(find.text('Try again'), findsOneWidget);
   });
 
   testWidgets('step bar: current step named, finished steps ticked and tappable', (tester) async {

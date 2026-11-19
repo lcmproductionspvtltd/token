@@ -12,6 +12,7 @@ const { today } = require('../utils/time');
 const { hashPassword, validatePassword } = require('../services/auth');
 const { assertLoginAvailable } = require('../services/accounts');
 const { createSiteService, FEATURE_ICONS } = require('../services/site');
+const legal = require('../content/legal');
 
 function addDays(iso, days) {
   const d = new Date(`${iso}T00:00:00Z`);
@@ -34,6 +35,14 @@ module.exports = function siteRoutes(router, { db, auth, limiter }) {
       signup: { enabled: signup.enabled, approval: signup.mode === 'approval', trialDays: signup.trialDays },
       categories: await categories(),
     };
+  });
+
+  /** Terms and Privacy for the apps, which show them as their own screens (same text as /terms and /privacy). */
+  router.get('/api/public/legal/:doc', async ({ params }) => {
+    const doc = { terms: legal.terms, privacy: legal.privacy }[params.doc];
+    if (!doc) throw notFound('Page not found');
+    const { title, updated, intro, sections } = doc;
+    return { title, updated, intro, sections, contact: legal.CONTACT };
   });
 
   router.get('/api/admin/site', async ({ req }) => {

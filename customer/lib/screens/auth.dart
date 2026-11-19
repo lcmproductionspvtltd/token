@@ -1,5 +1,6 @@
 // Sign in / sign up for customers, in two tabs on one screen.
 
+import 'package:bquee_shared/screens/legal.dart';
 import 'package:bquee_shared/core/api.dart';
 import 'package:bquee_shared/core/native.dart';
 import 'package:bquee_shared/ui/icons.dart';
@@ -370,7 +371,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         style: const TextStyle(color: Tk.ink3, fontSize: 12.5, height: 1.45),
                       ),
                       const SizedBox(height: 6),
-                      LegalLinks(site: session.api.base),
+                      const LegalLinks(),
                     ],
                   ),
                 ),
