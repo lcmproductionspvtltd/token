@@ -1,0 +1,332 @@
+/* Token page. */
+
+/* ================= token page (v2) ================= */
+
+.tp {
+  background:
+    radial-gradient(60% 40% at 100% 0%, var(--brand-tint), transparent 70%),
+    radial-gradient(50% 35% at 0% 40%, color-mix(in srgb, var(--tone-rose) 9%, #fff), transparent 70%), var(--porcelain);
+  background-attachment: fixed;
+}
+.tp-wrap {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: clamp(18px, 3vw, 36px) var(--gutter) 56px;
+  display: grid;
+  gap: clamp(18px, 2.4vw, 28px);
+}
+
+/* status banner */
+.tp-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 28px;
+  padding: clamp(20px, 3vw, 30px) clamp(20px, 3vw, 34px);
+  border-radius: var(--r-xl);
+  color: #fff;
+  background:
+    radial-gradient(90% 140% at 100% 0%, color-mix(in srgb, var(--tone-rose) 45%, transparent), transparent 60%),
+    linear-gradient(120deg, var(--brand-deep), var(--brand));
+  box-shadow: 0 24px 44px -28px var(--brand-glow);
+  animation: rise 0.4s var(--ease);
+}
+.tp-banner.serving {
+  background:
+    radial-gradient(90% 140% at 100% 0%, color-mix(in srgb, var(--tone-sky) 55%, transparent), transparent 60%),
+    linear-gradient(120deg, color-mix(in srgb, var(--tone-sky) 60%, #0b1b44), var(--tone-sky));
+}
+.tp-banner.done {
+  background: linear-gradient(120deg, #0f5132, #1f9d55);
+}
+.tp-banner.cancelled,
+.tp-banner.missed {
+  background: linear-gradient(120deg, #3d3747, #6a6478);
+  box-shadow: none;
+}
+.tp-banner-text {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  flex: 1 1 320px;
+}
+.tp-banner-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  background: rgb(255 255 255 / 16%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 22%);
+}
+.tp-banner.fresh .tp-banner-icon {
+  background: #22a35a;
+  animation: pop 0.5s var(--ease);
+}
+.tp-banner-icon .i {
+  width: 26px;
+  height: 26px;
+  stroke-width: 2.2;
+}
+.tp-banner h1 {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 1.1rem + 1.5vw, 2.3rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+.tp-banner p {
+  margin-top: 4px;
+  font-size: var(--t-sm);
+  color: rgb(255 255 255 / 82%);
+}
+.tp-banner-stats {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+}
+.tp-banner-stats > div {
+  min-width: 128px;
+  padding: 12px 18px;
+  border-radius: 18px;
+  background: rgb(255 255 255 / 14%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 18%);
+}
+.tp-banner-stats dt {
+  font-size: var(--t-xs);
+  color: rgb(255 255 255 / 75%);
+}
+.tp-banner-stats dd {
+  margin: 2px 0 0;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+/* ticket | services, with actions under the ticket */
+.tp-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+  grid-template-areas:
+    'ticket panel'
+    'actions panel';
+  grid-template-rows: auto 1fr;
+  gap: 16px clamp(18px, 3vw, 36px);
+  align-items: start;
+}
+.tp-ticket-area {
+  grid-area: ticket;
+  min-width: 0;
+}
+.tp-actions {
+  grid-area: actions;
+}
+.tp-panel-area {
+  grid-area: panel;
+  min-width: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.tp-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.tp-actions .btn {
+  width: 100%;
+  min-height: 54px;
+  border-radius: 16px;
+  font-size: var(--t-md);
+}
+.tp-download.btn {
+  border: 0;
+  background: linear-gradient(
+    120deg,
+    var(--brand-deep),
+    var(--brand) 60%,
+    color-mix(in srgb, var(--brand) 70%, var(--tone-rose))
+  );
+  box-shadow: 0 16px 30px -18px var(--brand-glow);
+}
+.tp-download.btn:hover {
+  filter: brightness(1.08);
+}
+.tp-another.btn {
+  --b-bg: var(--paper);
+  --b-fg: var(--brand-ink);
+  --b-line: var(--brand-line);
+}
+.tp-another.btn:hover {
+  --b-bg: var(--brand-wash);
+  --b-line: var(--brand);
+}
+
+.live-panel {
+  box-shadow:
+    0 1px 2px rgb(34 28 43 / 5%),
+    0 24px 44px -32px rgb(34 28 43 / 30%);
+  border: 0;
+  border-radius: var(--r-xl);
+}
+.live-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 22px 6px;
+}
+.live-panel-head b {
+  font-size: var(--t-lg);
+  font-weight: 600;
+}
+.live-panel-head span {
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--pill);
+  background: var(--brand-tint);
+  color: var(--brand-ink);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+}
+.live-items li > span:not(.avatar):not(.live-item-end) {
+  flex: 1;
+}
+.live-item-end {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.tp-links {
+  justify-content: space-between;
+}
+
+@media (max-width: 900px) {
+  .tp-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'ticket'
+      'actions'
+      'panel';
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .tp-banner {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 520px) {
+  .tp-banner-stats {
+    width: 100%;
+  }
+  .tp-banner-stats > div {
+    flex: 1;
+    min-width: 0;
+  }
+  .tp-banner-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+}
+@media (max-width: 400px) {
+  .tp-actions {
+    grid-template-columns: 1fr;
+  }
+  .live-items li {
+    flex-wrap: wrap;
+  }
+}
+.live-items .live-item-end {
+  flex: none !important;
+  display: flex !important;
+  min-width: 0;
+}
+
+/* token preview = the exact image that downloads */
+.tp-preview {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 26px;
+  overflow: hidden;
+  cursor: zoom-in;
+  box-shadow: 0 30px 60px -36px var(--brand-glow);
+  animation: rise 0.4s var(--ease);
+}
+.tp-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.tp-zoom-hint {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--pill);
+  background: rgb(26 20 34 / 72%);
+  color: #fff;
+  font-size: var(--t-xs);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0.9;
+}
+.tp-preview-loading {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 720 / 1060;
+  border-radius: 26px;
+  background: var(--brand-wash);
+  color: var(--ink-3);
+}
+.tp-zoom .dialog-body {
+  padding: 0 14px 14px;
+}
+.tp-zoom-img {
+  display: block;
+  width: 100%;
+  border-radius: 20px;
+}
+.tp-home.btn {
+  --b-bg: var(--brand-tint);
+  --b-fg: var(--brand-ink);
+  --b-line: transparent;
+}
+.tp-home.btn:hover {
+  --b-bg: var(--brand-line);
+}
+.tp-download.pdf.btn {
+  background: linear-gradient(120deg, var(--ink), color-mix(in srgb, var(--brand-deep) 65%, var(--ink)));
+  box-shadow: 0 16px 30px -18px rgb(34 28 43 / 55%);
+}
+@media (max-width: 400px) {
+  .tp-actions {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .tp-actions .btn {
+    font-size: var(--t-sm);
+    padding: 0 10px;
+  }
+}
+@media (max-width: 340px) {
+  .tp-actions {
+    grid-template-columns: 1fr !important;
+  }
+}

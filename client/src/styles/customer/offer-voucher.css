@@ -1,0 +1,276 @@
+/* Offer voucher. */
+
+/* =====================================================================
+   Offer voucher (v2): colour band, details, perforated tear, code + book.
+   ===================================================================== */
+.coupon.v2 {
+  --notch: 13px;
+  --paper-c: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  min-height: 100%;
+  padding: 0;
+  border-radius: 24px;
+  background: var(--paper-c);
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--c1) 14%, var(--line));
+  box-shadow:
+    0 1px 2px rgb(30 10 50 / 5%),
+    0 26px 46px -30px color-mix(in srgb, var(--c1) 70%, transparent);
+  overflow: hidden;
+  isolation: isolate;
+  grid-template-columns: none;
+}
+.coupon.v2 > * {
+  position: relative;
+}
+
+/* colour band */
+.coupon-hero {
+  display: grid;
+  align-content: end;
+  gap: 8px;
+  min-height: 150px;
+  padding: 22px 22px 20px;
+  color: #fff;
+  background:
+    linear-gradient(
+      140deg,
+      color-mix(in srgb, var(--c1) 92%, transparent),
+      color-mix(in srgb, var(--c2) 88%, transparent)
+    ),
+    var(--img, none) center / cover,
+    linear-gradient(140deg, var(--c1), var(--c2));
+  overflow: hidden;
+}
+.coupon-rings {
+  position: absolute;
+  right: -60px;
+  top: -70px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 26px solid rgb(255 255 255 / 9%);
+  box-shadow:
+    0 0 0 34px rgb(255 255 255 / 5%),
+    inset 0 0 0 30px rgb(255 255 255 / 5%);
+  pointer-events: none;
+}
+.coupon-gift {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  background: rgb(255 255 255 / 18%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.coupon-gift .i {
+  width: 20px;
+  height: 20px;
+}
+.coupon-big {
+  font-size: clamp(1.9rem, 1.5rem + 1.2vw, 2.35rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 14px rgb(0 0 0 / 18%);
+  max-width: 82%;
+  overflow-wrap: anywhere;
+}
+.coupon-save {
+  width: fit-content;
+  padding: 4px 11px;
+  border-radius: var(--pill);
+  background: #fff;
+  color: var(--c1);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  box-shadow: 0 6px 14px -8px rgb(0 0 0 / 40%);
+}
+
+/* details */
+.coupon-body {
+  flex: 1;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 18px 22px 16px;
+}
+.coupon.v2 h3 {
+  font-family: var(--serif);
+  font-size: 1.32rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.coupon.v2 p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.coupon-valid {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 2px;
+  padding: 4px 10px;
+  border-radius: var(--pill);
+  background: color-mix(in srgb, var(--c1) 8%, #fff);
+  color: color-mix(in srgb, var(--c1) 75%, var(--ink));
+  font-size: var(--t-xs);
+  font-weight: 500;
+}
+.coupon-valid .i {
+  width: 13px;
+  height: 13px;
+}
+
+/* perforation with side notches */
+.coupon-tear {
+  height: 2px;
+  margin: 0 var(--notch);
+  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--c1) 30%, #fff) 0 8px, transparent 8px 14px);
+}
+.coupon-tear::before,
+.coupon-tear::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: calc(var(--notch) * 2);
+  height: calc(var(--notch) * 2);
+  border-radius: 50%;
+  background: var(--notch-bg, color-mix(in srgb, var(--brand) 6%, #f6f4f8));
+  border: 1px solid color-mix(in srgb, var(--c1) 14%, var(--line));
+  transform: translateY(-50%);
+}
+.coupon-tear::before {
+  left: calc(var(--notch) * -2);
+}
+.coupon-tear::after {
+  right: calc(var(--notch) * -2);
+}
+
+/* code + book */
+.coupon-foot {
+  display: grid;
+  gap: 10px;
+  padding: 16px 22px 20px;
+}
+.coupon.v2 .coupon-code {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 50px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  border: 1.5px dashed color-mix(in srgb, var(--c1) 45%, #fff);
+  background: color-mix(in srgb, var(--c1) 5%, #fff);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.coupon.v2 .coupon-code:hover {
+  background: color-mix(in srgb, var(--c1) 10%, #fff);
+}
+.coupon.v2 .coupon-code.plain {
+  cursor: default;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+.coupon-code-label {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.coupon.v2 .coupon-code b {
+  flex: 1;
+  color: var(--c1);
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.coupon.v2 .coupon-code.plain b {
+  font-size: var(--t-sm);
+  letter-spacing: 0;
+  font-weight: 600;
+}
+.coupon.v2 .coupon-code .i {
+  width: 18px;
+  height: 18px;
+  color: var(--c1);
+}
+.coupon.v2 .coupon-code.copied {
+  border-style: solid;
+  border-color: #15803d;
+  background: #ecfdf3;
+}
+.coupon.v2 .coupon-code.copied b,
+.coupon.v2 .coupon-code.copied .i,
+.coupon.v2 .coupon-code.copied .coupon-code-label {
+  color: #15803d;
+}
+.coupon.v2 .coupon-book {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(110deg, var(--c1), var(--c2));
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 12px 22px -12px var(--c1);
+  transition:
+    transform 0.2s var(--ease),
+    box-shadow 0.2s;
+}
+.coupon.v2 .coupon-book:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 26px -12px var(--c1);
+}
+.coupon.v2 .coupon-book .i {
+  transition: transform 0.2s var(--ease);
+}
+.coupon.v2 .coupon-book:hover .i {
+  transform: translateX(3px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .coupon.v2 .coupon-book,
+  .coupon.v2 .coupon-book .i {
+    transition: none;
+  }
+}
+.coupon.v2::before,
+.coupon.v2::after {
+  display: none;
+}
+.coupon.v2 .coupon-code {
+  min-height: 56px;
+}
+.coupon.v2 {
+  -webkit-mask: none;
+  mask: none;
+  max-width: 86vw;
+}

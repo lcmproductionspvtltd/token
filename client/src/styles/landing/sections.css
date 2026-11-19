@@ -1,0 +1,249 @@
+/* Sections below the hero: colour pass. */
+
+/* =====================================================================
+   Landing page sections (below the hero) – colourful, professional pass.
+   The header (.ld-nav) and hero (.ld-hero) are intentionally untouched.
+   ===================================================================== */
+
+.ld {
+  --c-teal: #0f9b8e;
+  --c-amber: #e08a0b;
+  --c-rose: #db2777;
+  --c-sky: #2563eb;
+}
+
+/* Soft colour washes behind the page body. */
+.ld-main {
+  position: relative;
+  isolation: isolate;
+}
+.ld-main::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 28% at 100% 8%, color-mix(in srgb, var(--brand) 10%, transparent), transparent 70%),
+    radial-gradient(38% 22% at 0% 30%, color-mix(in srgb, var(--c-teal) 8%, transparent), transparent 70%),
+    radial-gradient(40% 22% at 100% 62%, color-mix(in srgb, var(--c-amber) 8%, transparent), transparent 70%),
+    radial-gradient(40% 20% at 0% 88%, color-mix(in srgb, var(--c-rose) 7%, transparent), transparent 70%);
+}
+
+/* Section headings: a short coloured rule under the title. */
+.ld-head h2::after {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 5px;
+  margin-top: 16px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, var(--brand), color-mix(in srgb, var(--brand) 40%, var(--c-rose)));
+}
+
+/* Quick facts – each figure has its own colour. */
+.ld-facts {
+  gap: 10px;
+  border: 1px solid color-mix(in srgb, var(--brand) 8%, var(--line));
+}
+.ld-facts > div {
+  --fc: var(--brand);
+  background: linear-gradient(150deg, color-mix(in srgb, var(--fc) 9%, #fff), #fff 70%);
+}
+.ld-facts > div:nth-child(2) {
+  --fc: var(--c-teal);
+}
+.ld-facts > div:nth-child(3) {
+  --fc: var(--c-amber);
+}
+.ld-facts > div:nth-child(4) {
+  --fc: var(--c-rose);
+}
+.ld-facts > div:hover {
+  background: linear-gradient(150deg, color-mix(in srgb, var(--fc) 15%, #fff), #fff 75%);
+}
+.ld-facts .ld-fact-icon,
+.ld-facts > div:nth-child(n) .ld-fact-icon {
+  background: linear-gradient(140deg, var(--fc), color-mix(in srgb, var(--fc) 65%, #000));
+  color: #fff;
+  box-shadow: 0 10px 20px -10px var(--fc);
+}
+.ld-facts > div:nth-child(n) dd {
+  color: color-mix(in srgb, var(--fc) 55%, var(--ink));
+}
+
+/* Check waiting time – warmer card and a strong Check button. */
+.qc-check {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 90% at 100% 0%, color-mix(in srgb, var(--brand) 12%, transparent), transparent 70%),
+    linear-gradient(160deg, #fff, color-mix(in srgb, var(--brand) 4%, #fff));
+  border: 1px solid color-mix(in srgb, var(--brand) 12%, var(--line));
+}
+.qc-check::after {
+  /* faint ticket outline in the corner */
+  content: '';
+  position: absolute;
+  right: -28px;
+  bottom: -30px;
+  width: 170px;
+  height: 110px;
+  border-radius: 22px;
+  border: 2px dashed color-mix(in srgb, var(--brand) 18%, transparent);
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+.qc-check > * {
+  position: relative;
+  z-index: 1;
+}
+.qc-input {
+  background: #fff;
+  border-color: color-mix(in srgb, var(--brand) 22%, var(--line-2));
+}
+.qc-form .btn.primary {
+  background: var(--grad-btn);
+  color: #fff;
+  box-shadow: 0 12px 22px -12px var(--brand-glow);
+}
+.qc-form .btn.primary:disabled {
+  opacity: 1;
+  background: color-mix(in srgb, var(--brand) 22%, #fff);
+  color: var(--brand-ink);
+  box-shadow: none;
+}
+
+/* How it works – one colour per step, joined by a dashed line. */
+.ld-steps {
+  position: relative;
+}
+.ld-step {
+  --sc: var(--brand);
+  border: 1px solid color-mix(in srgb, var(--sc) 16%, var(--line));
+  background: linear-gradient(165deg, color-mix(in srgb, var(--sc) 8%, #fff), #fff 55%);
+  box-shadow: 0 18px 36px -30px color-mix(in srgb, var(--sc) 70%, transparent);
+}
+.ld-step:nth-child(2) {
+  --sc: var(--c-rose);
+}
+.ld-step:nth-child(3) {
+  --sc: var(--c-teal);
+}
+.ld-step::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--sc), color-mix(in srgb, var(--sc) 40%, #fff));
+}
+.ld-step::after {
+  background: radial-gradient(circle, color-mix(in srgb, var(--sc) 16%, transparent), transparent 70%);
+}
+.ld-step-icon {
+  background: linear-gradient(135deg, var(--sc), color-mix(in srgb, var(--sc) 60%, #000));
+  box-shadow: 0 14px 26px -12px var(--sc);
+}
+.ld-step-n {
+  color: color-mix(in srgb, var(--sc) 35%, #fff);
+}
+.reveal.in .ld-step:hover {
+  border-color: color-mix(in srgb, var(--sc) 40%, #fff);
+  box-shadow: 0 30px 50px -30px color-mix(in srgb, var(--sc) 80%, transparent);
+}
+@media (min-width: 761px) {
+  .ld-steps::before {
+    content: '';
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    top: calc(clamp(24px, 2.6vw, 34px) + 29px);
+    border-top: 2px dashed color-mix(in srgb, var(--brand) 25%, transparent);
+    z-index: 0;
+  }
+  .ld-step {
+    z-index: 1;
+  }
+}
+
+/* Offers band – a touch more colour at the edges. */
+.ld-band {
+  background:
+    radial-gradient(55% 80% at 100% 0%, color-mix(in srgb, var(--c-rose) 12%, transparent), transparent 70%),
+    radial-gradient(50% 70% at 0% 100%, color-mix(in srgb, var(--c-amber) 12%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--brand-wash), color-mix(in srgb, var(--brand) 9%, #fff));
+}
+
+/* Reviews – tinted cards with a coloured quote mark. */
+.ld-reviews .review {
+  background: linear-gradient(165deg, color-mix(in srgb, var(--brand) 6%, #fff), #fff 60%);
+  border: 1px solid color-mix(in srgb, var(--brand) 12%, var(--line));
+  box-shadow: 0 20px 40px -32px var(--brand-glow);
+}
+.ld-reviews .review-quote {
+  color: color-mix(in srgb, var(--brand) 45%, var(--c-rose));
+  opacity: 0.5;
+}
+.ld-score {
+  background:
+    radial-gradient(80% 60% at 100% 0%, color-mix(in srgb, var(--c-rose) 35%, transparent), transparent 70%),
+    linear-gradient(160deg, color-mix(in srgb, var(--brand) 85%, #000), color-mix(in srgb, var(--brand) 55%, #120d18));
+}
+
+/* Visit us – brand-colour card instead of near-black, livelier tiles. */
+.ld-visit-card {
+  background:
+    radial-gradient(70% 60% at 100% 0%, color-mix(in srgb, var(--c-rose) 40%, transparent), transparent 70%),
+    radial-gradient(60% 60% at 0% 100%, color-mix(in srgb, var(--c-sky) 25%, transparent), transparent 70%),
+    linear-gradient(160deg, color-mix(in srgb, var(--brand) 80%, #000), color-mix(in srgb, var(--brand) 45%, #0d0716));
+  box-shadow: 0 30px 60px -36px color-mix(in srgb, var(--brand) 80%, transparent);
+}
+.ld-visit-mark {
+  background: rgb(255 255 255 / 16%);
+  box-shadow: 0 0 0 8px rgb(255 255 255 / 8%);
+  backdrop-filter: blur(6px);
+}
+.ld-hours {
+  background: rgb(255 255 255 / 14%);
+}
+.ld-about {
+  opacity: 0.85;
+}
+.ld-visit-card .ld-directions {
+  background: #fff;
+  color: var(--brand-ink);
+  box-shadow: 0 12px 24px -12px rgb(0 0 0 / 45%);
+}
+.ld-tile {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--tone) 9%, #fff), #fff 65%);
+  border-color: color-mix(in srgb, var(--tone) 16%, var(--line));
+}
+.ld-tile-icon {
+  background: linear-gradient(140deg, var(--tone), color-mix(in srgb, var(--tone) 65%, #000));
+  color: #fff;
+  box-shadow: 0 10px 20px -10px var(--tone);
+}
+.ld-tile b {
+  color: color-mix(in srgb, var(--tone) 45%, var(--ink));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ld-step,
+  .ld-tile {
+    transition: none;
+  }
+}
+.ld-steps .ld-step:nth-child(n) .ld-step-icon {
+  background: linear-gradient(135deg, var(--sc), color-mix(in srgb, var(--sc) 60%, #000));
+  box-shadow: 0 14px 26px -12px var(--sc);
+}
+.ld-steps .ld-step:nth-child(n) .ld-step-n {
+  color: color-mix(in srgb, var(--sc) 35%, #fff);
+}
+@media (max-width: 560px) {
+  .qc-check::after {
+    display: none;
+  }
+}

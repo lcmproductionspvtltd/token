@@ -1,0 +1,94 @@
+/* Super admin: team and permissions. */
+
+/* ---------- super admin team ---------- */
+.team-note {
+  display: flex;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: var(--r-lg);
+  background: var(--brand-wash);
+  color: var(--brand-ink);
+  font-size: var(--t-sm);
+}
+.team-note .i {
+  flex: none;
+  margin-top: 2px;
+}
+.team-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.team-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--line);
+}
+.team-list li:last-child {
+  border-bottom: 0;
+}
+.team-list li.faded {
+  opacity: 0.6;
+}
+.team-info {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+.team-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.team-info small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.perm-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.perm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--pill);
+  background: var(--brand-tint);
+  color: var(--brand-ink);
+  font-size: var(--t-xs);
+  font-weight: 500;
+}
+.perm-chip .i {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.4;
+}
+.perm-chip.none {
+  background: var(--porcelain);
+  color: var(--ink-3);
+}
+.team-list .actions {
+  display: flex;
+  gap: 4px;
+}
+.perm-list {
+  display: grid;
+  gap: 12px;
+}
+@media (max-width: 560px) {
+  .team-list li {
+    flex-wrap: wrap;
+  }
+  .team-list .actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

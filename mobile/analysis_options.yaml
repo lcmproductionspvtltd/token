@@ -1,0 +1,10 @@
+# No external lint packages (self-contained). The analyzer's own checks still run.
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+
+# Same line width as the website and server code.
+formatter:
+  page_width: 120

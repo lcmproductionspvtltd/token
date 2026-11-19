@@ -1,0 +1,142 @@
+/* Small screens. */
+
+/* ---------- small screens ---------- */
+@media (max-width: 1024px) {
+  .site-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 960px) {
+  .site-nav {
+    display: none;
+  }
+  .site-burger {
+    display: inline-grid;
+  }
+  .site-nav + .site-auth {
+    margin-left: auto;
+  }
+  .site-app,
+  .site-faq-wrap,
+  .site-cats-in,
+  .acct-in {
+    grid-template-columns: 1fr;
+  }
+  .site-quote {
+    flex-basis: calc((100% - 18px) / 2);
+  }
+  .site-foot-in {
+    grid-template-columns: 1fr 1fr;
+  }
+  .site-foot-brand {
+    grid-column: 1 / -1;
+  }
+  .site-stats-in div:nth-child(odd) {
+    border-left: 0;
+  }
+  .acct-in {
+    min-height: 0;
+    padding-block: 108px 48px;
+  }
+  .acct-card {
+    width: 100%;
+    max-width: 560px;
+    justify-self: center;
+  }
+}
+@media (max-width: 720px) {
+  .site-hero-in {
+    padding-block: 124px 120px;
+  }
+  .site-steps {
+    grid-template-columns: 1fr;
+  }
+  .site-quote {
+    flex-basis: 88%;
+  }
+  .acct .acct-points {
+    display: none;
+  }
+  .acct-copy h2 {
+    margin-top: 14px;
+  }
+  .site-stats-in {
+    grid-template-columns: 1fr 1fr;
+  }
+  .site-stats-in div {
+    padding: 16px;
+  }
+  .site-stats-in div:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+}
+@media (max-width: 520px) {
+  .site-cta .btn,
+  .site-cta-btns .btn {
+    flex: 1 1 100%;
+  }
+  .acct-two {
+    grid-template-columns: 1fr;
+  }
+  .site-foot-in {
+    grid-template-columns: 1fr;
+  }
+  .store-btn {
+    flex: 1 1 150px;
+    min-width: 0;
+    gap: 9px;
+    padding: 8px 10px 8px 8px;
+  }
+  .store-ico {
+    width: 34px;
+    height: 34px;
+  }
+  .store-txt b {
+    font-size: 0.95rem;
+  }
+  .signup-role em {
+    margin-left: 0;
+  }
+  .acct-form {
+    padding: 20px 10px 6px;
+  }
+  .acct-card {
+    border-radius: 24px;
+    padding: 8px;
+  }
+  .site-head-bar {
+    gap: 8px;
+    padding: 0 6px 0 12px;
+    height: 58px;
+    border-radius: 18px;
+  }
+  .site-auth .btn.sm {
+    padding: 0 12px;
+  }
+  /* smaller logo so Sign in, Sign up and the menu button fit on phones */
+  .site-head .site-logo img {
+    height: 26px;
+  }
+}
+@media (max-width: 360px) {
+  .site-head .site-logo-full {
+    display: none;
+  }
+  .site-head .site-logo .site-logo-icon {
+    display: block;
+  }
+  .site-auth {
+    gap: 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .store-btn,
+  .site-feature,
+  .site-faq summary .i,
+  .quote-dots button {
+    transition: none;
+  }
+  .quote-track {
+    scroll-behavior: auto;
+  }
+}

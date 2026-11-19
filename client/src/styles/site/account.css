@@ -1,0 +1,322 @@
+/* Sign in / sign up page. */
+
+/* ---------- sign in / sign up ---------- */
+.acct {
+  color: #fff;
+  background:
+    linear-gradient(105deg, rgb(20 8 32 / 92%) 0%, rgb(20 8 32 / 70%) 50%, rgb(20 8 32 / 45%) 100%),
+    url('/img/site-auth.jpg') center / cover no-repeat,
+    #1d0f2e;
+}
+.acct-in {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+  min-height: calc(100dvh - 40px);
+  padding-block: 120px 64px;
+}
+.acct-copy h2 {
+  margin-top: 20px;
+  font-size: clamp(2rem, 1.2rem + 2.4vw, 3.3rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  max-width: 15ch;
+  color: #fff;
+}
+.acct .acct-points {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+}
+.acct-points li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: rgb(255 255 255 / 88%);
+}
+.acct-points li span {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 12%);
+  border: 1px solid rgb(255 255 255 / 18%);
+}
+.acct-points .i {
+  width: 19px;
+  height: 19px;
+}
+.acct-card {
+  min-width: 0;
+  padding: 10px;
+  border-radius: 28px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 40px 80px -36px rgb(0 0 0 / 70%);
+}
+.acct-tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 20px;
+  background: var(--porcelain);
+  border: 1px solid var(--line);
+}
+.acct-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  border: 0;
+  border-radius: 15px;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.acct-tabs button .i {
+  width: 18px;
+  height: 18px;
+}
+.acct-tabs button.on {
+  background: var(--paper);
+  color: var(--brand-ink);
+  box-shadow: 0 6px 16px -8px rgb(40 12 70 / 35%);
+}
+.acct-tabs button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.acct-form {
+  padding: 24px 18px 8px;
+}
+.acct-form h1 {
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  line-height: 1.2;
+  font-weight: 600;
+}
+.acct-sub {
+  margin: 6px 0 20px;
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+}
+.acct-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  margin-bottom: 14px;
+}
+.acct-label {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.acct-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 6px 0 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line-2);
+  background: #fbf9fd;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
+}
+.acct-input:focus-within {
+  border-color: var(--brand);
+  background: var(--paper);
+  box-shadow: 0 0 0 4px var(--brand-tint);
+}
+.acct-input > .i {
+  flex: none;
+  width: 19px;
+  height: 19px;
+  color: var(--ink-3);
+}
+.acct-input:focus-within > .i {
+  color: var(--brand);
+}
+.acct-input input,
+.acct-input select {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0 8px 0 0;
+  border: 0;
+  outline: none;
+  background-color: transparent;
+  font: inherit;
+  font-size: var(--t-md);
+  color: var(--ink);
+}
+.acct-input select {
+  cursor: pointer;
+}
+.acct-hint {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.acct-eye {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.acct-eye:hover {
+  background: var(--brand-wash);
+  color: var(--brand-ink);
+}
+.acct-eye .i {
+  width: 19px;
+  height: 19px;
+}
+.acct-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 12px;
+}
+.acct-form .auth-error {
+  margin-bottom: 14px;
+}
+.acct-form .btn.lg {
+  margin-top: 4px;
+  min-height: 52px;
+  border-radius: 14px;
+}
+.acct-fine {
+  margin-top: 14px;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  text-align: center;
+  line-height: 1.5;
+}
+.acct-switch {
+  margin: 4px 0 0;
+  padding: 14px 18px 12px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+}
+.acct-switch:empty {
+  display: none;
+}
+.acct-switch button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--brand-ink);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.signup-role {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, var(--brand-wash), color-mix(in srgb, var(--tone-rose) 8%, #fff));
+  border: 1px solid var(--brand-line);
+}
+.signup-role > .i {
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--grad-btn);
+  color: #fff;
+}
+.signup-role span {
+  display: grid;
+  line-height: 1.2;
+}
+.signup-role small {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.signup-role b {
+  color: var(--brand-ink);
+}
+.signup-role em {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  font-style: normal;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.signup-role em .i {
+  width: 13px;
+  height: 13px;
+}
+.acct-done {
+  text-align: center;
+  padding-bottom: 20px;
+}
+.acct-done-ico {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 18px;
+  border-radius: 50%;
+  background: var(--ok-bg, #dcfce7);
+  color: var(--ok-fg, #15803d);
+}
+.acct-done-ico .i {
+  width: 30px;
+  height: 30px;
+}
+.acct-done .btn {
+  margin-top: 22px;
+}
+.hp {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  pointer-events: none;
+}
+
+/* sign-up in steps: Back and Next / Create side by side */
+.acct-step-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.acct-step-actions .btn.block {
+  flex: 1;
+}
+
+.acct-form .form-steps {
+  margin: 4px 0 2px;
+}

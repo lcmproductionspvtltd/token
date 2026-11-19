@@ -1,0 +1,55 @@
+# Render Blueprint – one-click deploy on Render's free plan.
+# Render dashboard → New → Blueprint → pick this repository.
+#
+# Free plan notes:
+#   • The web service sleeps after 15 minutes without visits; the first visit then takes ~1 minute.
+#   • The free PostgreSQL database expires after 30 days. For a database that stays free,
+#     create one on neon.tech and paste its connection string into DATABASE_URL instead.
+services:
+  - type: web
+    name: salonq
+    runtime: node
+    plan: free
+    buildCommand: echo "No build step needed"
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    # Deploy a push only after the GitHub checks (.github/workflows/checks.yml) pass.
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: NODE_VERSION
+        value: '22'
+      - key: NODE_ENV
+        value: production
+      - key: TZ
+        value: Asia/Kolkata
+      - key: TRUST_PROXY
+        value: '1'
+      # Visitor address for request limits: Cloudflare (in front of Render) sets it and visitors can't fake it.
+      - key: CLIENT_IP_HEADER
+        value: true-client-ip
+      # The free plan's disk is wiped on every restart, so images go into PostgreSQL.
+      - key: UPLOADS_STORAGE
+        value: database
+      - key: ADMIN_USERNAME
+        value: admin
+      # A random password is generated – see it under Environment in the Render dashboard.
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      # Encrypts the two-step sign-in secrets stored in the database. Generated once; never change it
+      # (changing it means everyone sets up their authenticator app again).
+      - key: APP_SECRET
+        generateValue: true
+      # Production: start clean. Set to "1" only for a test site – it loads a demo business whose
+      # logins (owner / Owner@123, staff / Staff@123) are public in the README.
+      - key: SEED_DEMO_DATA
+        value: '0'
+      - key: DATABASE_URL
+        fromDatabase:
+          name: salonq-db
+          property: connectionString
+
+databases:
+  - name: salonq-db
+    plan: free
+    databaseName: salonq
+    user: salonq

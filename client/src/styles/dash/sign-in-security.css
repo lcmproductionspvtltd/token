@@ -1,0 +1,90 @@
+/* Account menu → Sign-in security (dash/SecurityDialog.jsx). */
+.sec-block {
+  display: grid;
+  gap: 10px;
+  padding: 2px 0 16px;
+}
+.sec-block + .sec-block {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.sec-block h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1rem;
+}
+.sec-block h3 .i {
+  width: 18px;
+  height: 18px;
+  color: var(--brand);
+}
+.sec-block p {
+  margin: 0;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.sec-block > .btn {
+  justify-self: start;
+}
+.sec-fine {
+  font-size: var(--t-xs);
+  color: var(--ink-3) !important;
+}
+.sec-renew {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sec-renew .input {
+  width: 150px;
+  letter-spacing: 0.2em;
+}
+.sec-devices {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.sec-devices li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--porcelain);
+}
+.sec-devices .sec-dev-text {
+  flex: 1;
+  display: grid;
+}
+.sec-devices small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.sec-devices .i {
+  width: 18px;
+  height: 18px;
+  color: var(--ink-3);
+}
+
+/* Another person's two-step sign-in, in the business owner / team member forms (dash/MfaReset.jsx). */
+.mfa-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--porcelain);
+}
+.mfa-row > span {
+  flex: 1 1 220px;
+  display: grid;
+}
+.mfa-row small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}

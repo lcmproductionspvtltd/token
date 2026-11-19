@@ -1,0 +1,146 @@
+/* One / many services and staff choice. */
+
+/* ---------- one / many services and staff (business sign-up and new business) ---------- */
+.bmodes {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.bmodes-group {
+  display: grid;
+  gap: 8px;
+}
+.bmodes-label {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.bmodes-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.bmode {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line-2);
+  background: #fbf9fd;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s;
+}
+.bmode:hover {
+  border-color: var(--brand-line);
+}
+.bmode.on {
+  border-color: var(--brand);
+  background: var(--brand-wash);
+  box-shadow: 0 0 0 3px var(--brand-tint);
+}
+.bmode:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.bmode-ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--ink-3);
+}
+.bmode.on .bmode-ico {
+  background: var(--grad-btn);
+  border-color: transparent;
+  color: #fff;
+}
+.bmode-ico .i {
+  width: 17px;
+  height: 17px;
+}
+.bmode-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.25;
+}
+.bmode-text b {
+  font-size: 0.92rem;
+}
+.bmode-text small {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.bmode-tick {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-2);
+  background: var(--paper);
+  color: #fff;
+}
+.bmode.on .bmode-tick {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+.bmode-tick .i {
+  width: 12px;
+  height: 12px;
+}
+.bmodes-flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--porcelain);
+  border: 1px dashed var(--line-2);
+  font-size: var(--t-xs);
+  color: var(--ink-2);
+}
+.bmodes-flow .i {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--brand);
+}
+.bmodes-flow b {
+  color: var(--brand-ink);
+}
+@media (max-width: 420px) {
+  .bmodes-row {
+    grid-template-columns: 1fr;
+  }
+}
+.signup-ref {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #fce7f3;
+  color: #9d174d;
+  font-size: var(--t-sm);
+}
+.signup-ref .i {
+  width: 16px;
+  height: 16px;
+}
