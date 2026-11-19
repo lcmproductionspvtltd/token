@@ -18,8 +18,8 @@ const DEFAULTS = {
   },
   hero: {
     badge: 'Replace paper tokens and token machines',
-    title: 'Digital token & queue system',
-    highlight: 'for salons, clinics and walk-ins',
+    title: 'QR token & queue system',
+    highlight: 'for salons & clinics',
     text: 'Customers scan your QR code, choose services and a staff member, and get a numbered token with a live waiting time on their phone – no app, no token machine, no paper. Staff scan the token to start and finish each service.',
     primary: 'Start free',
     secondary: 'Sign in',
@@ -247,7 +247,7 @@ const DEFAULTS = {
  * anything the super admin wrote is kept.
  */
 const OLD_DEFAULTS = {
-  heroTitles: ['Walk-ins,'],
+  heroTitles: ['Walk-ins,', 'Digital token & queue system'],
   categoriesText: ['Salons, spas, clinics, service centres, offices – anywhere people wait their turn.'],
   faqQuestions: [
     [

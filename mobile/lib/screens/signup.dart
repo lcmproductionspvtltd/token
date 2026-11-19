@@ -258,15 +258,12 @@ class _SignupScreenState extends State<SignupScreen> {
                         'Package',
                         hint: 'Pick the plan that fits your business.',
                         children: [
-                          for (final p in _packages)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: _PackageTile(
-                                p: p,
-                                on: package == p.s('name'),
-                                onTap: () => setState(() => package = p.s('name')),
-                              ),
-                            ),
+                          SelectX<String>(
+                            'Package',
+                            value: package,
+                            options: [for (final p in _packages) MapEntry(p.s('name'), _packageLabel(p))],
+                            onChanged: (v) => setState(() => package = v),
+                          ),
                         ],
                       ),
                     FieldGroup(
@@ -518,81 +515,10 @@ class _Message extends StatelessWidget {
   }
 }
 
-class _PackageTile extends StatelessWidget {
-  final Json p;
-  final bool on;
-  final VoidCallback onTap;
-  const _PackageTile({required this.p, required this.on, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final b = brandOf(context);
-    return Semantics(
-      button: true,
-      selected: on,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: on ? b.wash : Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: on ? b.c : Tk.line, width: on ? 1.8 : 1.2),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            p.s('name'),
-                            style: const TextStyle(fontWeight: FontWeight.w700, color: Tk.ink, fontSize: 15),
-                          ),
-                        ),
-                        if (p.b('highlight')) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(gradient: b.gradBtn, borderRadius: BorderRadius.circular(99)),
-                            child: const Text(
-                              'Popular',
-                              style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    if (p.s('period').isNotEmpty)
-                      Text(p.s('period'), style: const TextStyle(color: Tk.ink3, fontSize: 12.5)),
-                  ],
-                ),
-              ),
-              Text(
-                p.s('price'),
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: b.ink),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                width: 22,
-                height: 22,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: on ? b.c : Colors.white,
-                  border: Border.all(color: on ? b.c : Tk.line2, width: 1.5),
-                ),
-                alignment: Alignment.center,
-                child: on ? const AppIcon('check', size: 13, color: Colors.white, stroke: 2.6) : null,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+/// One line for the package dropdown, same as the website:
+/// "Business – ₹999 per month (popular)", "Starter – Free · 14-day trial".
+String _packageLabel(Json p) {
+  final period = p.s('period');
+  final joined = period.isEmpty ? '' : (RegExp(r'^per\b', caseSensitive: false).hasMatch(period) ? ' ' : ' · ') + period;
+  return p.s('name') + (p.s('price').isNotEmpty ? ' – ${p.s('price')}$joined' : '') + (p.b('highlight') ? ' (popular)' : '');
 }

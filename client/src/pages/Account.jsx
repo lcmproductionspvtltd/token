@@ -284,26 +284,15 @@ function SignUpForm({ site, onPending }) {
       {at === 0 && (
         <>
           {packages.length > 0 && (
-            <div className="pkg-pick">
-              <span className="acct-label">Package *</span>
-              <div className="pkg-row" role="radiogroup" aria-label="Package">
+            <AField label="Package *" icon="tag">
+              <select value={pkg} onChange={(e) => setPkg(e.target.value)} aria-label="Package">
                 {packages.map((p) => (
-                  <button
-                    key={p.name}
-                    type="button"
-                    role="radio"
-                    aria-checked={pkg === p.name}
-                    className={'pkg' + (pkg === p.name ? ' on' : '')}
-                    onClick={() => setPkg(p.name)}
-                  >
-                    {p.highlight && <em>Popular</em>}
-                    <b>{p.name}</b>
-                    <span className="pkg-price">{p.price}</span>
-                    {p.period && <small>{p.period}</small>}
-                  </button>
+                  <option key={p.name} value={p.name}>
+                    {packageLabel(p)}
+                  </option>
                 ))}
-              </div>
-            </div>
+              </select>
+            </AField>
           )}
           <AField label="Business name *" icon="store">
             <input
@@ -431,6 +420,12 @@ function SignUpForm({ site, onPending }) {
     </form>
   );
 }
+
+/** One line for the package dropdown: "Business – ₹999 per month (popular)", "Starter – Free · 14-day trial". */
+const packageLabel = (p) => {
+  const period = p.period ? (/^per\b/i.test(p.period) ? ' ' : ' · ') + p.period : '';
+  return p.name + (p.price ? ` – ${p.price}${period}` : '') + (p.highlight ? ' (popular)' : '');
+};
 
 export function Account({ query }) {
   const site = useSite();

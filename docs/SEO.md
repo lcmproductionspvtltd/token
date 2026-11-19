@@ -33,7 +33,8 @@ Google treats that as spam.
 | Each business page `/s/<slug>` gets its own title, description, canonical link and LocalBusiness data                                       | `seo.js → business`              |
 | Dashboards, sign-in, tokens and branch booking pages: `noindex`                                                                             | `seo.js → PRIVATE_PAGES`         |
 | Unknown addresses answer HTTP 404 (no “soft 404”)                                                                                           | `seo.js → notFound`              |
-| `/robots.txt` and `/sitemap.xml` (home + every live business page)                                                                          | `seo.js`                         |
+| `/robots.txt` and `/sitemap.xml` (home, Terms, Privacy + every live business page)                                                          | `seo.js`                         |
+| Terms and Conditions (`/terms`) and Privacy Policy (`/privacy`): indexable, full text in the HTML, linked in the footer                     | `src/content/legal.js`           |
 | Fast pages: compressed (brotli/gzip), cached files, small images                                                                            | `compress.js`, `static-files.js` |
 | Mobile friendly, HTTPS, one H1, logical H2/H3 order                                                                                         | home page                        |
 

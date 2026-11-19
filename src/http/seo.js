@@ -18,6 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createSiteService } = require('../services/site');
+const legal = require('../content/legal');
 const { pickEncoding, compressQuick, MIN_BYTES } = require('./compress');
 
 /** SPA addresses that exist but must not appear on Google. */
@@ -27,6 +28,8 @@ const PRIVATE_PAGES = [
   /^\/b\/[^/]+(\/book)?\/?$/,
   /^\/t\/[^/]+\/?$/,
 ];
+/** Terms and Privacy: indexable, with their full text in the HTML. */
+const LEGAL_PAGES = { '/terms': legal.terms, '/privacy': legal.privacy };
 const BUSINESS_PAGE = /^\/s\/([a-z0-9-]{1,80})\/?$/i;
 const CACHE_MS = 10 * 60_000; // the sitemap is rebuilt at most every 10 minutes
 
@@ -400,6 +403,37 @@ function createSeo({ db, config, headers, log = console }) {
     send(req, res, 200, html);
   }
 
+  /* ---------------- Terms and Privacy ---------------- */
+
+  function legalPage(req, res, doc) {
+    const base = baseUrl(req);
+    const title = `${doc.title} | BQuee`;
+    const block = (sec) =>
+      (sec.h ? `<h2>${esc(sec.h)}</h2>` : '') +
+      (sec.list && sec.p && sec.p.length ? `<p>${esc(sec.p[0])}</p>` : '') +
+      (sec.list ? `<ul>${sec.list.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '') +
+      (sec.list ? (sec.p || []).slice(1) : sec.p || []).map((t) => `<p>${esc(t)}</p>`).join('');
+    const body =
+      `<div class="site seo-pre"><header class="seo-pre-head site-wrap"><a href="/"><img src="/img/brand/bquee-logo.png" alt="BQuee" width="126" height="30" /></a></header>` +
+      `<main class="site-wrap legal-in"><h1>${esc(doc.title)}</h1><p class="legal-date">Last updated: ${esc(doc.updated)}</p>` +
+      doc.intro.map((t) => `<p>${esc(t)}</p>`).join('') +
+      doc.sections.map(block).join('') +
+      `</main></div>`;
+    const html = fill({
+      title,
+      description: doc.description,
+      head: previewTags({
+        base,
+        url: base + doc.path,
+        title,
+        description: doc.description,
+        image: '/img/og-image.png',
+      }),
+      body,
+    });
+    send(req, res, 200, html);
+  }
+
   /* ---------------- private pages, 404, robots, sitemap ---------------- */
 
   const noindexHead = '    <meta name="robots" content="noindex, nofollow" />';
@@ -450,6 +484,7 @@ function createSeo({ db, config, headers, log = console }) {
       const day = (d) => new Date(d).toISOString().slice(0, 10);
       const urls = [
         { loc: `${base}/`, lastmod: day(content.updatedAt || Date.now()), priority: '1.0' },
+        ...Object.values(LEGAL_PAGES).map((d) => ({ loc: base + d.path, lastmod: d.updatedIso, priority: '0.3' })),
         ...rows.map((r) => ({
           loc: `${base}/s/${encodeURIComponent(r.slug)}`,
           lastmod: day(r.created_at),
@@ -481,6 +516,7 @@ function createSeo({ db, config, headers, log = console }) {
       if (pathname === '/') return (await home(req, res), true);
       if (pathname === '/robots.txt') return (robots(req, res), true);
       if (pathname === '/sitemap.xml') return (await sitemap(req, res), true);
+      if (LEGAL_PAGES[pathname]) return (legalPage(req, res, LEGAL_PAGES[pathname]), true);
       const m = pathname.match(BUSINESS_PAGE);
       if (m) return (await business(req, res, m[1]), true);
       if (PRIVATE_PAGES.some((re) => re.test(pathname))) return (privatePage(req, res), true);

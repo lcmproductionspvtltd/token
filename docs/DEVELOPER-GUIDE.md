@@ -165,6 +165,7 @@ src/
     admin*.js              super admin: businesses, team, referrals, catalog, access rules
     reports.js, support.js, site.js, account-requests.js
   utils/                   ids, dates, input validation
+  content/legal.js         Terms and Conditions + Privacy Policy text (website pages and server copies)
 client/src/                React website source (see section 10)
 public/                    what the server serves: index.html, sw.js, icons, fonts, built app in public/app
 mobile/                    BQuee Biz Flutter app
@@ -492,7 +493,7 @@ GitHub check fails if they differ.
 ```
 client/src/
   main.jsx         route table: / · /login · /signup · /admin · /owner · /staff · /s/:slug · /s/:slug/login
-                   · /b/:branchId · /b/:branchId/book · /t/:tokenId
+                   · /b/:branchId · /b/:branchId/book · /t/:tokenId · /terms · /privacy
   core/            api.js (fetch wrapper: cookies, CSRF header, errors), router.jsx (tiny history router),
                    ui.jsx (dialogs, toasts, useLoad, useInterval…), format.js, Steps.jsx (stepper), pwa.jsx
   pages/           Home (BQuee home page), Account (sign in / sign up), Login (business sign-in), MfaStep

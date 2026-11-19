@@ -964,6 +964,23 @@ const login = async (username, password) => {
       missing.html.includes('noindex'),
   );
   check('files still load normally', (await page('/manifest.webmanifest')).status === 200);
+  for (const [p, title] of [
+    ['/terms', 'Terms and Conditions'],
+    ['/privacy', 'Privacy Policy'],
+  ]) {
+    const legalPage = await page(p);
+    check(
+      `${title}: indexable page with its full text and the contact details`,
+      legalPage.status === 200 &&
+        legalPage.html.includes(`<title>${title} | BQuee</title>`) &&
+        legalPage.html.includes(`${p}" />`) &&
+        !legalPage.html.includes('noindex') &&
+        legalPage.html.includes('+971 56 570 8076') &&
+        legalPage.html.includes('info@bquee.com') &&
+        legalPage.html.includes('Al Hamra Industrial Zone-FZ'),
+    );
+    check(`${title} is in the sitemap`, sitemapXml.html.includes(`${p}</loc>`));
+  }
 
   const su = {
     businessName: 'Signup Spa',
@@ -1056,7 +1073,7 @@ const login = async (username, password) => {
   const reset = await ok('admin resets site to defaults', 'DELETE', '/api/admin/site', null, sa);
   check(
     'reset restores defaults',
-    reset.content.hero.title === 'Digital token & queue system' && reset.content.signup.enabled === true,
+    reset.content.hero.title === 'QR token & queue system' && reset.content.signup.enabled === true,
   );
 
   // ---- 18. Customer app accounts, booking and history ----

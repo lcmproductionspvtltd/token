@@ -250,6 +250,10 @@ export function SiteFooter({ site, withCta }) {
       <div className="site-wrap site-copy">
         <span>© {new Date().getFullYear()} BQuee</span>
         <span>QR tokens and live queues for every business</span>
+        <nav className="site-legal-links" aria-label="Legal">
+          <Link to="/terms">Terms and Conditions</Link>
+          <Link to="/privacy">Privacy Policy</Link>
+        </nav>
       </div>
     </footer>
   );

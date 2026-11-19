@@ -58,6 +58,33 @@ void main() {
     expect(find.text('Your customers’ booking form'), findsOneWidget, reason: 'Back goes one step');
   });
 
+  testWidgets('business sign-up: packages are a dropdown, the popular one picked', (tester) async {
+    _tallScreen(tester);
+    await tester.pumpWidget(
+      _app(
+        const SignupScreen(
+          site: {
+            'signup': {'enabled': true, 'approval': false, 'trialDays': 14},
+            'sections': {'plans': true},
+            'categories': <Map<String, dynamic>>[],
+            'plans': [
+              {'name': 'Starter', 'price': 'Free', 'period': '14-day trial', 'highlight': false},
+              {'name': 'Business', 'price': '₹999', 'period': 'per month', 'highlight': true},
+            ],
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(DropdownButtonFormField<String>), findsOneWidget);
+    expect(find.text('Business – ₹999 per month (popular)'), findsOneWidget, reason: 'popular plan picked');
+    await tester.tap(find.text('Business – ₹999 per month (popular)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Starter – Free · 14-day trial').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Starter – Free · 14-day trial'), findsOneWidget, reason: 'another plan can be chosen');
+  });
+
   testWidgets('new business form: 4 steps, each checked before Next', (tester) async {
     _tallScreen(tester);
     await tester.pumpWidget(_opener((c) => editBusiness(c, null, const [], false)));

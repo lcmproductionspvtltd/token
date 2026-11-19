@@ -105,7 +105,11 @@ async function audit(browser, label, login, pages, width) {
   );
   const tabs = (role, list) => list.map((t) => `/${role}${t ? '?tab=' + t : ''}`);
   const sets = [
-    ['visitor', null, ['/', '/login', '/signup', `/b/${ids.b}`, `/b/${ids.b}/book`, `/s/${ids.s}`, `/t/${ids.t}`]],
+    [
+      'visitor',
+      null,
+      ['/', '/login', '/signup', '/terms', '/privacy', `/b/${ids.b}`, `/b/${ids.b}/book`, `/s/${ids.s}`, `/t/${ids.t}`],
+    ],
     [
       'super admin',
       ['admin', 'Admin@123'],

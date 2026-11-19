@@ -14,6 +14,7 @@ import { Landing, SalonPage } from './customer/Landing.jsx';
 import { Booking } from './customer/Booking.jsx';
 import { TokenPage } from './customer/TokenPage.jsx';
 import { Home } from './pages/Home.jsx';
+import { Privacy, Terms } from './pages/Legal.jsx';
 import { SalonLogin } from './pages/Login.jsx';
 import { Account } from './pages/Account.jsx';
 import { OwnerApp } from './dash/owner/OwnerApp.jsx';
@@ -33,6 +34,8 @@ const ROUTES = [
   [/^\/b\/([^/]+)$/, Landing, 'branchId'], // branch landing – opened by the branch QR code
   [/^\/b\/([^/]+)\/book$/, Booking, 'branchId'],
   [/^\/t\/([^/]+)$/, TokenPage, 'id'], // customer token
+  [/^\/terms$/, Terms],
+  [/^\/privacy$/, Privacy],
 ];
 
 function App() {
