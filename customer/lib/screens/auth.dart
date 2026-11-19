@@ -369,6 +369,8 @@ class _AuthScreenState extends State<AuthScreen> {
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Tk.ink3, fontSize: 12.5, height: 1.45),
                       ),
+                      const SizedBox(height: 6),
+                      LegalLinks(site: session.api.base),
                     ],
                   ),
                 ),

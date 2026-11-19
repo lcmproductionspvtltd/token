@@ -18,8 +18,8 @@ const DEFAULTS = {
   },
   hero: {
     badge: 'Replace paper tokens and token machines',
-    title: 'QR token & queue system',
-    highlight: 'for salons & clinics',
+    title: 'Digital token & queue system',
+    highlight: 'for every business',
     text: 'Customers scan your QR code, choose services and a staff member, and get a numbered token with a live waiting time on their phone – no app, no token machine, no paper. Staff scan the token to start and finish each service.',
     primary: 'Start free',
     secondary: 'Sign in',
@@ -247,7 +247,12 @@ const DEFAULTS = {
  * anything the super admin wrote is kept.
  */
 const OLD_DEFAULTS = {
-  heroTitles: ['Walk-ins,', 'Digital token & queue system'],
+  // [title, coloured second line] of earlier built-in headings
+  heroes: [
+    ['Walk-ins,', 'without the waiting room.'],
+    ['QR token & queue system', 'for salons & clinics'],
+    ['Digital token & queue system', 'for salons, clinics and walk-ins'],
+  ],
   categoriesText: ['Salons, spas, clinics, service centres, offices – anywhere people wait their turn.'],
   faqQuestions: [
     [
@@ -261,7 +266,7 @@ const OLD_DEFAULTS = {
 
 function upgradeUntouched(stored) {
   const s = { ...(stored || {}) };
-  if (s.hero && OLD_DEFAULTS.heroTitles.includes(s.hero.title)) delete s.hero;
+  if (s.hero && OLD_DEFAULTS.heroes.some(([t, h]) => s.hero.title === t && s.hero.highlight === h)) delete s.hero;
   if (OLD_DEFAULTS.categoriesText.includes(s.categoriesText)) delete s.categoriesText;
   if (
     Array.isArray(s.faqs) &&

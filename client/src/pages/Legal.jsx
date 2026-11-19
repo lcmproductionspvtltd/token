@@ -42,6 +42,8 @@ function LegalPage({ doc }) {
         <aside className="legal-contact" aria-label="Contact details">
           <h2>Questions?</h2>
           <p>
+            {c.company}
+            <br />
             <a href={c.phoneHref}>{c.phone}</a>
             <br />
             <a href={'mailto:' + c.email}>{c.email}</a>

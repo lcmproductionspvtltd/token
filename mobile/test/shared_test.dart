@@ -52,6 +52,12 @@ void main() {
     expect(Api.isLocalTest(Uri.parse('http://10.0.2.2:3000')), isTrue, reason: 'emulator test server allowed');
   });
 
+  testWidgets('Privacy Policy and Terms links are shown (app stores need them)', (tester) async {
+    await tester.pumpWidget(_app(const Scaffold(body: LegalLinks(site: 'https://bquee.example'))));
+    expect(find.text('Privacy Policy'), findsOneWidget);
+    expect(find.text('Terms and Conditions'), findsOneWidget);
+  });
+
   testWidgets('step bar: current step named, finished steps ticked and tappable', (tester) async {
     final semantics = tester.ensureSemantics();
     var picked = -1;

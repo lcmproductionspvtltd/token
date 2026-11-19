@@ -405,6 +405,14 @@ Future<void> showAccountSheet(BuildContext context) {
                   Navigator.pop(ctx);
                   openAccountRequest(context, session.role);
                 }),
+              item('eye', 'Privacy Policy', () {
+                Navigator.pop(ctx);
+                openPrivacy(context, session.api.base);
+              }),
+              item('list', 'Terms and Conditions', () {
+                Navigator.pop(ctx);
+                openTerms(context, session.api.base);
+              }),
               item('logout', 'Sign out', () async {
                 Navigator.pop(ctx);
                 final ok = await confirmDialog(

@@ -194,6 +194,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   item('ticket', 'My tokens', () => session.goTab?.call('tokens')),
                   item('lock', 'Change password', _password),
+                  item('eye', 'Privacy Policy', () => openPrivacy(context, session.api.base)),
+                  item('list', 'Terms and Conditions', () => openTerms(context, session.api.base)),
                   item('logout', 'Sign out', () async {
                     final ok = await confirmDialog(
                       context,

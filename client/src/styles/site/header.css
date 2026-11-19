@@ -28,7 +28,7 @@
 
 /* ---------- header: a floating, rounded bar over the hero ---------- */
 .site-head {
-  position: sticky;
+  position: sticky; /* also the anchor for the floating phone menu */
   top: 12px;
   z-index: 40;
   width: min(1200px, 100% - 2 * min(var(--gutter), 24px));
@@ -102,8 +102,14 @@
   display: none;
 }
 .site-mobile-nav {
+  /* Floats over the page, so opening the menu never pushes the content down. */
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  max-height: calc(100dvh - 100px);
+  overflow-y: auto;
   display: grid;
-  margin-top: 8px;
   padding: 6px;
   border-radius: 18px;
   background: var(--paper);

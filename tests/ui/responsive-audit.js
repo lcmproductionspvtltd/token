@@ -115,6 +115,21 @@ const WIDTHS = [320, 360, 390, 480, 600, 768, 900, 1024, 1280, 1440, 1920];
     }
     await ctx.close();
   }
+  // Home page on a phone: opening the menu floats over the page and never pushes it down.
+  {
+    const ctx = await b.newContext({ viewport: { width: 390, height: 844 } });
+    const p = await ctx.newPage();
+    await p.goto(B + '/', { waitUntil: 'networkidle' });
+    const top = () => p.evaluate(() => document.querySelector('.site-hero h1').getBoundingClientRect().top);
+    const before = await top();
+    await p.click('.site-burger');
+    await p.waitForTimeout(250);
+    if (Math.abs((await top()) - before) > 1) problems.push('/ @390px: opening the menu pushes the page down');
+    await p.mouse.click(195, 800);
+    await p.waitForTimeout(250);
+    if (await p.$('.site-mobile-nav')) problems.push('/ @390px: the menu does not close on a tap outside it');
+    await ctx.close();
+  }
   const uniq = [...new Set(problems)];
   console.log(uniq.length ? uniq.join('\n') : 'No responsive problems found');
   await b.close();

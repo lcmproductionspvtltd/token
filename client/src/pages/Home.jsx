@@ -161,8 +161,23 @@ export function SiteHeader({ site, tab }) {
     setMenu(false);
     go(sid);
   };
+  const head = useRef(null);
+  // The open phone menu closes on a tap outside it or the Escape key.
+  useEffect(() => {
+    if (!menu) return undefined;
+    const outside = (e) => {
+      if (head.current && !head.current.contains(e.target)) setMenu(false);
+    };
+    const esc = (e) => e.key === 'Escape' && setMenu(false);
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('keydown', esc);
+    return () => {
+      document.removeEventListener('pointerdown', outside);
+      document.removeEventListener('keydown', esc);
+    };
+  }, [menu]);
   return (
-    <header className={'site-head' + (menu ? ' open' : '')}>
+    <header ref={head} className={'site-head' + (menu ? ' open' : '')}>
       <div className="site-head-bar">
         <Logo />
         <nav className="site-nav" aria-label="Sections">

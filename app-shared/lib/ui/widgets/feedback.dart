@@ -75,3 +75,36 @@ Future<void> openLink(BuildContext context, String url) async {
   final ok = await Native.openUrl(url);
   if (!ok && context.mounted) toast(context, 'No app on this phone can open that link', error: true);
 }
+
+/// "Privacy Policy · Terms and Conditions": opens the website's pages (app stores expect both to be
+/// reachable from the app, also before signing in). [site] is the server address, e.g. session.api.base.
+class LegalLinks extends StatelessWidget {
+  final String site;
+  final Color color;
+  const LegalLinks({super.key, required this.site, this.color = Tk.ink3});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget link(String label, String path) => TextButton(
+      onPressed: () => openLink(context, '$site$path'),
+      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), minimumSize: const Size(0, 36)),
+      child: Text(
+        label,
+        style: TextStyle(color: color, fontSize: 12.5, decoration: TextDecoration.underline, decorationColor: color),
+      ),
+    );
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        link('Privacy Policy', '/privacy'),
+        Text('·', style: TextStyle(color: color)),
+        link('Terms and Conditions', '/terms'),
+      ],
+    );
+  }
+}
+
+/// The website's Privacy Policy and Terms pages, for account menus.
+void openPrivacy(BuildContext context, String site) => openLink(context, '$site/privacy');
+void openTerms(BuildContext context, String site) => openLink(context, '$site/terms');

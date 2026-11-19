@@ -11,13 +11,19 @@
 
 const CONTACT = {
   name: 'BQuee',
+  company: 'IBILL Software and Consultancy FZ-LLC', // the registered company that provides BQuee
   phone: '+971 56 570 8076',
   phoneHref: 'tel:+971565708076',
   email: 'info@bquee.com',
   address: 'Compass Building, Al Shohada Road, Al Hamra Industrial Zone-FZ, Ras Al Khaimah, United Arab Emirates',
 };
 
-const contactLines = [`Phone: ${CONTACT.phone}`, `Email: ${CONTACT.email}`, `Address: ${CONTACT.address}`];
+const contactLines = [
+  `${CONTACT.company} (BQuee)`,
+  `Phone: ${CONTACT.phone}`,
+  `Email: ${CONTACT.email}`,
+  `Address: ${CONTACT.address}`,
+];
 
 const terms = {
   path: '/terms',
@@ -27,7 +33,7 @@ const terms = {
   updated: '19 November 2026',
   updatedIso: '2026-11-19', // for the sitemap
   intro: [
-    'These Terms and Conditions (the “Terms”) apply to the BQuee website, the BQuee Biz app, the BQuee customer app and the BQuee token booking and queue service (together, the “Service”), provided by BQuee (“BQuee”, “we”, “us”), Compass Building, Al Shohada Road, Al Hamra Industrial Zone-FZ, Ras Al Khaimah, United Arab Emirates.',
+    'These Terms and Conditions (the “Terms”) apply to the BQuee website, the BQuee Biz app, the BQuee customer app and the BQuee token booking and queue service (together, the “Service”), provided by IBILL Software and Consultancy FZ-LLC (“IBILL”, “we”, “us”), the company that owns and operates BQuee, Compass Building, Al Shohada Road, Al Hamra Industrial Zone-FZ, Ras Al Khaimah, United Arab Emirates.',
     'By creating an account, booking a token or otherwise using the Service, you agree to these Terms. If you do not agree, please do not use the Service.',
   ],
   sections: [
@@ -95,7 +101,7 @@ const terms = {
     {
       h: '8. Intellectual property',
       p: [
-        'BQuee owns the Service, its software, design and brand. We give you a personal, non-transferable right to use the Service while your account is active and you follow these Terms.',
+        'IBILL Software and Consultancy FZ-LLC owns the Service and the BQuee software, design and brand. We give you a personal, non-transferable right to use the Service while your account is active and you follow these Terms.',
         'Businesses keep ownership of the content they add. You allow us to store, show and process that content only to run the Service for you.',
       ],
     },
@@ -118,14 +124,14 @@ const terms = {
       h: '11. Disclaimer and limitation of liability',
       p: [
         'The Service is provided “as is” and “as available”. To the extent the law allows, we do not give any promise that it will meet every need or produce particular business results.',
-        'To the extent the law allows, BQuee is not liable for indirect or consequential loss, lost profits, lost data or lost business, or for the services a business provides to its customers. Our total liability for any claim is limited to the fees you paid us in the 12 months before the claim.',
+        'To the extent the law allows, we are not liable for indirect or consequential loss, lost profits, lost data or lost business, or for the services a business provides to its customers. Our total liability for any claim is limited to the fees you paid us in the 12 months before the claim.',
         'Nothing in these Terms limits liability that cannot be limited by law.',
       ],
     },
     {
       h: '12. Indemnity',
       p: [
-        'Businesses agree to cover BQuee against claims caused by their services, their content or their breach of these Terms or the law.',
+        'Businesses agree to cover us against claims caused by their services, their content or their breach of these Terms or the law.',
       ],
     },
     {
@@ -158,7 +164,7 @@ const privacy = {
   updated: '19 November 2026',
   updatedIso: '2026-11-19', // for the sitemap
   intro: [
-    'This Privacy Policy explains what personal information BQuee (“BQuee”, “we”, “us”), Compass Building, Al Shohada Road, Al Hamra Industrial Zone-FZ, Ras Al Khaimah, United Arab Emirates, collects when you use the BQuee website, the BQuee Biz app, the BQuee customer app and the token booking service (the “Service”), why we use it and the choices you have.',
+    'This Privacy Policy explains what personal information IBILL Software and Consultancy FZ-LLC (“IBILL”, “we”, “us”), the company that owns and operates BQuee, Compass Building, Al Shohada Road, Al Hamra Industrial Zone-FZ, Ras Al Khaimah, United Arab Emirates, collects when you use the BQuee website, the BQuee Biz app, the BQuee customer app and the token booking service (the “Service”), why we use it and the choices you have.',
     'We follow the UAE Personal Data Protection Law (Federal Decree-Law No. 45 of 2021) and, where they apply to you, India’s Digital Personal Data Protection Act 2023 and the EU and UK General Data Protection Regulation (GDPR).',
   ],
   sections: [
@@ -211,7 +217,7 @@ const privacy = {
         'the business you book with, as described above;',
         'trusted service providers who host the Service and its database for us (cloud hosting), bound to protect the information and use it only for us;',
         'authorities, when the law requires it or to protect the rights and safety of people or the Service;',
-        'a buyer or successor, if BQuee’s business is sold or merged, with the same protections.',
+        'a buyer or successor, if our business is sold or merged, with the same protections.',
       ],
     },
     {

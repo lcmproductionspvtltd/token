@@ -237,6 +237,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Tk.ink3, fontSize: 12.5, height: 1.45),
                       ),
+                      const SizedBox(height: 6),
+                      LegalLinks(site: session.api.base),
                     ],
                   ),
                 ),

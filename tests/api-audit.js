@@ -975,6 +975,7 @@ const login = async (username, password) => {
         legalPage.html.includes(`<title>${title} | BQuee</title>`) &&
         legalPage.html.includes(`${p}" />`) &&
         !legalPage.html.includes('noindex') &&
+        legalPage.html.includes('IBILL Software and Consultancy FZ-LLC') &&
         legalPage.html.includes('+971 56 570 8076') &&
         legalPage.html.includes('info@bquee.com') &&
         legalPage.html.includes('Al Hamra Industrial Zone-FZ'),
@@ -1073,7 +1074,7 @@ const login = async (username, password) => {
   const reset = await ok('admin resets site to defaults', 'DELETE', '/api/admin/site', null, sa);
   check(
     'reset restores defaults',
-    reset.content.hero.title === 'QR token & queue system' && reset.content.signup.enabled === true,
+    reset.content.hero.title === 'Digital token & queue system' && reset.content.signup.enabled === true,
   );
 
   // ---- 18. Customer app accounts, booking and history ----
