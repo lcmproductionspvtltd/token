@@ -1,0 +1,102 @@
+# BQuee – running it in production
+
+Step-by-step jobs for whoever runs the live service. Keep this next to the server's passwords (in a password
+manager, not in this repository).
+
+## 1. Before going live (checklist)
+
+- [ ] `NODE_ENV=production`, `PUBLIC_URL=https://your-domain` (Render sets `RENDER_EXTERNAL_URL` itself).
+- [ ] `APP_SECRET` set to a long random value (Render's blueprint creates one). **Keep a copy**: without it,
+      everyone's two-step sign-in must be set up again.
+- [ ] `DATABASE_URL` with `?sslmode=verify-full` when the database is reached over the internet.
+- [ ] `SEED_DEMO_DATA=0`; demo logins removed, or their passwords changed.
+- [ ] The super admin has signed in once and set up two-step sign-in, and saved the backup codes.
+- [ ] Database user is not a superuser (section 3).
+- [ ] Backups run and one restore has been tried (section 4).
+- [ ] Health check `/api/health` is watched (section 6).
+- [ ] Render: Auto-Deploy = **After CI Checks Pass** (set in `render.yaml`), so a push that breaks a test is not deployed.
+
+## 2. Secrets
+
+| Secret               | Where it lives                      | How to change it                                                                                                                                                                                                                                                                 |
+| -------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Database password    | Host's environment (`DATABASE_URL`) | Change it in the database, update `DATABASE_URL`, restart.                                                                                                                                                                                                                       |
+| `APP_SECRET`         | Host's environment                  | Don't change it casually – it unlocks the stored two-step keys. If it leaked: set a new one, restart, then every owner/admin/team member sets up two-step sign-in again at next sign-in (`UPDATE users SET mfa_secret = NULL, mfa_enabled_at = NULL, mfa_backup_codes = NULL;`). |
+| Super admin password | The admin's password manager        | Sign in → Sign-in security / profile. Forgotten: `node scripts/reset-admin.js admin 'New-long-password'` on the server (also resets two-step sign-in).                                                                                                                           |
+| Sessions             | Database                            | To sign everyone out at once: `DELETE FROM sessions; DELETE FROM customer_sessions;`                                                                                                                                                                                             |
+
+Never put secrets in the repository: every push is scanned (`scripts/check-secrets.sh`).
+
+## 3. Database user with only the rights it needs
+
+Run once as the database owner (adjust names). The app user can read and write data but can't create other
+users or databases. Migrations run with the same user, so it owns the schema:
+
+```sql
+CREATE ROLE bquee_app LOGIN PASSWORD 'long-random-password' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+CREATE DATABASE bquee OWNER bquee_app;
+REVOKE ALL ON DATABASE bquee FROM PUBLIC;
+```
+
+Managed databases (Render, Neon, Supabase) already give a non-superuser account – use that one.
+
+## 4. Backups and restore
+
+**Render / managed database**: use the provider's automatic backups and point-in-time recovery (paid plans). The
+free Render database has no backups – don't keep real customers on it.
+
+**Own server**: `sh scripts/backup.sh` every night (cron line inside the script). It writes the database and the
+uploaded pictures into `backups/` and keeps 14 days. Copy `backups/` to another place (another server or cloud
+storage, encrypted) – a backup on the same disk is lost with the disk.
+
+**Restore drill (do it every 3 months, and once before going live):**
+
+1. Make an empty test database: `createdb bquee_restore_test`
+2. `pg_restore --no-owner --dbname=postgres://…/bquee_restore_test backups/bquee-<date>.dump`
+3. Start a copy of BQuee on it: `DATABASE_URL=…/bquee_restore_test PORT=3998 node server.js`
+4. Sign in, open a business, check today's tokens and a report.
+5. Write down how long it took and the date of the backup. Delete the test database.
+
+Target: no more than 1 day of data lost; back online within 4 hours.
+
+## 5. Keeping data only as long as needed
+
+Done automatically every hour (`src/services/maintenance.js`): ended sessions, old sign-in limits and unfinished
+two-step sign-ins are removed. Deleted accounts are removed through the account-request flow. Decide with your
+lawyer how long finished tokens and reports are kept, and write it in your privacy policy.
+
+## 6. Watching the service
+
+- **Up or down**: an uptime monitor (UptimeRobot, Better Stack…) calls `https://your-domain/api/health` every
+  minute and alerts the owner by SMS/e-mail.
+- **Errors**: Render → Logs. Each error line starts with a request ID; a user can quote the `X-Request-Id`
+  from their browser.
+- **Database**: watch disk space and connection count in the provider's dashboard. "Server busy" (503) answers
+  mean the database pool is full – raise `DATABASE_POOL_SIZE` (default 10) or the database plan.
+- **Certificates**: Render renews them itself. Own server: `certbot renew` runs from cron; the monitor above
+  alerts if HTTPS fails.
+
+## 7. Big traffic and attacks
+
+The app limits each address (600 requests a minute) and each account, but a large attack must be stopped
+before it reaches the server. Put the site behind **Cloudflare** (free plan is enough to start): DNS through
+Cloudflare, proxy on, "Bot Fight Mode" on, and a rate-limit rule for `/api/login` and `/api/public/*`.
+Then set `TRUST_PROXY=1` so BQuee sees real visitor addresses.
+
+## 8. When something goes wrong
+
+1. **Site down**: check `/api/health`, then Render → Events/Logs. Roll back: Render → Deploys → previous deploy →
+   "Rollback".
+2. **Account taken over**: super admin resets that user's password and two-step sign-in (Businesses or Team),
+   which signs them out everywhere.
+3. **Secret leaked**: change it (section 2), sign everyone out, check the logs for what was done with it.
+4. **Data leaked**: stop the cause, write down what/when/who, tell affected businesses and – where the law asks
+   (for example within 72 hours under GDPR, or as India's DPDP rules require) – the authorities.
+5. Afterwards: write a short note (what happened, why, what was changed) and add a test that would have caught it.
+
+## 9. Releasing a new version
+
+1. Push to GitHub. The **Checks** run (all server tests, web bundle, secret scan, both apps' analyze and tests).
+2. Only when they pass, Render deploys. Migrations run automatically at start, one server at a time.
+3. Apps: build on the Mac with the `.command` files, test on a real phone, then upload to the stores.
+4. Keep the previous app build until the new one has been live for a few days.

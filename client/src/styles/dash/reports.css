@@ -1,0 +1,158 @@
+/* Reports. */
+
+/* ---------- reports ---------- */
+
+.report-presets {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 14px;
+  scrollbar-width: thin;
+}
+.chip-btn {
+  flex: none;
+  border: 1px solid var(--line-2);
+  background: var(--paper);
+  color: var(--ink-2);
+  border-radius: var(--pill);
+  padding: 7px 14px;
+  font: inherit;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+.chip-btn:hover {
+  border-color: var(--brand-line);
+  color: var(--brand-ink);
+}
+.chip-btn.on {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  box-shadow: 0 6px 16px -8px var(--brand-glow);
+}
+.chip-btn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.report-filters {
+  align-items: flex-end;
+  gap: 10px 12px;
+}
+.filter-field {
+  display: grid;
+  gap: 4px;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.report .is-busy {
+  opacity: 0.55;
+  transition: opacity 0.2s;
+}
+.report .seg {
+  display: inline-flex;
+  background: var(--porcelain);
+  border: 1px solid var(--line);
+  border-radius: var(--pill);
+  padding: 3px;
+  gap: 2px;
+}
+.report .seg button {
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--t-sm);
+  padding: 6px 14px;
+  border-radius: var(--pill);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.report .seg button.on {
+  background: var(--paper);
+  color: var(--brand-ink);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(20, 8, 42, 0.12);
+}
+.day-chart {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+}
+.day-chart svg {
+  width: 100%;
+  height: 220px;
+  display: block;
+}
+.day-chart .bar {
+  fill: var(--brand);
+  opacity: 0.88;
+}
+.day-chart .bar:hover {
+  opacity: 1;
+  fill: var(--brand-ink);
+}
+.day-chart .grid {
+  stroke: var(--line);
+  stroke-dasharray: 3 4;
+}
+.day-chart .axis {
+  fill: var(--ink-3);
+  font-size: 11px;
+}
+.day-chart-max {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  background: var(--paper);
+  padding: 0 4px;
+}
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 22px;
+}
+.breakdown .table th:first-child,
+.breakdown .table td:first-child {
+  width: 55%;
+}
+.bd-name {
+  display: grid;
+  gap: 5px;
+}
+.bd-bar {
+  display: block;
+  height: 5px;
+  min-width: 4px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--brand), color-mix(in srgb, var(--brand) 55%, #ff7aa8));
+}
+.search-box {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.search-box .i {
+  position: absolute;
+  left: 11px;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-3);
+  pointer-events: none;
+}
+.search-box .input {
+  padding-left: 34px;
+  min-width: 200px;
+}
+.pill.off {
+  background: var(--off-bg);
+  color: var(--off-fg);
+}

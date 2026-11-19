@@ -1,0 +1,216 @@
+/* Card rails and reviews. */
+
+/* card rails */
+.ld-rail {
+  display: grid;
+  gap: 16px;
+}
+.ld-rail-track {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: 10px var(--gutter) 28px;
+  margin: -10px calc(var(--gutter) * -1) 0;
+  scroll-padding: 0 var(--gutter);
+  outline: none;
+}
+.ld-rail-track::-webkit-scrollbar {
+  display: none;
+}
+.ld-rail-track > * {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+.ld-rail-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.ld-dots {
+  display: flex;
+  gap: 6px;
+}
+.ld-dots button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--pill);
+  background: var(--line-2);
+  transition:
+    width 0.3s var(--ease),
+    background 0.3s;
+}
+.ld-dots button.on {
+  width: 28px;
+  background: var(--brand);
+}
+.ld-arrows {
+  display: flex;
+  gap: 8px;
+}
+.ld-arrow {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--lift);
+  transition:
+    background 0.15s,
+    color 0.15s,
+    transform 0.15s;
+}
+.ld-arrow:hover:not(:disabled) {
+  background: var(--brand);
+  color: #fff;
+  transform: scale(1.05);
+}
+.ld-arrow:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.ld-rail .coupon {
+  width: 340px;
+  transition: transform 0.3s var(--ease);
+}
+.ld-rail .coupon:hover {
+  transform: translateY(-5px);
+}
+.ld-band .coupon.v2 {
+  --notch-bg: color-mix(in srgb, var(--brand) 8%, #fff);
+}
+
+/* reviews – rating panel with breakdown, quote cards */
+.ld-reviews {
+  display: grid;
+  grid-template-columns: minmax(270px, 360px) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: stretch;
+}
+.ld-score {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  align-content: start;
+  gap: 22px;
+  padding: clamp(26px, 3vw, 38px);
+  border-radius: var(--r-xl);
+  background:
+    radial-gradient(120% 90% at 100% 100%, color-mix(in srgb, var(--brand) 70%, transparent), transparent 60%),
+    var(--brand-deep);
+  color: #fff;
+}
+.ld-score h2 {
+  font-size: clamp(1.8rem, 1.3rem + 1.2vw, 2.4rem);
+}
+.ld-score-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ld-score-main > b {
+  font-size: 4.4rem;
+  line-height: 0.9;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+}
+.ld-score-main > span {
+  display: grid;
+  gap: 4px;
+}
+.ld-score-main small {
+  font-size: var(--t-sm);
+  opacity: 0.75;
+}
+.ld-score .stars {
+  color: rgb(255 255 255 / 25%);
+}
+.ld-score .stars .i {
+  width: 18px;
+  height: 18px;
+}
+.ld-bars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  font-size: var(--t-xs);
+}
+.ld-bars li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 10px;
+}
+.ld-bars span {
+  opacity: 0.8;
+}
+.ld-bars span:last-child {
+  text-align: right;
+}
+.ld-bars i {
+  height: 6px;
+  border-radius: var(--pill);
+  background: rgb(255 255 255 / 16%);
+  overflow: hidden;
+}
+.ld-bars em {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #f5c043;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 1s 0.3s var(--ease);
+}
+.in .ld-bars em {
+  transform: none;
+}
+.ld-reviews .ld-rail {
+  align-content: space-between;
+}
+.ld-reviews .ld-rail-track {
+  margin-left: -16px;
+  padding-left: 16px;
+  scroll-padding-left: 16px;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 32px), transparent);
+  mask: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 32px), transparent);
+}
+.ld .review {
+  width: 360px;
+  min-height: 260px;
+  padding: 28px;
+  border-radius: var(--r-xl);
+  border: 0;
+  box-shadow:
+    0 1px 2px rgb(34 28 43 / 5%),
+    0 24px 44px -28px rgb(34 28 43 / 28%);
+  gap: 18px;
+}
+.review-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.review-quote {
+  width: 34px;
+  height: 34px;
+  color: var(--brand-line);
+  stroke-width: 2;
+}
+.ld .review blockquote {
+  font-size: 1.15rem;
+}
+.ld .review figcaption .avatar {
+  box-shadow:
+    0 0 0 2px var(--paper),
+    0 0 0 4px var(--brand-tint);
+}

@@ -1,0 +1,37 @@
+# docker compose up -d        → BQuee on http://localhost:3000 with its own PostgreSQL
+# docker compose exec app node scripts/seed.js   → load the demo data
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bquee
+      POSTGRES_USER: bquee
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change-this-password}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bquee -d bquee']
+      interval: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgres://bquee:${DB_PASSWORD:-change-this-password}@db:5432/bquee
+      TZ: ${TZ:-Asia/Kolkata}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      TRUST_PROXY: ${TRUST_PROXY:-0}
+    volumes:
+      - uploads:/app/storage/uploads
+
+volumes:
+  db-data:
+  uploads:

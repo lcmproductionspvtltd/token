@@ -1,0 +1,71 @@
+/* Colour accents mixed from the brand colour. */
+
+/* ---------- colour accents (all mixed from the brand colour) ---------- */
+
+.ld-facts > div:nth-child(2) .ld-fact-icon {
+  background: color-mix(in srgb, var(--tone-rose) 16%, #fff);
+  color: color-mix(in srgb, var(--tone-rose) 80%, #000);
+}
+.ld-facts > div:nth-child(3) .ld-fact-icon {
+  background: color-mix(in srgb, var(--tone-amber) 20%, #fff);
+  color: color-mix(in srgb, var(--tone-amber) 70%, #000);
+}
+.ld-facts > div:nth-child(4) .ld-fact-icon {
+  background: color-mix(in srgb, var(--tone-teal) 16%, #fff);
+  color: color-mix(in srgb, var(--tone-teal) 75%, #000);
+}
+.ld-facts > div:nth-child(2) dd {
+  color: var(--ink);
+}
+
+.ld-step:nth-child(2) .ld-step-icon {
+  background: linear-gradient(135deg, var(--tone-rose), color-mix(in srgb, var(--tone-rose) 60%, var(--brand-deep)));
+  box-shadow: 0 14px 26px -12px color-mix(in srgb, var(--tone-rose) 50%, transparent);
+}
+.ld-step:nth-child(3) .ld-step-icon {
+  background: linear-gradient(135deg, var(--tone-amber), color-mix(in srgb, var(--tone-amber) 55%, var(--tone-rose)));
+  box-shadow: 0 14px 26px -12px color-mix(in srgb, var(--tone-amber) 55%, transparent);
+}
+.ld-step:nth-child(2)::after {
+  background: radial-gradient(circle, color-mix(in srgb, var(--tone-rose) 18%, #fff), transparent 70%);
+}
+.ld-step:nth-child(3)::after {
+  background: radial-gradient(circle, color-mix(in srgb, var(--tone-amber) 22%, #fff), transparent 70%);
+}
+.ld-step:nth-child(2) .ld-step-n {
+  color: color-mix(in srgb, var(--tone-rose) 35%, #fff);
+}
+.ld-step:nth-child(3) .ld-step-n {
+  color: color-mix(in srgb, var(--tone-amber) 45%, #fff);
+}
+
+#how {
+  position: relative;
+}
+#how::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -60px -10% auto auto;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--tone-rose) 14%, transparent), transparent 70%);
+}
+
+.ld-how-cta .btn.primary,
+.ld-nav.solid .ld-nav-book {
+  background: linear-gradient(120deg, var(--brand-deep), var(--brand));
+  border: 0;
+  box-shadow: 0 12px 24px -14px var(--brand-glow);
+}
+.ld-score .stars .on,
+.ld-bars em {
+  color: var(--tone-amber);
+}
+.ld-bars em {
+  background: linear-gradient(90deg, var(--tone-amber), #ffd36b);
+}
+.ld-visit-mark {
+  background: linear-gradient(135deg, var(--brand), var(--tone-rose));
+}

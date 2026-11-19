@@ -1,0 +1,56 @@
+/* Footer. */
+
+/* ---------- footer ---------- */
+.site-foot {
+  background: #15101d;
+  color: rgb(255 255 255 / 80%);
+  padding-top: 64px;
+}
+.site-foot.with-cta {
+  padding-top: 56px;
+}
+.site-foot-in {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  padding-bottom: 40px;
+}
+.site-foot-brand p {
+  margin: 14px 0 20px;
+  max-width: 36ch;
+  line-height: 1.6;
+}
+.site-foot-col {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+.site-foot-col h4 {
+  color: #fff;
+  font-size: var(--t-sm);
+  margin-bottom: 4px;
+}
+.site-foot-col a,
+.site-foot-col button,
+.site-foot-col span {
+  text-align: left;
+  color: rgb(255 255 255 / 72%);
+  text-decoration: none;
+  font-size: var(--t-sm);
+  overflow-wrap: anywhere;
+  padding: 0;
+}
+.site-foot-col a:hover,
+.site-foot-col button:hover {
+  color: #fff;
+}
+.site-copy {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 20px;
+  padding-block: 20px;
+  border-top: 1px solid rgb(255 255 255 / 10%);
+  font-size: var(--t-xs);
+  color: rgb(255 255 255 / 55%);
+}

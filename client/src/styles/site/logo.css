@@ -1,0 +1,20 @@
+/* BQuee logo images. */
+
+/* ---------- BQuee logo images ---------- */
+.site-logo img {
+  display: block;
+  height: 34px;
+  width: auto;
+}
+.site-logo .site-logo-icon {
+  display: none;
+  border-radius: 9px;
+}
+.site-foot .site-logo img {
+  height: 38px;
+}
+.auth-logo img {
+  display: block;
+  height: 38px;
+  width: auto;
+}

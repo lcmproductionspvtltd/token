@@ -1,0 +1,22 @@
+/* BQuee logo in the super admin sidebar. */
+
+/* BQuee logo in the super admin sidebar (white logo; just the icon when the sidebar is collapsed) */
+.side-logo {
+  display: block;
+  height: 32px;
+  width: auto;
+  margin-left: 4px;
+}
+.side-logo-icon {
+  display: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  box-shadow: 0 0 0 1.5px rgb(255 255 255 / 35%);
+}
+.collapsed .side-logo {
+  display: none;
+}
+.collapsed .side-logo-icon {
+  display: block;
+}

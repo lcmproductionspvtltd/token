@@ -1,0 +1,91 @@
+# Runs on every push and pull request. Render deploys only after these pass
+# (render.yaml: autoDeployTrigger: checksPass – "After CI Checks Pass" in the Render dashboard).
+#   server-and-web  syntax, secret scan, dependency audit, web bundle up to date, all server tests
+#   apps            Flutter analyze + tests for BQuee Biz, BQuee (customer) and the shared code
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  server-and-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: bquee
+          POSTGRES_PASSWORD: bquee
+          POSTGRES_DB: bquee_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U bquee"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgres://bquee:bquee@localhost:5432/bquee_test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: JavaScript syntax
+        run: |
+          for f in $(git ls-files 'server.js' 'src/*.js' 'scripts/*.js' 'tests/*.js'); do node --check "$f"; done
+
+      - name: No secrets committed
+        run: bash scripts/check-secrets.sh
+
+      - name: Install web build tools (pinned versions)
+        run: npm install --no-fund
+
+      - name: Known security problems in packages
+        run: npm audit --audit-level=high
+
+      - name: Web bundle matches the source
+        run: |
+          npm run build
+          git diff --stat --exit-code public/app || (echo "public/app is out of date – run npm run build and commit it" && exit 1)
+
+      - name: Server tests (API, security, sign-in, database client, concurrency…)
+        run: npm test
+
+  apps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [mobile, customer, app-shared]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Flutter (stable)
+        run: |
+          git clone --depth 1 -b stable https://github.com/flutter/flutter.git "$HOME/flutter"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+
+      - name: Packages (Flutter's own + our local copies)
+        working-directory: ${{ matrix.app }}
+        run: |
+          flutter --version
+          flutter pub get
+
+      - name: Analyze
+        working-directory: ${{ matrix.app }}
+        run: flutter analyze --no-fatal-infos
+
+      - name: Tests
+        if: matrix.app != 'app-shared'
+        working-directory: ${{ matrix.app }}
+        run: flutter test

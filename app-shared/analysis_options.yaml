@@ -1,0 +1,8 @@
+# Same settings as the two apps (mobile/ and customer/). No external lint packages (self-contained).
+analyzer:
+  exclude:
+    - build/**
+
+# Same line width as the website and server code.
+formatter:
+  page_width: 120

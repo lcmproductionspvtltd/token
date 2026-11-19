@@ -1,0 +1,139 @@
+/* The dashboard shell on tablets and phones. */
+
+/* ---------- responsive shell ---------- */
+
+@media (max-width: 900px) {
+  .dash,
+  .dash.collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .side {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: min(300px, 86vw);
+    transform: translateX(-102%);
+    transition: transform 0.25s var(--ease);
+    box-shadow: var(--lift-hi);
+  }
+  .drawer-open .side {
+    transform: none;
+  }
+  .collapsed .side-name,
+  .collapsed .side-label,
+  .collapsed .side-sec-name {
+    display: revert;
+  }
+  .collapsed .side-item {
+    justify-content: flex-start;
+    padding: 0 12px;
+  }
+  .collapsed .side-badge {
+    position: static;
+    background: var(--porcelain);
+    color: var(--ink-2);
+  }
+  .side-collapse {
+    display: none;
+  }
+  .side-close {
+    display: inline-grid;
+  }
+  .side-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    background: rgb(26 20 34 / 40%);
+  }
+  .drawer-open .side-scrim {
+    display: block;
+  }
+  .topbar-menu {
+    display: inline-grid;
+    margin-left: -8px;
+  }
+  .topbar {
+    min-height: 62px;
+    gap: 8px;
+  }
+  .topbar-title h1 {
+    font-size: var(--t-lg);
+  }
+  .account-name,
+  .account-btn > .i {
+    display: none;
+  }
+  .account-btn {
+    padding: 2px;
+  }
+}
+@media (max-width: 520px) {
+  .scan-btn span {
+    display: none;
+  }
+  .scan-btn {
+    padding: 0;
+    width: 34px;
+  }
+  .topbar-title p {
+    display: none;
+  }
+  .search.sm input {
+    width: 140px;
+  }
+}
+
+.link-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 12px 14px 12px 18px;
+  border-radius: var(--r);
+  background: var(--porcelain);
+}
+.link-row a {
+  flex: 1;
+  min-width: 0;
+  color: var(--brand);
+  font-size: var(--t-sm);
+  word-break: break-all;
+}
+
+.handover {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+.handover li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 10px 12px 16px;
+  border-top: 1px solid var(--line);
+}
+.handover li:first-child {
+  border-top: 0;
+}
+.handover span {
+  flex: 1;
+  display: grid;
+  min-width: 0;
+}
+.handover small {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.handover b {
+  font-weight: 500;
+  word-break: break-all;
+}
+.handover b.link {
+  color: var(--brand);
+}
+.table td .dim-link {
+  display: block;
+}

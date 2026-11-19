@@ -1,0 +1,151 @@
+/* BQuee home page: header and buttons on dark backgrounds. */
+
+/* BQuee product landing page, and the sign-in / sign-up page that shares its header and footer. */
+
+.site {
+  min-height: 100dvh;
+  background: var(--porcelain);
+  color: var(--ink);
+  overflow-x: clip;
+}
+.site-loading {
+  display: grid;
+  place-items: center;
+}
+.site ul,
+.site ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.site-wrap {
+  width: min(1200px, 100% - 2 * var(--gutter));
+  margin-inline: auto;
+}
+.site main {
+  overflow-x: clip;
+}
+
+/* ---------- header: a floating, rounded bar over the hero ---------- */
+.site-head {
+  position: sticky;
+  top: 12px;
+  z-index: 40;
+  width: min(1200px, 100% - 2 * min(var(--gutter), 24px));
+  margin: 12px auto -76px;
+}
+.site-head-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 64px;
+  padding: 0 10px 0 18px;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 96%);
+  backdrop-filter: saturate(1.5) blur(16px);
+  -webkit-backdrop-filter: saturate(1.5) blur(16px);
+  border: 1px solid rgb(255 255 255 / 70%);
+  box-shadow: 0 18px 40px -22px rgb(22 8 40 / 55%);
+}
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--ink);
+  text-decoration: none;
+  flex: none;
+}
+.site-logo.light {
+  color: #fff;
+}
+.site-nav {
+  display: flex;
+  gap: 2px;
+  margin-inline: auto;
+}
+.site-nav button,
+.site-mobile-nav > button,
+.site-foot-col button {
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  color: var(--ink-2);
+}
+.site-nav button {
+  padding: 8px 14px;
+  border-radius: var(--pill);
+  font-size: var(--t-sm);
+  font-weight: 500;
+}
+.site-nav button:hover {
+  color: var(--brand-ink);
+  background: var(--brand-wash);
+}
+.site-auth {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.site-nav + .site-auth {
+  margin-left: 0;
+}
+.site-auth .btn.quiet.is-on {
+  color: var(--brand-ink);
+  background: var(--brand-wash);
+}
+.site-burger {
+  display: none;
+}
+.site-mobile-nav {
+  display: grid;
+  margin-top: 8px;
+  padding: 6px;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 48px -24px rgb(22 8 40 / 45%);
+}
+.site-mobile-nav > button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  padding: 14px 14px;
+  border-radius: 12px;
+  font-size: 1.02rem;
+  font-weight: 500;
+}
+.site-mobile-nav > button:hover {
+  background: var(--brand-wash);
+}
+.site-mobile-nav .i {
+  width: 18px;
+  height: 18px;
+  color: var(--ink-3);
+}
+
+/* ---------- buttons on dark backgrounds ---------- */
+.btn.white {
+  background: #fff;
+  color: var(--brand-ink);
+  border-color: #fff;
+  box-shadow: 0 14px 30px -16px rgb(0 0 0 / 55%);
+}
+.btn.white:hover {
+  background: var(--brand-wash);
+}
+.btn.glass {
+  background: rgb(255 255 255 / 10%);
+  color: #fff;
+  border: 1px solid rgb(255 255 255 / 38%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.btn.glass:hover {
+  background: rgb(255 255 255 / 20%);
+}

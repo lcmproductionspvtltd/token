@@ -1,0 +1,60 @@
+/* Package choice on sign-up. */
+
+/* ---------- package choice on sign-up (only when the home page shows pricing) ---------- */
+.pkg-pick {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.pkg-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+.pkg {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line-2);
+  background: #fbf9fd;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+}
+.pkg.on {
+  border-color: var(--brand);
+  background: var(--brand-wash);
+  box-shadow: 0 0 0 3px var(--brand-tint);
+}
+.pkg:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.pkg em {
+  position: absolute;
+  top: -9px;
+  right: 10px;
+  padding: 1px 8px;
+  border-radius: var(--pill);
+  background: var(--grad-btn);
+  color: #fff;
+  font-style: normal;
+  font-size: 0.66rem;
+  font-weight: 600;
+}
+.pkg b {
+  font-size: 0.92rem;
+}
+.pkg-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--brand-ink);
+}
+.pkg small {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}

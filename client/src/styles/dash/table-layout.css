@@ -1,0 +1,208 @@
+/* Tables and pagination: aligned cells, cards on narrow widths. */
+
+/* =====================================================================
+   Tables and pagination – aligned, single-line cells, scroll when wide.
+   ===================================================================== */
+
+/* Desktop / tablet table layout (cards take over below 820px of content width). */
+@container dash (min-width: 821px) {
+  .table th,
+  .table td {
+    white-space: nowrap;
+  }
+  .table td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+  /* The first column may wrap a long name, but stays readable. */
+  .table td:first-child:has(.cell-with-thumb) {
+    white-space: normal;
+    min-width: 200px;
+    max-width: 320px;
+  }
+  .table td:first-child small {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .table td small + small {
+    margin-top: 1px;
+  }
+  .table td.actions,
+  .table th:last-child {
+    width: 1%;
+  }
+  .table td.actions {
+    white-space: nowrap;
+  }
+  .table td.actions > * {
+    vertical-align: middle;
+  }
+  .table td.actions > * + * {
+    margin-left: 4px;
+  }
+  /* Scroll hint: shadow on the right edge when a table is wider than its panel. */
+  .table-wrap {
+    background:
+      linear-gradient(to right, var(--paper) 30%, transparent) left / 24px 100% no-repeat local,
+      linear-gradient(to left, var(--paper) 30%, transparent) right / 24px 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%, rgb(30 10 50 / 12%), transparent) left / 10px 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, rgb(30 10 50 / 12%), transparent) right / 10px 100% no-repeat scroll;
+  }
+}
+.table th {
+  height: 44px;
+  letter-spacing: 0.01em;
+}
+.table td b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.table td .cell-with-thumb {
+  gap: 12px;
+}
+.table td.r,
+.table th.r {
+  font-variant-numeric: tabular-nums;
+}
+.table td.actions .btn.icon-only {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+.table td.actions .btn.icon-only:hover {
+  background: var(--brand-tint);
+  color: var(--brand-ink);
+}
+.table td.actions .btn.danger-quiet.icon-only:hover {
+  background: var(--bad-bg, #fde8e8);
+  color: var(--bad-fg, #b42318);
+}
+.table td.actions .btn.is-off {
+  color: var(--good-fg, #15803d);
+}
+
+/* Business column in the super admin list. */
+.biz-cell {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.biz-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.biz-meta .dim-link {
+  font-size: var(--t-xs);
+}
+.activity {
+  display: inline-flex;
+  gap: 12px;
+}
+.activity > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink-3);
+}
+.activity .i {
+  width: 15px;
+  height: 15px;
+}
+.activity b {
+  display: inline !important;
+  color: var(--ink);
+}
+
+/* Pagination bar */
+.pager {
+  color: var(--ink-3);
+}
+.panel.flush > .pager {
+  padding: 12px 20px;
+  background: color-mix(in srgb, var(--brand) 3%, #fcfcfd);
+  border-top: 1px solid color-mix(in srgb, var(--brand) 8%, var(--line));
+  border-radius: 0 0 20px 20px;
+}
+.pager-info {
+  font-variant-numeric: tabular-nums;
+}
+.pager-pages {
+  gap: 4px;
+  padding: 3px;
+  border-radius: var(--pill);
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.pager-pages .icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+.pager-pages .icon-btn:disabled {
+  opacity: 0.35;
+}
+.pager-num {
+  min-width: 32px;
+  height: 32px;
+  font-weight: 500;
+}
+.pager-num:hover {
+  background: var(--brand-wash);
+  color: var(--brand-ink);
+}
+.pager-num.on {
+  background: var(--grad-btn);
+  color: #fff;
+  box-shadow: 0 4px 10px -4px var(--brand-glow);
+}
+.pager-size select {
+  border-radius: var(--pill);
+  padding: 4px 12px;
+}
+@media (max-width: 560px) {
+  .pager {
+    justify-content: center;
+  }
+  .pager-info {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Lists that aren't tables (team, staff load, branches) get the same row rhythm. */
+.team-list li:hover,
+.staff-load li:hover {
+  background: color-mix(in srgb, var(--brand) 3%, #fff);
+}
+@container dash (min-width: 821px) {
+  .table td .clip {
+    display: block;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+/* Grids must not grow to fit a wide table – the table scrolls inside its panel instead. */
+.stack,
+.dcontent {
+  grid-template-columns: minmax(0, 1fr);
+}
+.stack > *,
+.dcontent > *,
+.panel,
+.table-wrap {
+  min-width: 0;
+  max-width: 100%;
+}
+.dcontent {
+  min-width: 0;
+  overflow-x: clip;
+}
+.table-wrap {
+  position: relative; /* keeps visually-hidden header labels inside the scroll area */
+}

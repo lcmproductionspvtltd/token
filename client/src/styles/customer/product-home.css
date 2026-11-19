@@ -1,0 +1,54 @@
+/* Product home. */
+
+/* ================= product home ================= */
+.home {
+  min-height: 100dvh;
+  background: var(--porcelain);
+}
+
+.feature {
+  padding: 28px 28px 32px 0;
+}
+
+.feature + .feature {
+  padding-left: 28px;
+  border-left: 1px solid var(--line);
+}
+
+.feature > .i {
+  width: 26px;
+  height: 26px;
+  color: var(--brand);
+}
+
+.feature h2 {
+  font-size: var(--t-lg);
+  margin: 16px 0 8px;
+}
+
+.feature p {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+}
+
+@media (max-width: 1000px) {
+  .feature:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .feature:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+}
+@media (max-width: 760px) {
+  .feature,
+  .feature + .feature {
+    padding: 22px 0;
+    border-left: 0;
+  }
+
+  .feature + .feature {
+    border-top: 1px solid var(--line);
+  }
+}
