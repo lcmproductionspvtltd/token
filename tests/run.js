@@ -64,6 +64,8 @@ async function waitForServer(url, timeoutMs = 10_000) {
   failed += await runNode(path.join(__dirname, 'static-files.test.js'));
   failed += await runNode(path.join(__dirname, 'http-rules.test.js'));
   failed += await runNode(path.join(__dirname, 'db-driver.test.js'), { TEST_DATABASE_URL: DATABASE_URL });
+  failed += await runNode(path.join(__dirname, 'rate-limiter.test.js'), { TEST_DATABASE_URL: DATABASE_URL });
+  failed += await runNode(path.join(__dirname, 'startup.test.js'), { TEST_DATABASE_URL: DATABASE_URL });
 
   await resetDatabase();
   // Authenticator secrets of the test accounts, shared by the audits of this run (see helpers/session.js).
@@ -79,7 +81,7 @@ async function waitForServer(url, timeoutMs = 10_000) {
     ['api-audit.js', 1, many],
     ['security-audit.js', 1, many],
     ['account-requests-audit.js', 1, many],
-    ['session-audit.js', 1, { ...many, TRUST_PROXY: '1', APP_SECRET: 'test-secret-for-encryption' }],
+    ['session-audit.js', 1, { ...many, TRUST_PROXY: '1' }],
     ['concurrency-audit.js', 2, { TRUST_PROXY: '1' }],
   ];
   let port = PORT;
@@ -99,6 +101,8 @@ async function waitForServer(url, timeoutMs = 10_000) {
             UPLOADS_DIR: uploadsDir,
             ADMIN_USERNAME: 'admin',
             ADMIN_PASSWORD: 'Admin@12345-bq',
+            // Every test server shares one key, like production servers must.
+            APP_SECRET: 'test-key-for-all-servers-Qm7Vx2Lp9Rz4',
           },
           stdio: ['ignore', 'ignore', 'inherit'],
         }),

@@ -44,7 +44,16 @@ module.exports = {
   uploadsStorage: env.UPLOADS_STORAGE === 'database' ? 'database' : 'disk',
 
   port: Number(env.PORT) || 3000,
-  trustProxy: env.TRUST_PROXY === '1',
+  // Behind proxies: TRUST_PROXY = how many proxies in front (1 = one, e.g. Nginx). The visitor's address is
+  // then the one THAT many places from the right of X-Forwarded-For – never the first, which a visitor can fake.
+  // CLIENT_IP_HEADER: a header set by the edge that visitors can't fake (Render: true-client-ip).
+  trustProxy: Number(env.TRUST_PROXY) > 0,
+  proxyHops: Math.min(Math.max(Number(env.TRUST_PROXY) || 0, 0), 5),
+  // On Render (RENDER=true, set by Render) Cloudflare's True-Client-IP is used by default: Render's proxy only
+  // appends to X-Forwarded-For, so its first entry can be faked.
+  clientIpHeader: String(env.CLIENT_IP_HEADER || (env.RENDER === 'true' ? 'true-client-ip' : ''))
+    .trim()
+    .toLowerCase(),
 
   databaseUrl: env.DATABASE_URL || 'postgres://bquee:bquee@localhost:5432/bquee',
   databasePoolSize: Number(env.DATABASE_POOL_SIZE) || 10,

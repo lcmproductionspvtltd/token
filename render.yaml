@@ -24,6 +24,9 @@ services:
         value: Asia/Kolkata
       - key: TRUST_PROXY
         value: '1'
+      # Visitor address for request limits: Cloudflare (in front of Render) sets it and visitors can't fake it.
+      - key: CLIENT_IP_HEADER
+        value: true-client-ip
       # The free plan's disk is wiped on every restart, so images go into PostgreSQL.
       - key: UPLOADS_STORAGE
         value: database

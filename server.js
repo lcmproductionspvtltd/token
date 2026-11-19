@@ -19,15 +19,21 @@ async function main() {
   const transport = checkTransport(config.databaseUrl);
   if (config.production && !transport.ok) throw new Error(transport.message);
   if (config.production) console.log((transport.warning ? 'Warning – ' : '') + transport.message);
-  if (config.production && !require('./src/services/secret-box').hasKey())
-    console.log(
-      'Warning – APP_SECRET is not set: two-step sign-in secrets are stored unencrypted. Set APP_SECRET (a long random text).',
+  // Production: two-step sign-in secrets must be encrypted, so a strong APP_SECRET is required (audit 2.2).
+  const secretBox = require('./src/services/secret-box');
+  const problem = secretBox.secretProblem();
+  if (config.production && problem)
+    throw new Error(
+      `${problem} BQuee needs APP_SECRET in production (${secretBox.MIN_LENGTH}+ characters of random text) to encrypt two-step sign-in secrets. Set it in the host's environment – keep the same value across deploys.`,
     );
+  if (!config.production && problem) console.log(`Note – ${problem} (fine for development; required in production)`);
 
   const db = createPool({ connectionString: config.databaseUrl, max: config.databasePoolSize });
   await migrate(db);
 
   const app = createApp({ db, config });
+  const upgraded = await app.services.auth.upgradeSecrets();
+  if (upgraded) console.log(`Encrypted ${upgraded} two-step sign-in secret(s) with the current APP_SECRET.`);
   await app.services.auth.ensureSuperAdmin();
   if (config.seedDemoData) await require('./scripts/seed').seedIfEmpty(db);
   // Expired sessions and rate-limit counts are removed hourly (one server at a time).

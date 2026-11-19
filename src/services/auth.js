@@ -338,6 +338,34 @@ function createAuthService(db, config) {
       return codes;
     },
 
+    /**
+     * Encrypts two-step secrets stored unencrypted (development, or before APP_SECRET was set) and
+     * re-encrypts those made with APP_SECRET_PREVIOUS. Run at every start-up; returns how many changed.
+     */
+    async upgradeSecrets() {
+      let changed = 0;
+      for (const [table, column] of [
+        ['users', 'mfa_secret'],
+        ['mfa_challenges', 'secret'],
+      ]) {
+        const { rows } = await db.query(`SELECT id, ${column} AS v FROM ${table} WHERE ${column} IS NOT NULL`);
+        for (const r of rows) {
+          if (!secretBox.needsUpgrade(r.v)) continue;
+          let sealed;
+          try {
+            sealed = secretBox.seal(secretBox.open(r.v));
+          } catch (err) {
+            // Unreadable with both keys: leave it (that person sets up two-step sign-in again); never stop start-up.
+            console.error(JSON.stringify({ alert: 'mfa_secret_unreadable', table, id: r.id }));
+            continue;
+          }
+          await db.query(`UPDATE ${table} SET ${column} = $2 WHERE id = $1 AND ${column} = $3`, [r.id, sealed, r.v]);
+          changed++;
+        }
+      }
+      return changed;
+    },
+
     /** For a lost phone: the account sets two-step sign-in up again at its next sign-in. */
     async resetMfa(userId) {
       await db.query(

@@ -7,7 +7,7 @@
  */
 
 const { Router } = require('../src/http/router');
-const { httpsRedirect } = require('../src/http/security');
+const { httpsRedirect, clientIpOf } = require('../src/http/security');
 const { pickEncoding, compressQuick } = require('../src/http/compress');
 const zlib = require('zlib');
 const { merge } = require('../src/services/site');
@@ -63,6 +63,39 @@ check(
   'port kept when not 443',
   redirectFor({ publicHosts: ['shop.test:8443'], port: 8443 }, 'shop.test', '/a').location ===
     'https://shop.test:8443/a',
+);
+
+// Visitor address behind proxies (audit 3.2): a visitor-sent X-Forwarded-For entry is never trusted
+const reqOf = (headers, own = '10.0.0.9') => ({ headers, socket: { remoteAddress: own } });
+const spoofed = { 'x-forwarded-for': '1.1.1.1, 203.0.113.7' }; // visitor wrote 1.1.1.1; our proxy added 203.0.113.7
+check(
+  'no proxy trusted: the connection address is used',
+  clientIpOf(reqOf(spoofed), { trustProxy: false }) === '10.0.0.9',
+);
+check(
+  'one proxy: the address our proxy added, not the faked first one',
+  clientIpOf(reqOf(spoofed), { trustProxy: true, proxyHops: 1 }) === '203.0.113.7',
+);
+check(
+  'two proxies: counted from the right',
+  clientIpOf(reqOf({ 'x-forwarded-for': '9.9.9.9, 198.51.100.4, 10.1.1.1' }), { trustProxy: true, proxyHops: 2 }) ===
+    '198.51.100.4',
+);
+check(
+  'edge header (Render/Cloudflare True-Client-IP) wins over X-Forwarded-For',
+  clientIpOf(reqOf({ ...spoofed, 'true-client-ip': '198.51.100.20' }), {
+    trustProxy: true,
+    proxyHops: 1,
+    clientIpHeader: 'true-client-ip',
+  }) === '198.51.100.20',
+);
+check(
+  'a garbage header is ignored',
+  clientIpOf(reqOf({ 'true-client-ip': '<script>', 'x-forwarded-for': 'nonsense' }), {
+    trustProxy: true,
+    proxyHops: 1,
+    clientIpHeader: 'true-client-ip',
+  }) === '10.0.0.9',
 );
 
 // Compression choice

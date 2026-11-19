@@ -296,6 +296,20 @@ const garbage = (bytes) => listen((c) => (c.once('data', () => c.write(bytes)), 
   );
   ok('localhost allowed', rule('postgres://u:p@localhost/x').ok);
   ok('public IP without TLS refused', !rule('postgres://u:p@34.12.1.9/x').ok);
+  ok(
+    'public host with verify-ca (no host name check) refused',
+    !rule('postgres://u:p@db.example.com/x?sslmode=verify-ca').ok,
+  );
+  ok('private host with verify-ca allowed', rule('postgres://u:p@10.0.3.4/x?sslmode=verify-ca').ok);
+  const FAKE_PW = ['Fake', 'Pass', '42'].join(''); // made at run time so the secret scan doesn't flag it
+  ok(
+    'the start-up message never contains the password',
+    [
+      `postgres://u:${FAKE_PW}@db.example.com/x`,
+      `postgres://u:${FAKE_PW}@db.example.com/x?sslmode=verify-full`,
+      `postgres://u:${FAKE_PW}@10.0.3.4/x`,
+    ].every((u) => !rule(u).message.includes(FAKE_PW)),
+  );
 
   /* 9. garbled replies never crash the server */
   let crashed = false;

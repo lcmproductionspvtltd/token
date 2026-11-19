@@ -180,6 +180,26 @@ const must = async (label, ...args) => {
   );
   check('a different account is not affected', stillIn.status === 200);
 
+  /* 4b. many wrong passwords for one account at the SAME moment, on both servers (audit 3.1) */
+  const rush = await Promise.all(
+    Array.from({ length: 40 }, (_, i) =>
+      call(
+        BASES[i % 2],
+        'POST',
+        '/api/login',
+        { login: 'rush2', password: 'wrong-password' },
+        null,
+        '10.77.' + Math.floor(i / 200) + '.' + (i % 200),
+      ),
+    ),
+  );
+  const checkedNow = rush.filter((r) => r.status === 401).length;
+  check(
+    '40 wrong passwords at the same moment on two servers: at most 10 are checked, the rest refused',
+    checkedNow <= 10 && checkedNow + rush.filter((r) => r.status === 429).length === 40,
+    rush.map((r) => r.status).join(','),
+  );
+
   /* 5. one address flooding the API is slowed down (600 a minute per server) */
   const burst = await Promise.all(
     Array.from({ length: 650 }, () => call(A, 'GET', '/api/public/site', null, null, '10.88.0.1')),

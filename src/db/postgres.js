@@ -89,7 +89,20 @@ function isPrivateHost(host) {
 function checkTransport(connectionString) {
   const o = parseConnectionString(connectionString);
   const verified = !!o.ssl && o.ssl.rejectUnauthorized !== false;
-  if (verified) return { ok: true, message: 'Database connection: TLS with certificate check (' + o.sslmode + ').' };
+  // verify-ca checks the certificate but not the host name: not enough over the internet (audit 3.3).
+  if (verified && o.sslmode === 'verify-ca' && !isPrivateHost(o.host))
+    return {
+      ok: false,
+      message:
+        'Refusing to start: sslmode=verify-ca does not check that the certificate belongs to "' +
+        o.host +
+        '". Use sslmode=verify-full for a database reached over the internet.',
+    };
+  if (verified)
+    return {
+      ok: true,
+      message: 'Database connection: TLS with certificate and host name check (' + o.sslmode + ').',
+    };
   if (isPrivateHost(o.host))
     return {
       ok: true,

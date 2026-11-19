@@ -335,6 +335,60 @@ const cookiesOf = (r) => (r.headers.getSetCookie ? r.headers.getSetCookie() : []
   check('normal business links are fine', fine.status === 200);
 
   await db.end();
+  /* ---------- audit 4.1 / 4.4: CSRF on every kind of change, CORS, cookie scope, safe errors ---------- */
+  const w2 = await post(BASE, '/api/login', { login: 'sessstaff', password: 'Sess-Staff-2027' }, web);
+  const set2 = cookiesOf(w2);
+  const sess2 = set2.find((c) => /^(__Host-)?bq_session=/.test(c)) || '';
+  const jar2 = set2.map((c) => c.split(';')[0]).join('; ');
+  check(
+    'session cookie is scoped to the whole site (Path=/) with a limited lifetime',
+    /Path=\//.test(sess2) && Number((sess2.match(/Max-Age=(\d+)/) || [])[1]) <= 30 * 24 * 3600,
+    sess2,
+  );
+  const csrfMsg = /did not come from the BQuee page/;
+  for (const [method, url] of [
+    ['POST', '/api/owner/services'],
+    ['PUT', '/api/admin/site'],
+    ['DELETE', '/api/owner/offers/x1'],
+    ['POST', '/api/token/x1/next'],
+    ['PUT', '/api/staff/status'],
+    ['POST', '/api/admin/salons/bulk'],
+    ['POST', '/api/me/sessions/revoke-others'],
+  ]) {
+    const r = await req(method, url, { headers: { Cookie: jar2, Origin: BASE }, body: {} });
+    check(
+      `cookie request without CSRF token is refused before anything else: ${method} ${url}`,
+      r.status === 403 && csrfMsg.test(r.data.error || ''),
+      `${r.status} ${r.data.error}`,
+    );
+  }
+  const cors = await fetch(BASE + '/api/public/site', { headers: { Origin: 'https://evil.example' } });
+  const preflight = await fetch(BASE + '/api/me/profile', {
+    method: 'OPTIONS',
+    headers: { Origin: 'https://evil.example', 'Access-Control-Request-Method': 'PUT' },
+  });
+  check(
+    'no other website may call the API with the visitor’s cookies (no CORS headers, preflight refused)',
+    !cors.headers.get('access-control-allow-origin') &&
+      !cors.headers.get('access-control-allow-credentials') &&
+      preflight.status === 403 &&
+      !preflight.headers.get('access-control-allow-origin'),
+  );
+  const leaks = /\bat \S+:\d+|node_modules|\/home\/|\/opt\/|SELECT |INSERT |postgres(ql)?:\/\/|stack|DATABASE_URL/i;
+  const errorCases = [
+    await req('POST', '/api/login', { body: '{"login": broken json' }),
+    await req('POST', '/api/login', { body: '[1,2,3]' }),
+    await req('GET', '/api/does-not-exist'),
+    await req('GET', '/api/public/token/' + 'x'.repeat(500)),
+    await req('GET', '/api/public/branch/%E0%A4%A'),
+    await req('POST', '/api/public/book', { body: { branchId: { $ne: 1 }, items: 'nope' } }),
+  ];
+  check(
+    'error answers never show code, SQL, file paths or settings',
+    errorCases.every((r) => r.status >= 400 && r.status < 500 && !leaks.test(JSON.stringify(r.data))),
+    errorCases.map((r) => r.status + ' ' + JSON.stringify(r.data)).join(' | '),
+  );
+
   console.log(`Sign-in security audit: ${passed} passed, ${failures.length} failed`);
   failures.forEach((f) => console.log('  ✗ ' + f));
   process.exit(failures.length ? 1 : 0);

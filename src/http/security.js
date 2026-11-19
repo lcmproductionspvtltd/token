@@ -1,6 +1,6 @@
 'use strict';
 
-const { tooManyRequests } = require('./errors');
+const { tooManyRequests, serviceUnavailable } = require('./errors');
 
 /**
  * Security headers sent with every response.
@@ -43,6 +43,7 @@ class RateLimiter {
     this.log = log;
   }
 
+  /** Counts this request; refuses it once more than `max` happened in the window (per address, e.g. sign-ups). */
   async check(bucket, key, max, windowMs) {
     const now = Date.now();
     const used = await this.add(bucket, key, windowMs, now);
@@ -50,18 +51,26 @@ class RateLimiter {
   }
 
   /**
-   * Counts only failures: refuses once `max` failed tries happened in the window, otherwise runs
-   * `work()`; a 401 from it (wrong password) counts as one failure. Used per account, so people who
-   * sign in successfully many times are never blocked.
+   * At most `max` failed tries (wrong password, wrong code) per window. Each try is counted BEFORE
+   * `work()` runs, in one atomic database step (audit 3.1), so many simultaneous tries can never get
+   * past the limit. A try is taken back off when it was refused or did not fail with 401, so only
+   * real wrong passwords count and people who sign in successfully are never blocked.
    */
   async attempt(bucket, key, max, windowMs, work) {
     const now = Date.now();
-    if ((await this.used(bucket, key, windowMs, now)) >= max) throw this.limitError(now, windowMs);
+    const used = await this.add(bucket, key, windowMs, now); // reserves this try
+    if (used > max) {
+      await this.giveBack(bucket, key, windowMs, now);
+      throw this.limitError(now, windowMs);
+    }
+    let failed = false;
     try {
       return await work();
     } catch (err) {
-      if (err.status === 401) await this.add(bucket, key, windowMs, now);
+      failed = err.status === 401;
       throw err;
+    } finally {
+      if (!failed) await this.giveBack(bucket, key, windowMs, now);
     }
   }
 
@@ -72,12 +81,26 @@ class RateLimiter {
     return err;
   }
 
-  /** Adds one hit and returns the sliding-window count. */
+  /**
+   * When the limit can't be checked (database unreachable), the request is refused with "try again
+   * in a moment" – never let through unlimited (audit 2.1). Logged as an alert line for monitoring.
+   */
+  unavailable(bucket, err) {
+    this.log.error(
+      JSON.stringify({ alert: 'rate_limit_storage_error', bucket, error: String((err && err.message) || err) }),
+    );
+    const out = serviceUnavailable('The server is busy – please try again in a moment.');
+    out.retryAfter = 5;
+    return out;
+  }
+
+  /** Adds one hit and returns the sliding-window count (one atomic statement). */
   async add(bucket, key, windowMs, now) {
     const id = keyOf(bucket, key);
     const start = Math.floor(now / windowMs) * windowMs;
+    let row;
     try {
-      const {
+      ({
         rows: [row],
       } = await this.db.query(
         `INSERT INTO rate_limits (key, window_start, hits, prev_hits, expires_at)
@@ -90,32 +113,24 @@ class RateLimiter {
            expires_at = to_timestamp($3 / 1000.0)
          RETURNING hits, prev_hits`,
         [id, start, start + 2 * windowMs, windowMs],
-      );
-      return slide(row.hits, row.prev_hits, now, start, windowMs);
+      ));
     } catch (err) {
-      this.log.error('Rate limit check failed:', err.message);
-      return 0;
+      throw this.unavailable(bucket, err);
     }
+    return slide(row.hits, row.prev_hits, now, start, windowMs);
   }
 
-  /** The sliding-window count without adding a hit. */
-  async used(bucket, key, windowMs, now) {
+  /** Takes back one reserved try (same window only). */
+  async giveBack(bucket, key, windowMs, now) {
     const start = Math.floor(now / windowMs) * windowMs;
-    try {
-      const {
-        rows: [row],
-      } = await this.db.query('SELECT window_start, hits, prev_hits FROM rate_limits WHERE key = $1', [
+    await this.db
+      .query('UPDATE rate_limits SET hits = GREATEST(hits - 1, 0) WHERE key = $1 AND window_start = $2', [
         keyOf(bucket, key),
-      ]);
-      if (!row) return 0;
-      const ws = Number(row.window_start);
-      if (ws === start) return slide(row.hits, row.prev_hits, now, start, windowMs);
-      if (ws === start - windowMs) return slide(0, row.hits, now, start, windowMs);
-      return 0;
-    } catch (err) {
-      this.log.error('Rate limit check failed:', err.message);
-      return 0;
-    }
+        start,
+      ])
+      .catch((err) =>
+        this.log.error(JSON.stringify({ alert: 'rate_limit_storage_error', bucket, error: err.message })),
+      );
   }
 
   /** Forgets one key early (e.g. after a successful sign-in). */
@@ -178,4 +193,29 @@ function httpsRedirect(config) {
   };
 }
 
-module.exports = { securityHeaders, RateLimiter, FloodGuard, httpsRedirect };
+const IP = /^(\d{1,3}(\.\d{1,3}){3}|[0-9a-f:]{2,39}(%\w+)?)$/i;
+
+/**
+ * The visitor's address, used for request limits (audit 3.2). Only trusted proxy information is used:
+ *   - CLIENT_IP_HEADER (with TRUST_PROXY): one address set by the edge, e.g. Cloudflare's True-Client-IP on Render
+ *   - TRUST_PROXY=N: the address N places from the right of X-Forwarded-For – the one our own proxy added.
+ *     Earlier entries were sent by the visitor and can be faked, so they are never used.
+ *   - otherwise the connection's own address.
+ */
+function clientIpOf(req, config) {
+  const own = req.socket.remoteAddress || '';
+  if (!config.trustProxy) return own;
+  if (config.clientIpHeader) {
+    const value = String(req.headers[config.clientIpHeader] || '').trim();
+    if (IP.test(value)) return value;
+  }
+  const chain = String(req.headers['x-forwarded-for'] || '')
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean);
+  const hops = config.proxyHops || 1;
+  const pick = chain[chain.length - hops];
+  return pick && IP.test(pick) ? pick : own;
+}
+
+module.exports = { securityHeaders, RateLimiter, FloodGuard, httpsRedirect, clientIpOf };

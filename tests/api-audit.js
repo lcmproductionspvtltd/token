@@ -964,6 +964,11 @@ const login = async (username, password) => {
       missing.html.includes('noindex'),
   );
   check('files still load normally', (await page('/manifest.webmanifest')).status === 200);
+  const health = await ok('health check', 'GET', '/api/health');
+  check(
+    'health check shows the running code version',
+    health.ok === true && typeof health.version === 'string' && health.version.length > 0,
+  );
   await deny('unknown legal page', [404], 'GET', '/api/public/legal/cookies');
   for (const [p, title] of [
     ['/terms', 'Terms and Conditions'],

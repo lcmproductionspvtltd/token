@@ -10,7 +10,9 @@ const { assertLoginAvailable } = require('../services/accounts');
 module.exports = function authRoutes(router, { db, auth, limiter }) {
   router.get('/api/health', async () => {
     await db.query('SELECT 1');
-    return { ok: true, time: new Date().toISOString() };
+    // version: the Git commit running (Render sets RENDER_GIT_COMMIT) – compare with GitHub after a deploy.
+    const version = String(process.env.RENDER_GIT_COMMIT || process.env.GIT_COMMIT || 'dev').slice(0, 12);
+    return { ok: true, version, time: new Date().toISOString() };
   });
 
   // Browsers send what the Content-Security-Policy blocked (an injected script, a wrong image…).

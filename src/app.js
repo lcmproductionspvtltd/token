@@ -7,7 +7,7 @@
 const { Router } = require('./http/router');
 const { HttpError } = require('./http/errors');
 const crypto = require('crypto');
-const { securityHeaders, RateLimiter, FloodGuard } = require('./http/security');
+const { securityHeaders, RateLimiter, FloodGuard, clientIpOf } = require('./http/security');
 const { createStaticHandler, UPLOAD_NAME, UPLOAD_HEADERS } = require('./http/static-files');
 const { MIN_BYTES, pickEncoding, compressQuick } = require('./http/compress');
 const { createSeo } = require('./http/seo');
@@ -126,15 +126,7 @@ function createApp({ db, config, log = console }) {
     res.end(body);
   }
 
-  function clientIp(req) {
-    if (config.trustProxy) {
-      const forwarded = String(req.headers['x-forwarded-for'] || '')
-        .split(',')[0]
-        .trim();
-      if (forwarded) return forwarded;
-    }
-    return req.socket.remoteAddress || '';
-  }
+  const clientIp = (req) => clientIpOf(req, config);
 
   /*
    * CSRF (audit section 4): a change made with the website's session cookie must come from this

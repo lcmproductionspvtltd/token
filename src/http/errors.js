@@ -17,4 +17,5 @@ module.exports = {
   notFound: (message = 'Not found') => new HttpError(404, message),
   tooManyRequests: (message = 'Too many attempts. Please wait a few minutes and try again.') =>
     new HttpError(429, message),
+  serviceUnavailable: (message = 'The server is busy – please try again in a moment.') => new HttpError(503, message),
 };
