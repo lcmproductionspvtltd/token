@@ -137,6 +137,61 @@ const garbage = (bytes) => listen((c) => (c.once('data', () => c.write(bytes)), 
   const sum = await db.query('SELECT ' + many.map((i) => '$' + (i + 1) + '::int').join('+') + ' AS s', many);
   ok('300 parameters', sum.rows[0].s === many.reduce((a, b) => a + b, 0));
 
+  /* 1b. more value types (audit 3.6): exact numbers, dates, lists, large replies */
+  const t = (
+    await db.query(
+      `SELECT 12345678901234567890.123456789::numeric AS n, 9007199254740993::bigint AS big,
+              '2026-11-19T10:15:30.123Z'::timestamptz AS ts, '2026-11-19'::date::text AS d,
+              ARRAY['a', 'b,c', 'd"e', NULL]::text[] AS arr, ARRAY[1, 2, 3]::int[] AS nums,
+              true AS yes, false AS no, repeat('y', 3000000) AS huge`,
+    )
+  ).rows[0];
+  ok('numeric keeps every digit (no rounding)', String(t.n) === '12345678901234567890.123456789', String(t.n));
+  ok('bigint beyond JavaScript’s safe range is exact', String(t.big) === '9007199254740993', String(t.big));
+  ok('timestamp with time zone', new Date(t.ts).toISOString() === '2026-11-19T10:15:30.123Z', String(t.ts));
+  ok('date as text', t.d === '2026-11-19');
+  const arr = Array.isArray(t.arr) ? t.arr : String(t.arr);
+  ok(
+    'text array with a comma, a quote and a null',
+    Array.isArray(arr)
+      ? arr.length === 4 && arr[1] === 'b,c' && arr[2] === 'd"e' && arr[3] === null
+      : arr === '{a,"b,c","d\\"e",NULL}',
+    JSON.stringify(t.arr),
+  );
+  ok(
+    'int array',
+    Array.isArray(t.nums) ? t.nums.join() === '1,2,3' : String(t.nums) === '{1,2,3}',
+    JSON.stringify(t.nums),
+  );
+  ok('booleans', t.yes === true && t.no === false);
+  ok('3 MB reply arrives whole', t.huge.length === 3_000_000);
+
+  /* 1c. sign-in method and server error codes */
+  const enc = (await db.query('SHOW password_encryption')).rows[0].password_encryption;
+  ok('signed in to a server that uses SCRAM-SHA-256 passwords', enc === 'scram-sha-256', enc);
+  await db.query('CREATE TEMP TABLE IF NOT EXISTS uniq_test (k int PRIMARY KEY)').catch(() => {});
+  let dupCode = '';
+  try {
+    await db.transaction(async (tx) => {
+      await tx.query('CREATE TEMP TABLE u2 (k int PRIMARY KEY)');
+      await tx.query('INSERT INTO u2 VALUES (1)');
+      await tx.query('INSERT INTO u2 VALUES (1)');
+    });
+  } catch (err) {
+    dupCode = err.code;
+  }
+  ok('a duplicate value reports PostgreSQL’s code (23505)', dupCode === '23505', dupCode);
+  let syntaxCode = '';
+  try {
+    await db.query('SELEC 1');
+  } catch (err) {
+    syntaxCode = err.code;
+  }
+  ok(
+    'a broken query reports its code (42601) and the pool keeps working',
+    syntaxCode === '42601' && (await db.query('SELECT 1 AS x')).rows[0].x === 1,
+  );
+
   /* 2. errors keep the pool usable */
   const syntax = await rejects(db.query('SELEC 1'));
   ok('syntax error reported', syntax && syntax.code === '42601', syntax && syntax.code);

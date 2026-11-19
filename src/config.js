@@ -44,6 +44,8 @@ module.exports = {
   uploadsStorage: env.UPLOADS_STORAGE === 'database' ? 'database' : 'disk',
 
   port: Number(env.PORT) || 3000,
+  // One JSON line per API request (on in production; LOG_REQUESTS=1/0 to change).
+  logRequests: env.LOG_REQUESTS ? env.LOG_REQUESTS === '1' : env.NODE_ENV === 'production',
   // Behind proxies: TRUST_PROXY = how many proxies in front (1 = one, e.g. Nginx). The visitor's address is
   // then the one THAT many places from the right of X-Forwarded-For – never the first, which a visitor can fake.
   // CLIENT_IP_HEADER: a header set by the edge that visitors can't fake (Render: true-client-ip).

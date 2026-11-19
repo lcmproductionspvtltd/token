@@ -52,8 +52,8 @@ jobs:
       - name: No secrets committed
         run: bash scripts/check-secrets.sh
 
-      - name: Install web build tools (pinned versions)
-        run: npm install --no-fund
+      - name: Install web build tools (exactly as package-lock.json lists)
+        run: npm ci --no-fund
 
       - name: Known security problems in packages
         run: npm audit --audit-level=high

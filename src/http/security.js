@@ -17,7 +17,7 @@ function securityHeaders({ https }) {
     'Content-Security-Policy': [
       "default-src 'self'",
       "img-src 'self' data: blob:",
-      "style-src 'self' 'unsafe-inline'",
+      "style-src 'self'", // no inline styles (audit 4.4); React sets styles through the DOM, which is allowed
       "script-src 'self'",
       "connect-src 'self'",
       "media-src 'self' blob:",

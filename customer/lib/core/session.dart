@@ -37,13 +37,13 @@ class Session extends ChangeNotifier {
     api.onUnauthorized = _expired;
     var token = await Native.getSecret('c_token');
     var moved = false;
-    if (token == null || token.isEmpty) {
-      final old = await Native.getPref('c_token');
-      if (old != null && old.isNotEmpty) {
-        token = old;
-        moved = true;
-        await Native.removePref('c_token');
-      }
+    // Older versions kept the token in plain app preferences: move it into secure storage once,
+    // and always delete the plain copy – even when a secure one already exists.
+    final old = await Native.getPref('c_token');
+    if (old != null) await Native.removePref('c_token');
+    if ((token == null || token.isEmpty) && old != null && old.isNotEmpty) {
+      token = old;
+      moved = true;
     }
     if (token != null && token.isNotEmpty) {
       api.token = token;

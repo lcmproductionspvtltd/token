@@ -389,6 +389,7 @@ function createAuthService(db, config) {
     async requireUser(req, ...roles) {
       const user = await sessionUser(req);
       if (!user) throw unauthorized();
+      req.actor = `${user.role}:${user.id}`; // for the request log (id only, never names or tokens)
       if (roles.length && !roles.includes(user.role)) throw forbidden();
       assertCanUseAccount(user);
       return user;

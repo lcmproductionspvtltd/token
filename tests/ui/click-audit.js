@@ -21,6 +21,13 @@ async function audit(browser, label, login, pages, width) {
   page.setDefaultTimeout(1500); // a button that vanished after a re-render is skipped quickly
   const problem = (what) => report.problems.push(`[${label} ${width}px] ${what}`);
   page.on('pageerror', (e) => problem('JS error: ' + e.message));
+  // A blocked inline style or script (Content-Security-Policy) is a problem too.
+  page.on(
+    'console',
+    (m) =>
+      /Content Security Policy|Refused to (apply|execute|load)/i.test(m.text()) &&
+      problem('CSP: ' + m.text().slice(0, 160)),
+  );
   page.on(
     'console',
     (m) =>

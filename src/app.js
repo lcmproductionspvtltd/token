@@ -203,6 +203,34 @@ function createApp({ db, config, log = console }) {
       );
     res.once('close', () => flood.done());
 
+    // One structured log line per API request (audit 4.6): the route pattern (never ids or tokens from the
+    // address), status, time and who – never bodies, headers, cookies, passwords or codes.
+    if (config.logRequests) {
+      const started = process.hrtime.bigint();
+      res.once('finish', () => {
+        const ms = Number(process.hrtime.bigint() - started) / 1e6;
+        let m = null;
+        try {
+          m = router.match(req.method, pathname);
+        } catch (err) {
+          // a broken address (already answered 400)
+        }
+        const line = {
+          t: new Date().toISOString(),
+          id: requestId,
+          method: req.method,
+          route: m ? m.pattern : 'unknown',
+          status: res.statusCode,
+          ms: Math.round(ms),
+          ...(req.actor ? { actor: req.actor } : {}),
+        };
+        // Worth an alert: server errors and refused sign-ins in bulk show up by these fields.
+        if (res.statusCode >= 500) line.alert = 'server_error';
+        else if (res.statusCode === 429) line.alert = 'rate_limited';
+        log.log(JSON.stringify(line));
+      });
+    }
+
     try {
       if (req.method !== 'GET' && req.method !== 'HEAD' && pathname !== '/api/csp-report') assertSameSite(req);
       const match = router.match(req.method, pathname);

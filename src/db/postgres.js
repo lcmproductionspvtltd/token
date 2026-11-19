@@ -236,8 +236,13 @@ function parseValue(text, typeOid) {
     }
     case TYPE.FLOAT4:
     case TYPE.FLOAT8:
-    case TYPE.NUMERIC:
       return Number(text);
+    case TYPE.NUMERIC: {
+      // A JavaScript number holds about 15 significant digits. Money values fit easily; anything
+      // longer stays text so no digit is ever silently rounded away (audit 3.6).
+      const digits = text.replace(/^-/, '').replace('.', '').replace(/^0+/, '');
+      return /^-?\d+(\.\d+)?$/.test(text) && digits.length <= 15 ? Number(text) : text;
+    }
     case TYPE.JSON:
     case TYPE.JSONB:
       return JSON.parse(text);

@@ -78,6 +78,42 @@ function openWith(env, value) {
   }
   const ok = await start({ ...prod, APP_SECRET: GOOD }, 3982);
   check('production with a strong APP_SECRET: starts', ok.started, ok.output.slice(-200));
+  if (ok.started) {
+    // Request log (audit 4.6): one JSON line per API request; route pattern, never passwords or address ids.
+    const SECRET_PW = 'Never-In-Logs-77';
+    let logged = '';
+    ok.child.stdout.on('data', (d) => (logged += d));
+    ok.child.stderr.on('data', (d) => (logged += d));
+    await fetch('http://127.0.0.1:3982/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: 'admin', password: SECRET_PW }),
+    });
+    await fetch('http://127.0.0.1:3982/api/public/token/tok-id-in-address-123');
+    await new Promise((r) => setTimeout(r, 300));
+    const lines = logged
+      .split('\n')
+      .filter((l) => l.startsWith('{'))
+      .map((l) => {
+        try {
+          return JSON.parse(l);
+        } catch (err) {
+          return null;
+        }
+      })
+      .filter(Boolean);
+    const login = lines.find((l) => l.route === '/api/login');
+    const token = lines.find((l) => l.route === '/api/public/token/:id');
+    check(
+      'production logs one JSON line per request: route, status, time, request id',
+      login && login.status === 401 && typeof login.ms === 'number' && login.id && token && token.status === 404,
+      JSON.stringify(lines.slice(-3)),
+    );
+    check(
+      'the log never holds passwords or ids from the address',
+      logged.length > 0 && !logged.includes(SECRET_PW) && !logged.includes('tok-id-in-address-123'),
+    );
+  }
   if (ok.started) await stop(ok);
   const dev = await start({}, 3983);
   check(

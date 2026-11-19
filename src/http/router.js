@@ -21,7 +21,7 @@ class Router {
         }) +
         '$',
     );
-    this.routes.push({ method, regex, keys, handler });
+    this.routes.push({ method, pattern, regex, keys, handler });
     return this;
   }
 
@@ -52,7 +52,7 @@ class Router {
         // Broken %-encoding (e.g. "/api/tokens/%E0%A4") is the caller's mistake: 400, not 500 (audit F-09).
         throw new HttpError(400, 'Invalid address');
       }
-      return { handler: route.handler, params };
+      return { handler: route.handler, params, pattern: route.pattern };
     }
     return null;
   }

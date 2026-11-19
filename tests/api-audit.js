@@ -214,6 +214,51 @@ const login = async (username, password) => {
     (await ok('A data', 'GET', '/api/owner/data', null, oa)).offers.some((o) => o.id === offA),
   );
   await deny('owner B acts on A token', [404], 'POST', '/api/token/' + tk1 + '/start', {}, ob);
+
+  // Complete cross-business sweep (audit 4.3): owner B tries every action on each of A's records by id.
+  const beforeA = await ok('A data before the sweep', 'GET', '/api/owner/data', null, oa);
+  const sweep = [
+    ['PUT', '/api/owner/branches/' + a1, { name: 'hack' }],
+    ['DELETE', '/api/owner/branches/' + a2],
+    ['POST', '/api/owner/branches/' + a1 + '/reset-numbers', {}],
+    ['PUT', '/api/owner/services/' + svA, { name: 'hack', duration: 5, price: 1 }],
+    ['DELETE', '/api/owner/services/' + svA],
+    ['PUT', '/api/owner/staff/' + stA1, { name: 'hack' }],
+    ['PUT', '/api/owner/staff/' + stA1 + '/active', { active: false }],
+    ['PUT', '/api/owner/staff/' + stA1 + '/status', { online: false }],
+    ['PUT', '/api/owner/offers/' + offA, { title: 'hack' }],
+    ['DELETE', '/api/owner/offers/' + offA],
+    ['PUT', '/api/owner/testimonials/' + revA, { name: 'h', text: 'h' }],
+    ['DELETE', '/api/owner/testimonials/' + revA],
+    ['POST', '/api/token/' + tk1 + '/start', {}],
+    ['POST', '/api/token/' + tk1 + '/finish', {}],
+    ['POST', '/api/token/' + tk1 + '/next', {}],
+    ['POST', '/api/token/' + tk1 + '/cancel', {}],
+    ['GET', '/api/token/' + tk1 + '/services'],
+  ];
+  for (const [method, url, body] of sweep)
+    await deny(
+      `owner B cannot ${method} another business's ${url.split('/')[3]}`,
+      [403, 404],
+      method,
+      url,
+      body || null,
+      ob,
+    );
+  const bTokens = await ok('B token list with A’s branch id', 'GET', '/api/owner/tokens?branchId=' + a1, null, ob);
+  check('B never sees A’s tokens, even when asking for A’s branch', !JSON.stringify(bTokens).includes(tk1));
+  const bReport = await ok('B report with A’s branch id', 'GET', '/api/owner/reports?branchId=' + a1, null, ob);
+  check('B’s report never includes A’s tokens', !JSON.stringify(bReport).includes(tk1));
+  const afterA = await ok('A data after the sweep', 'GET', '/api/owner/data', null, oa);
+  // Every list A's dashboard shows, by id, name and on/off (live waiting minutes change by themselves).
+  const essentials = (d) =>
+    JSON.stringify(
+      Object.keys(d)
+        .sort()
+        .filter((k) => Array.isArray(d[k]))
+        .map((k) => [k, d[k].map((x) => [x.id, x.name || x.title, x.active, x.status])]),
+    );
+  check('after the whole sweep A’s data is exactly the same', essentials(beforeA) === essentials(afterA));
   await deny('staff B acts on A token', [404], 'POST', '/api/token/' + tk1 + '/start', {}, sbt);
   await ok(
     'owner A links staff to a B service (ignored)',
