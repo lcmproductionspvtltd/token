@@ -3,7 +3,7 @@
  * Pages and the app bundle: network first (always fresh), cached copy when offline.
  * Fonts, icons and images: cache first. The API is never cached (queues must be live).
  */
-const VERSION = 'bquee-v4';
+const VERSION = 'bquee-v5';
 const SHELL = [
   '/',
   '/app/app.js',

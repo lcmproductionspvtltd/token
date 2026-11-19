@@ -173,3 +173,34 @@
   background: var(--paper);
   border: 1px solid var(--line);
 }
+
+/* Google result preview (Google & locations page) */
+.seo-preview {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font-family: Arial, sans-serif;
+}
+.seo-preview-url {
+  display: block;
+  font-size: 0.8rem;
+  color: #4d5156;
+}
+.seo-preview b {
+  display: block;
+  margin-top: 2px;
+  color: #1a0dab;
+  font-size: 1.15rem;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.seo-preview p {
+  margin: 4px 0 0;
+  color: #4d5156;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}

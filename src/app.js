@@ -10,6 +10,7 @@ const crypto = require('crypto');
 const { securityHeaders, RateLimiter, FloodGuard } = require('./http/security');
 const { createStaticHandler, UPLOAD_NAME, UPLOAD_HEADERS } = require('./http/static-files');
 const { MIN_BYTES, pickEncoding, compressQuick } = require('./http/compress');
+const { createSeo } = require('./http/seo');
 const { createAuthService } = require('./services/auth');
 const { createTokenService } = require('./services/tokens');
 const { createCatalogService } = require('./services/catalog');
@@ -92,7 +93,13 @@ function createApp({ db, config, log = console }) {
   ])
     register(router, services);
 
-  const serveStatic = createStaticHandler({ publicDir: config.publicDir, uploadsDir: config.uploadsDir, headers });
+  const seo = createSeo({ db, config, headers, log });
+  const serveStatic = createStaticHandler({
+    publicDir: config.publicDir,
+    uploadsDir: config.uploadsDir,
+    headers,
+    onMissing: (req, res) => seo.notFound(req, res),
+  });
 
   // Per visitor address: at most API_REQUESTS_PER_MINUTE (default 600 = 10 a second) API requests.
   const flood = new FloodGuard({ perMinute: Number(process.env.API_REQUESTS_PER_MINUTE) || 600 });
@@ -179,6 +186,7 @@ function createApp({ db, config, log = console }) {
       if (req.method !== 'GET' && req.method !== 'HEAD') return sendJson(res, 405, { error: 'Method not allowed' });
       if (pathname.startsWith('/uploads/') && services.uploads.servesFromDatabase)
         return serveStoredImage(req, res, pathname);
+      if (await seo.handle(req, res, pathname)) return;
       return serveStatic(req, res, pathname);
     }
 

@@ -43,7 +43,7 @@ const UPLOAD_HEADERS = {
 // this many bytes in total – the oldest entries go first (audit F-08).
 const CACHE_LIMIT_BYTES = 48 * 1024 * 1024;
 
-function createStaticHandler({ publicDir, uploadsDir, headers }) {
+function createStaticHandler({ publicDir, uploadsDir, headers, onMissing = null }) {
   const cache = new Map(); // file → entry, oldest first
   let cachedBytes = 0;
   const realRoots = new Map();
@@ -142,7 +142,10 @@ function createStaticHandler({ publicDir, uploadsDir, headers }) {
         return res.end('Not found');
       }
     } else {
-      file = resolveFile(publicDir, pathname) || path.join(publicDir, 'index.html');
+      file = resolveFile(publicDir, pathname);
+      // Not a file: the app's own "not found" page (with a real 404 for search engines), if given.
+      if (!file && onMissing) return onMissing(req, res, pathname);
+      if (!file) file = path.join(publicDir, 'index.html');
     }
 
     const entry = load(file);

@@ -7,14 +7,16 @@ import { Panel, handleError } from './Shell.jsx';
 import { StepBar } from '../core/Steps.jsx';
 
 /** The editor's pages, in the order they appear on the home page. */
-const PAGES = ['Setup', 'Top of page', 'Features', 'Pricing & reviews', 'FAQ & contact'];
+const PAGES = ['Setup', 'Top of page', 'Features', 'Pricing & reviews', 'FAQ & contact', 'Google & locations'];
 
 const SECTIONS = [
   ['stats', 'Numbers strip'],
+  ['replace', 'Replace paper tokens (problems and fixes)'],
   ['features', 'Features'],
   ['steps', 'How it works'],
   ['categories', 'Business types'],
   ['app', 'Mobile app download'],
+  ['locations', 'Locations'],
   ['plans', 'Pricing'],
   ['testimonials', 'Testimonials'],
   ['faqs', 'FAQ'],
@@ -41,6 +43,26 @@ const LISTS = {
       ['icon', 'Icon', 'icon'],
       ['title', 'Title', 'text', 60],
       ['text', 'Text', 'area', 240],
+    ],
+  },
+  replace: {
+    title: 'Replace paper tokens and token machines',
+    item: 'problem',
+    max: 10,
+    blank: { problem: '', solution: '' },
+    fields: [
+      ['problem', 'Problem (what goes wrong today)', 'text', 120],
+      ['solution', 'How BQuee fixes it', 'area', 240],
+    ],
+  },
+  locations: {
+    title: 'Locations',
+    item: 'region',
+    max: 20,
+    blank: { region: '', places: '' },
+    fields: [
+      ['region', 'Country or region', 'text', 60],
+      ['places', 'Cities – separated by commas', 'area', 300],
     ],
   },
   steps: {
@@ -193,6 +215,7 @@ export function SiteTab() {
       )}
       {page === 2 && (
         <>
+          <ListEditor spec={LISTS.replace} items={c.replace} onChange={(v) => put(['replace'], v)} icons={icons} />
           <ListEditor spec={LISTS.features} items={c.features} onChange={(v) => put(['features'], v)} icons={icons} />
           <ListEditor spec={LISTS.steps} items={c.steps} onChange={(v) => put(['steps'], v)} icons={icons} />
           <TypesAndAppPanels text={text} />
@@ -213,6 +236,18 @@ export function SiteTab() {
         <>
           <ListEditor spec={LISTS.faqs} items={c.faqs} onChange={(v) => put(['faqs'], v)} icons={icons} />
           <CtaContactPanels text={text} />
+        </>
+      )}
+
+      {page === 5 && (
+        <>
+          <SeoPanel c={c} text={text} />
+          <ListEditor
+            spec={LISTS.locations}
+            items={c.locations}
+            onChange={(v) => put(['locations'], v)}
+            icons={icons}
+          />
         </>
       )}
 
@@ -382,6 +417,27 @@ function CtaContactPanels({ text }) {
         {text(['footer', 'text'], 'Footer text', 240, true)}
       </Panel>
     </div>
+  );
+}
+
+/** What Google shows for the home page, with a live preview and length hints. */
+function SeoPanel({ c, text }) {
+  const seo = c.seo || {};
+  const title = seo.title || '';
+  const desc = seo.description || '';
+  return (
+    <Panel
+      title="Google search result"
+      sub="The title and description Google and link previews show for the home page. Leave empty to use the default."
+    >
+      {text(['seo', 'title'], `Title – best under 60 characters (${title.length})`, 70)}
+      {text(['seo', 'description'], `Description – best under 160 characters (${desc.length})`, 170, true)}
+      <div className="seo-preview" aria-label="Google preview">
+        <span className="seo-preview-url">{window.location.host}</span>
+        <b>{title || 'BQuee'}</b>
+        <p>{desc}</p>
+      </div>
+    </Panel>
   );
 }
 

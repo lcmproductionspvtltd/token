@@ -36,6 +36,7 @@ const publicHosts = [publicUrl && new URL(publicUrl).host, ...String(env.PUBLIC_
 
 module.exports = {
   production: env.NODE_ENV === 'production',
+  publicUrl, // used for canonical links, the sitemap and link previews
   publicHosts,
 
   publicDir: path.join(ROOT_DIR, 'public'),

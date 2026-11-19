@@ -1,0 +1,131 @@
+/* Home page: "Replace paper tokens and token machines" (problem → solution) and "Locations". */
+
+.site-why {
+  background: var(--brand-wash);
+}
+.site-why-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 16px;
+}
+.site-why-list li {
+  padding: 22px 24px;
+  border-radius: 20px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+}
+.site-why-list p {
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  line-height: 1.55;
+}
+.site-why-list svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  padding: 3px;
+  border-radius: 50%;
+}
+.site-why-problem {
+  color: var(--ink-3);
+}
+.site-why-problem svg {
+  color: #b42318;
+  background: #fde7e5;
+}
+.site-why-solution {
+  color: var(--ink);
+  font-weight: 500;
+}
+.site-why-solution svg {
+  color: #067647;
+  background: #dcfae6;
+}
+
+.site-places-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px;
+}
+.site-places-grid article {
+  padding: 20px 22px;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.site-places-grid h3 {
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 1.05rem;
+}
+.site-places-grid h3 svg {
+  width: 18px;
+  height: 18px;
+  color: var(--brand);
+}
+.site-places-grid p {
+  margin: 8px 0 0;
+  color: var(--ink-2);
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+/* The page text the server sends for search engines (replaced by the live page as soon as it loads). */
+.seo-pre-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+.seo-pre-head nav {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.seo-pre-head nav a,
+.seo-pre .site-cta a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+.seo-pre .site-cta a {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brand);
+}
+.seo-pre-stats {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+.seo-pre .site-sec h3 {
+  margin-top: 18px;
+}
+.seo-pre .site-sec p,
+.seo-pre .site-sec li {
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+.seo-pre-foot {
+  padding-top: 32px;
+  padding-bottom: 32px;
+  color: var(--ink-3);
+}

@@ -10,6 +10,7 @@ const { Router } = require('../src/http/router');
 const { httpsRedirect } = require('../src/http/security');
 const { pickEncoding, compressQuick } = require('../src/http/compress');
 const zlib = require('zlib');
+const { merge } = require('../src/services/site');
 
 let passed = 0;
 let failed = 0;
@@ -72,5 +73,25 @@ const text = JSON.stringify({ list: Array.from({ length: 200 }, (_, i) => ({ id:
 check('gzip round trip', zlib.gunzipSync(compressQuick(text, 'gzip')).toString() === text);
 check('brotli round trip', zlib.brotliDecompressSync(compressQuick(text, 'br')).toString() === text);
 
-console.log(`\nAddress, redirect and compression rules: ${passed} passed, ${failed} failed`);
+// Home page text saved by an earlier version: untouched built-in text is upgraded, own text kept
+const oldFaqs = [
+  'Do my customers need to install an app?',
+  'Can I use it for more than one branch?',
+  'How does the waiting time work?',
+  'Can I export my data?',
+].map((q) => ({ q, a: 'x' }));
+const upgraded = merge({ hero: { title: 'Walk-ins,', highlight: 'without the waiting room.' }, faqs: oldFaqs });
+check(
+  'untouched old heading and FAQ get the new SEO text',
+  upgraded.hero.title.includes('token') && upgraded.faqs.length > 4,
+);
+const own = merge({ hero: { title: 'Our own words' }, faqs: [{ q: 'Our question?', a: 'Our answer' }] });
+check('text the super admin wrote is kept', own.hero.title === 'Our own words' && own.faqs.length === 1);
+check(
+  'an empty Google title falls back to the default',
+  merge({ seo: { title: '', description: 'Ours' } }).seo.title.includes('BQuee') &&
+    merge({ seo: { description: 'Ours' } }).seo.description === 'Ours',
+);
+
+console.log(`\nAddress, redirect, compression and home page rules: ${passed} passed, ${failed} failed`);
 if (failed) process.exit(1);

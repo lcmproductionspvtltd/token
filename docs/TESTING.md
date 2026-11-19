@@ -66,9 +66,9 @@ The tests set up two-step sign-in for the admin and owner logins themselves and 
 QR engine:           8 passed, 0 failed
 Waiting time:       21 passed, 0 failed
 Static files:       12 passed, 0 failed
-Address rules:      15 passed, 0 failed
+Address rules:      18 passed, 0 failed
 Database client:    38 passed, 0 failed
-API audit:         492 passed, 0 failed
+API audit:         515 passed, 0 failed
 Security:           72 passed, 0 failed
 Account requests:   86 passed, 0 failed
 Sign-in security:   57 passed, 0 failed

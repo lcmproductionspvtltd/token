@@ -10,11 +10,17 @@ const v = require('../utils/validate');
 const { badRequest } = require('../http/errors');
 
 const DEFAULTS = {
+  // What Google and link previews show (the <title> and description of the home page).
+  seo: {
+    title: 'Digital Token & Queue System for Salons & Clinics | BQuee',
+    description:
+      'Replace paper tokens and token machines with QR tokens and live waiting times. Queue management for salons, clinics and walk-ins in UAE, GCC, India and Europe.',
+  },
   hero: {
-    badge: 'QR token booking for every business',
-    title: 'Walk-ins,',
-    highlight: 'without the waiting room.',
-    text: 'Customers scan your QR code, pick services and a staff member, and get a numbered token with a live waiting time. Your staff scan the token to start and finish each service.',
+    badge: 'Replace paper tokens and token machines',
+    title: 'Digital token & queue system',
+    highlight: 'for salons, clinics and walk-ins',
+    text: 'Customers scan your QR code, choose services and a staff member, and get a numbered token with a live waiting time on their phone – no app, no token machine, no paper. Staff scan the token to start and finish each service.',
     primary: 'Start free',
     secondary: 'Sign in',
   },
@@ -56,6 +62,33 @@ const DEFAULTS = {
       text: 'Revenue, services, staff and busy hours for any date range – export to Excel in one tap.',
     },
   ],
+  // "Replace paper tokens and token machines": the everyday problem and how BQuee solves it.
+  replace: [
+    {
+      problem: 'Paper token rolls run out and the token printer jams',
+      solution: 'The token is on the customer’s phone – no paper, no printer, nothing to refill or repair.',
+    },
+    {
+      problem: 'Token machines and display screens are costly to buy and maintain',
+      solution: 'Print one QR poster. Any phone or browser becomes your token counter and your queue display.',
+    },
+    {
+      problem: 'Customers crowd the reception asking “how long?”',
+      solution: 'Every customer sees their token number, how many are ahead and a live waiting time.',
+    },
+    {
+      problem: 'People walk away when the queue looks long',
+      solution: 'Customers book at the door, wait anywhere – a café, their car, home – and come back on time.',
+    },
+    {
+      problem: 'Staff call out names and lose track of who is next',
+      solution: 'Staff scan the token to start and finish. The queue moves on its own, stylist by stylist.',
+    },
+    {
+      problem: 'No idea of busy hours, revenue or staff performance',
+      solution: 'Reports by day, service, staff and branch – export to Excel in one tap.',
+    },
+  ],
   steps: [
     {
       title: 'Sign up your business',
@@ -72,7 +105,27 @@ const DEFAULTS = {
     },
   ],
   categoriesTitle: 'Made for every kind of business',
-  categoriesText: 'Salons, spas, clinics, service centres, offices – anywhere people wait their turn.',
+  categoriesText:
+    'Salons, barbershops, beauty parlours, spas, clinics, hospital OPDs, labs, service centres, repair shops and offices – anywhere people wait their turn.',
+  // Where BQuee is used: region + its main cities (comma-separated).
+  locations: [
+    {
+      region: 'United Arab Emirates',
+      places: 'Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, Umm Al Quwain, Al Ain',
+    },
+    { region: 'Saudi Arabia', places: 'Riyadh, Jeddah, Dammam, Al Khobar, Makkah, Madinah' },
+    { region: 'Qatar', places: 'Doha, Al Wakrah, Al Khor, Lusail' },
+    { region: 'Kuwait', places: 'Kuwait City, Hawalli, Salmiya, Farwaniya' },
+    { region: 'Bahrain', places: 'Manama, Muharraq, Riffa' },
+    { region: 'Oman', places: 'Muscat, Salalah, Sohar, Nizwa' },
+    {
+      region: 'Kerala',
+      places:
+        'Kochi, Thiruvananthapuram, Kozhikode, Thrissur, Kannur, Kollam, Kottayam, Malappuram, Palakkad, Alappuzha',
+    },
+    { region: 'India', places: 'Bengaluru, Chennai, Mumbai, Delhi, Hyderabad, Pune, Coimbatore, Mangaluru' },
+    { region: 'Europe', places: 'London, Manchester, Birmingham, Dublin, Paris, Berlin, Amsterdam, Madrid' },
+  ],
   app: {
     title: 'Run your queue from your phone',
     text: 'The BQuee app for business owners and staff: live queue, scanning, reports and settings – on Android and iPhone.',
@@ -124,8 +177,36 @@ const DEFAULTS = {
   ],
   faqs: [
     {
+      q: 'What is a digital token system?',
+      a: 'It gives every customer a numbered token on their phone instead of a paper slip from a token machine. With BQuee the customer scans your QR code, gets a token and sees a live waiting time, and your staff scan the token to start and finish the service.',
+    },
+    {
+      q: 'Can BQuee replace our paper tokens or token machine?',
+      a: 'Yes. You don’t need a token dispenser, thermal printer, paper rolls or a token display screen. Print the QR poster for your branch – customers take their token by scanning it, and any phone, tablet or computer shows the queue.',
+    },
+    {
       q: 'Do my customers need to install an app?',
       a: 'No. Customers scan your QR code and book in their browser. The app is for owners and staff.',
+    },
+    {
+      q: 'Is BQuee a queue management system for salons and barbershops?',
+      a: 'Yes – it was made for salons. Every stylist has their own queue, customers can choose a stylist or “no preference”, and the waiting time counts each service they booked.',
+    },
+    {
+      q: 'Does it work for clinics, hospitals and service centres?',
+      a: 'Yes. Clinics, hospital OPDs, labs, repair and service centres use the same QR token: patients and customers see their place in the queue and wait comfortably instead of crowding the counter.',
+    },
+    {
+      q: 'Can I use BQuee in the UAE, Saudi Arabia, Qatar and the rest of the GCC?',
+      a: 'Yes. BQuee runs in any phone browser, so businesses in Dubai, Abu Dhabi, Sharjah, Riyadh, Jeddah, Doha, Kuwait City, Manama and Muscat can start the same day – there is nothing to install.',
+    },
+    {
+      q: 'Can businesses in Kerala, the rest of India and Europe use it?',
+      a: 'Yes. Salons and clinics in Kochi, Thiruvananthapuram, Kozhikode, Thrissur, Bengaluru, Chennai, London, Dublin and anywhere else can sign up online and take their first token booking in minutes.',
+    },
+    {
+      q: 'How do I stop crowding and long queues in my waiting area?',
+      a: 'Give every customer a token with a live waiting time. They can wait outside, shop nearby or come back just in time, so your waiting area stays calm and fewer people walk away.',
     },
     {
       q: 'Can I use it for more than one branch?',
@@ -151,12 +232,46 @@ const DEFAULTS = {
     app: true,
     plans: true,
     testimonials: true,
+    replace: true,
+    locations: true,
     faqs: true,
     contact: true,
     tokenCheck: true,
   },
   signup: { enabled: true, mode: 'trial', trialDays: 14, planName: 'Free trial' },
 };
+
+/**
+ * Built-in text of earlier versions. Saved content that still equals it word for word was never
+ * changed by the super admin, so it is upgraded to the current built-in text (the SEO wording);
+ * anything the super admin wrote is kept.
+ */
+const OLD_DEFAULTS = {
+  heroTitles: ['Walk-ins,'],
+  categoriesText: ['Salons, spas, clinics, service centres, offices – anywhere people wait their turn.'],
+  faqQuestions: [
+    [
+      'Do my customers need to install an app?',
+      'Can I use it for more than one branch?',
+      'How does the waiting time work?',
+      'Can I export my data?',
+    ],
+  ],
+};
+
+function upgradeUntouched(stored) {
+  const s = { ...(stored || {}) };
+  if (s.hero && OLD_DEFAULTS.heroTitles.includes(s.hero.title)) delete s.hero;
+  if (OLD_DEFAULTS.categoriesText.includes(s.categoriesText)) delete s.categoriesText;
+  if (
+    Array.isArray(s.faqs) &&
+    OLD_DEFAULTS.faqQuestions.some(
+      (qs) => qs.length === s.faqs.length && qs.every((q, i) => s.faqs[i] && s.faqs[i].q === q),
+    )
+  )
+    delete s.faqs;
+  return s;
+}
 
 const SECTION_KEYS = Object.keys(DEFAULTS.sections);
 const FEATURE_ICONS = [
@@ -183,10 +298,13 @@ const clone = (x) => JSON.parse(JSON.stringify(x));
 /** Stored content on top of the defaults (top level and one level down). */
 function merge(stored) {
   const out = clone(DEFAULTS);
-  for (const [k, val] of Object.entries(stored || {})) {
+  for (const [k, val] of Object.entries(upgradeUntouched(stored))) {
     if (!(k in out)) continue;
     if (Array.isArray(out[k])) out[k] = Array.isArray(val) ? val : out[k];
-    else if (out[k] && typeof out[k] === 'object')
+    else if (k === 'seo') {
+      // An empty title or description falls back to the default, so Google always gets one.
+      for (const [f, x] of Object.entries(val || {})) if (x && f in out.seo) out.seo[f] = x;
+    } else if (out[k] && typeof out[k] === 'object')
       out[k] = { ...out[k], ...(val && typeof val === 'object' ? val : {}) };
     else out[k] = val;
   }
@@ -213,7 +331,7 @@ function clean(body) {
   const contact = b.contact || {};
   const signup = b.signup || {};
   const sections = b.sections || {};
-  return {
+  const out = {
     hero: {
       badge: t(hero.badge, 80),
       title: v.required(t(hero.title, 60), 'Hero title'),
@@ -270,6 +388,21 @@ function clean(body) {
       planName: t(signup.planName, 40) || 'Free trial',
     },
   };
+  // Added later: saved only when the editor sends them, so older editors never wipe the defaults.
+  if (b.seo) {
+    out.seo = { title: t(b.seo.title, 70), description: t(b.seo.description, 170) };
+  }
+  if (Array.isArray(b.replace)) {
+    out.replace = list(b.replace, 10, (r) =>
+      t(r && r.problem, 120) ? { problem: t(r.problem, 120), solution: t(r.solution, 240) } : null,
+    );
+  }
+  if (Array.isArray(b.locations)) {
+    out.locations = list(b.locations, 20, (l) =>
+      t(l && l.region, 60) ? { region: t(l.region, 60), places: t(l.places, 300) } : null,
+    );
+  }
+  return out;
 }
 
 function createSiteService(db) {
@@ -298,4 +431,4 @@ function createSiteService(db) {
   return { get, save, reset };
 }
 
-module.exports = { createSiteService, FEATURE_ICONS, clean };
+module.exports = { createSiteService, FEATURE_ICONS, clean, merge };

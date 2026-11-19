@@ -19,10 +19,12 @@ Future<void> _save(Json content) => session.api.put('/api/admin/site', content);
 
 const List<MapEntry<String, String>> _sections = [
   MapEntry('stats', 'Numbers strip'),
+  MapEntry('replace', 'Replace paper tokens (problems and fixes)'),
   MapEntry('features', 'Features'),
   MapEntry('steps', 'How it works'),
   MapEntry('categories', 'Business types'),
   MapEntry('app', 'Mobile app download'),
+  MapEntry('locations', 'Locations'),
   MapEntry('plans', 'Pricing'),
   MapEntry('testimonials', 'Testimonials'),
   MapEntry('faqs', 'FAQ'),
@@ -44,6 +46,24 @@ class _ListSpec {
 }
 
 final List<_ListSpec> _lists = [
+  _ListSpec(
+    'replace',
+    'Replace paper tokens and token machines',
+    'problem',
+    'ticket',
+    10,
+    {'problem': '', 'solution': ''},
+    const [('problem', 'Problem (what goes wrong today)', 'text', 120), ('solution', 'How BQuee fixes it', 'area', 240)],
+  ),
+  _ListSpec(
+    'locations',
+    'Locations',
+    'region',
+    'pin',
+    20,
+    {'region': '', 'places': ''},
+    const [('region', 'Country or region', 'text', 60), ('places', 'Cities – separated by commas', 'area', 300)],
+  ),
   _ListSpec(
     'stats',
     'Numbers strip',
@@ -114,7 +134,7 @@ final List<_ListSpec> _lists = [
 _ListSpec _list(String key) => _lists.firstWhere((l) => l.key == key);
 
 /// The editor's pages, in the order they appear on the home page (same as the web).
-const _kPages = ['Setup', 'Top of page', 'Features', 'Pricing & reviews', 'FAQ & contact'];
+const _kPages = ['Setup', 'Top of page', 'Features', 'Pricing & reviews', 'FAQ & contact', 'Google & locations'];
 
 class AdminWebsite extends StatefulWidget {
   const AdminWebsite({super.key});
@@ -266,6 +286,7 @@ class _AdminWebsiteState extends State<AdminWebsite> {
               listGroup('stats'),
             ],
             if (page == 2) ...[
+              listGroup('replace'),
               listGroup('features'),
               listGroup('steps'),
               group(
@@ -326,6 +347,18 @@ class _AdminWebsiteState extends State<AdminWebsite> {
                 c.m('footer').s('text'),
                 () => _editFields(context, c, 'Footer', 'footer', const [('text', 'Footer text', 'area', 240)]),
               ),
+            ],
+            if (page == 5) ...[
+              group(
+                'search',
+                'Google search result',
+                c.m('seo').s('title'),
+                () => _editFields(context, c, 'Google search result', 'seo', const [
+                  ('title', 'Title – best under 60 characters', 'text', 70),
+                  ('description', 'Description – best under 160 characters', 'area', 170),
+                ]),
+              ),
+              listGroup('locations'),
             ],
           ],
         );

@@ -853,6 +853,118 @@ const login = async (username, password) => {
     pub1.hero.title === 'Queues, sorted.' && pub1.signup.trialDays === 30 && pub1.app.playUrl.startsWith('https://'),
   );
 
+  // ---- 17b. Search engines (SEO): the server sends finished pages, robots.txt and a sitemap ----
+  const page = async (p) => {
+    const r = await fetch(BASE + p);
+    return { status: r.status, type: r.headers.get('content-type') || '', html: await r.text() };
+  };
+  const ldOf = (html) => {
+    const m = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+    return m ? JSON.parse(m[1]) : null;
+  };
+  const home0 = await page('/');
+  const ld0 = ldOf(home0.html);
+  check(
+    'home page: SEO title, description and canonical link in the HTML',
+    /<title>Digital Token &amp; Queue System[^<]*\| BQuee<\/title>/.test(home0.html) &&
+      /<meta name="description" content="Replace paper tokens and token machines[^"]{20,}"/.test(home0.html) &&
+      /<link rel="canonical" href="http[^"]+\/" \/>/.test(home0.html),
+  );
+  check(
+    'home page: link-preview tags (WhatsApp, LinkedIn, X)',
+    /property="og:image" content="http[^"]+\/img\/og-image\.png"/.test(home0.html) &&
+      /name="twitter:card" content="summary_large_image"/.test(home0.html),
+  );
+  check(
+    'home page: the page text is in the HTML (heading shows the saved hero, every FAQ)',
+    home0.html.includes('<h1>Queues, sorted.') &&
+      home0.html.includes('Replace paper tokens and token machines</h2>') &&
+      home0.html.includes('Queue management across the UAE, GCC, India and Europe</h2>') &&
+      pub1.faqs.every((f) =>
+        home0.html.includes(f.q.replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;')),
+      ),
+  );
+  check(
+    'home page: structured data for the organisation, website, software and FAQ',
+    ld0 &&
+      ['Organization', 'WebSite', 'SoftwareApplication', 'FAQPage'].every((t) =>
+        ld0['@graph'].some((g) => g['@type'] === t),
+      ) &&
+      ld0['@graph'].find((g) => g['@type'] === 'FAQPage').mainEntity.length === pub1.faqs.length,
+  );
+  const seoSaved = await ok(
+    'admin saves the Google title and description',
+    'PUT',
+    '/api/admin/site',
+    {
+      ...edited,
+      seo: { title: 'Token booking <for> salons', description: '' },
+    },
+    sa,
+  );
+  const home1 = await page('/');
+  check(
+    'saved Google title is used (and made safe); an empty description falls back to the default',
+    seoSaved.content.seo.title === 'Token booking <for> salons' &&
+      home1.html.includes('<title>Token booking &lt;for&gt; salons</title>') &&
+      /<meta name="description" content="Replace paper tokens/.test(home1.html),
+  );
+  const { seo: _seo, replace: _replace, locations: _locations, ...olderEditor } = edited;
+  await ok('an older editor without the new parts saves', 'PUT', '/api/admin/site', olderEditor, sa);
+  const pub2 = await ok('public site after the older editor', 'GET', '/api/public/site');
+  check(
+    'an editor that doesn’t know the new parts never wipes them (built-in text returns)',
+    pub2.replace.length >= 3 && pub2.locations.length >= 5 && pub2.seo.title.includes('BQuee'),
+  );
+  const robots = await page('/robots.txt');
+  check(
+    'robots.txt allows the site, blocks private areas and names the sitemap',
+    robots.status === 200 &&
+      /Allow: \//.test(robots.html) &&
+      /Disallow: \/admin/.test(robots.html) &&
+      /Disallow: \/t\//.test(robots.html) &&
+      /Sitemap: http[^\s]+\/sitemap\.xml/.test(robots.html),
+  );
+  const adminData = await ok('admin data for business pages', 'GET', '/api/admin/data', null, sa);
+  const liveBiz = adminData.salons.find((x) => x.active && !x.expired && x.slug);
+  const sitemapXml = await page('/sitemap.xml');
+  check(
+    'sitemap lists the home page and live business pages',
+    sitemapXml.status === 200 &&
+      sitemapXml.type.includes('xml') &&
+      /<loc>http[^<]+\/<\/loc>/.test(sitemapXml.html) &&
+      sitemapXml.html.includes(`/s/${liveBiz.slug}</loc>`),
+  );
+  const bizPage = await page(`/s/${liveBiz.slug}`);
+  check(
+    'business page gets its own title, canonical link and business details',
+    bizPage.status === 200 &&
+      bizPage.html.includes(`<title>${liveBiz.name.replace(/&/g, '&amp;')}`) &&
+      bizPage.html.includes(`/s/${liveBiz.slug}" />`) &&
+      ldOf(bizPage.html)['@type'] === 'LocalBusiness',
+  );
+  for (const p of [
+    '/login',
+    '/signup',
+    '/admin',
+    '/owner',
+    '/staff',
+    `/s/${liveBiz.slug}/login`,
+    '/t/abc123',
+    '/b/abc123',
+  ])
+    check(`private page is hidden from Google: ${p}`, (await page(p)).html.includes('content="noindex, nofollow"'));
+  const missing = await page('/no-such-page');
+  const missingBiz = await page('/s/no-such-business');
+  check(
+    'unknown addresses and businesses answer 404 (still the app’s own page)',
+    missing.status === 404 &&
+      missingBiz.status === 404 &&
+      missing.html.includes('id="root"') &&
+      missing.html.includes('noindex'),
+  );
+  check('files still load normally', (await page('/manifest.webmanifest')).status === 200);
+
   const su = {
     businessName: 'Signup Spa',
     ownerName: 'Sana Owner',
@@ -942,7 +1054,10 @@ const login = async (username, password) => {
     email: '',
   });
   const reset = await ok('admin resets site to defaults', 'DELETE', '/api/admin/site', null, sa);
-  check('reset restores defaults', reset.content.hero.title === 'Walk-ins,' && reset.content.signup.enabled === true);
+  check(
+    'reset restores defaults',
+    reset.content.hero.title === 'Digital token & queue system' && reset.content.signup.enabled === true,
+  );
 
   // ---- 18. Customer app accounts, booking and history ----
   const cu = { name: 'Asha Customer', mobile: '98765 22222', email: 'Asha@Cust.test', password: 'Asha@12345' };
@@ -1641,16 +1756,16 @@ const login = async (username, password) => {
     body: JSON.stringify({ username: 'admin', password: 'Admin@12345-bq' }),
   });
   check('sign-in answers are never compressed', !signIn.headers.get('content-encoding'));
-  const page = await rawGet('/app/app.js', { 'Accept-Encoding': 'gzip' });
+  const appFile = await rawGet('/app/app.js', { 'Accept-Encoding': 'gzip' });
   check(
     'website files are gzip-compressed',
-    page.headers['content-encoding'] === 'gzip' && page.headers.vary === 'Accept-Encoding',
+    appFile.headers['content-encoding'] === 'gzip' && appFile.headers.vary === 'Accept-Encoding',
   );
   await new Promise((r) => setTimeout(r, 2500)); // strongest brotli is made in the background
   const pageBr = await rawGet('/app/app.js', { 'Accept-Encoding': 'gzip, br' });
   check(
     'website files are brotli-compressed once ready, and smaller than gzip',
-    pageBr.headers['content-encoding'] === 'br' && pageBr.body.length < page.body.length,
+    pageBr.headers['content-encoding'] === 'br' && pageBr.body.length < appFile.body.length,
   );
 
   console.log(`API audit: ${passed} passed, ${failures.length} failed`);

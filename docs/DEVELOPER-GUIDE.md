@@ -14,6 +14,7 @@ Other documents (more detail on one topic):
 | [SECURITY.md](SECURITY.md)             | What protects the system, and where                         |
 | [OPERATIONS.md](OPERATIONS.md)         | Running production: secrets, backups, monitoring, incidents |
 | [AUDIT-RESPONSE.md](AUDIT-RESPONSE.md) | The Nov 2026 security audit and how each point was handled  |
+| [SEO.md](SEO.md)                       | Keywords, technical SEO and the off-page checklist          |
 
 ---
 
@@ -136,6 +137,7 @@ src/
     security.js            headers/CSP, RateLimiter (PostgreSQL), FloodGuard, httpsRedirect
     cookies.js             cookie parse/build
     compress.js            brotli/gzip choice for website files and API answers
+    seo.js                 search engines: server-made home/business pages, noindex, 404, robots.txt, sitemap
     static-files.js        serves public/ and uploads, with a bounded cache
   db/
     postgres.js            our PostgreSQL client + pool (TLS, timeouts, transactions)
@@ -227,8 +229,10 @@ request ─► server.js handler
                ├─ cookie session + non-GET → CSRF check (header token = cookie, same Origin)
                ├─ router.match(method, path) → handler({ req, res, body, query, params, ip })
                └─ result → JSON 200 (≥1 KB: brotli/gzip, except sign-in answers) · HttpError → its status + { error } · other error → 500 (logged with request ID)
-            4. otherwise → static-files.js: public/ (the website, gzip at once, strongest brotli made in the background), /uploads/… pictures,
-               unknown paths → index.html (the website's own router decides the page)
+            4. otherwise → seo.js first: / and /s/<slug> get a server-made page (title, text, structured data),
+               private pages get noindex, /robots.txt and /sitemap.xml (see docs/SEO.md)
+            5. then static-files.js: public/ (the website, gzip at once, strongest brotli made in the background), /uploads/…
+               pictures; an unknown address → index.html with HTTP 404 + noindex (the app shows its "not found" page)
 ```
 
 ### 6.2 A route file

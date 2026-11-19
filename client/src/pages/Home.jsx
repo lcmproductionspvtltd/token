@@ -367,8 +367,10 @@ export function Home() {
   useEffect(() => {
     applyBrand();
     rememberReferral();
-    document.title = 'BQuee – QR token booking and live queues for businesses';
   }, []);
+  useEffect(() => {
+    if (site && site.seo && site.seo.title) document.title = site.seo.title;
+  }, [site]);
 
   // Coming from sign-in / sign-up with a section in mind: scroll to it once the page is drawn.
   useEffect(() => {
@@ -447,6 +449,33 @@ export function Home() {
                   </div>
                 ))}
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* ---------- replace paper tokens and token machines (problem → solution) ---------- */}
+        {on.replace && site.replace && site.replace.length > 0 && (
+          <section id="why" className="site-sec site-why">
+            <div className="site-wrap">
+              <SectionHead
+                kicker="Why switch"
+                title="Replace paper tokens and token machines"
+                text="The everyday problems of paper tokens, token dispensers and crowded waiting rooms – and how BQuee solves each one."
+              />
+              <ul className="site-why-list">
+                {site.replace.map((r, i) => (
+                  <li key={i}>
+                    <p className="site-why-problem">
+                      <Icon name="x" /> {r.problem}
+                    </p>
+                    {r.solution && (
+                      <p className="site-why-solution">
+                        <Icon name="check" /> {r.solution}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
           </section>
         )}
@@ -566,6 +595,29 @@ export function Home() {
         )}
 
         {/* ---------- pricing ---------- */}
+        {/* ---------- where BQuee works ---------- */}
+        {on.locations && site.locations && site.locations.length > 0 && (
+          <section id="locations" className="site-sec site-places">
+            <div className="site-wrap">
+              <SectionHead
+                kicker="Locations"
+                title="Queue management across the UAE, GCC, India and Europe"
+                text="BQuee runs in any phone browser – no token machine, display or installation – so salons, clinics and service centres can start the same day, wherever they are."
+              />
+              <div className="site-places-grid">
+                {site.locations.map((l, i) => (
+                  <article key={i}>
+                    <h3>
+                      <Icon name="pin" /> {l.region}
+                    </h3>
+                    {l.places && <p>{l.places}</p>}
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {on.plans && site.plans.length > 0 && (
           <section id="pricing" className="site-sec tint">
             <div className="site-wrap">
