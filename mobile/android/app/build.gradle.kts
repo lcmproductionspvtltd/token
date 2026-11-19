@@ -29,11 +29,25 @@ android {
         versionName = flutter.versionName
     }
 
+    // Store signing: the release workflow (.github/workflows/release.yml) passes the upload key from GitHub
+    // secrets in these environment variables. Without them (Mac builds, CI checks) the test key is used, as before.
+    val uploadKeystore = System.getenv("BQUEE_KEYSTORE_FILE")
+    signingConfigs {
+        if (!uploadKeystore.isNullOrEmpty()) {
+            create("upload") {
+                storeFile = file(uploadKeystore)
+                storePassword = System.getenv("BQUEE_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("BQUEE_KEY_ALIAS")
+                keyPassword = System.getenv("BQUEE_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig =
+                if (!uploadKeystore.isNullOrEmpty()) signingConfigs.getByName("upload")
+                else signingConfigs.getByName("debug")
         }
     }
 }

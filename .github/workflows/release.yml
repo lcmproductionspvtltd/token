@@ -1,0 +1,122 @@
+# Store release builds – run by hand only: GitHub → Actions → "Release builds" → Run workflow.
+#
+# Android: App Bundle (for Google Play) + APK, signed with your upload key when these repository
+# secrets exist (Settings → Secrets and variables → Actions):
+#   ANDROID_KEYSTORE_BASE64   the .jks upload key file, base64-encoded (base64 -i upload.jks | pbcopy)
+#   ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+# Without them the files are signed with the test key (fine for testing, not for Google Play).
+# iPhone: an unsigned release build (.ipa) – sign and upload it with Xcode / Transporter on the Mac.
+#
+# Runs in the "release" environment: add required reviewers to it (Settings → Environments → release)
+# so nobody can make store builds without approval. Keys never live in the repository.
+name: Release builds
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'Which app'
+        type: choice
+        options: [both, mobile, customer]
+        default: both
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_VERSION: '3.50.0'
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    environment: release
+    timeout-minutes: 45
+    strategy:
+      matrix:
+        app: [mobile, customer]
+    steps:
+      - name: Skip when another app was chosen
+        if: inputs.app != 'both' && inputs.app != matrix.app
+        run: echo "Skipping ${{ matrix.app }}"
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: inputs.app == 'both' || inputs.app == matrix.app
+
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        if: inputs.app == 'both' || inputs.app == matrix.app
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Flutter (fixed version)
+        if: inputs.app == 'both' || inputs.app == matrix.app
+        run: |
+          git clone --depth 1 -b "$FLUTTER_VERSION" https://github.com/flutter/flutter.git "$HOME/flutter"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+
+      - name: Upload key (from secrets, if set)
+        if: inputs.app == 'both' || inputs.app == matrix.app
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+            echo "BQUEE_KEYSTORE_FILE=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+            echo "Signing with the upload key."
+          else
+            echo "::warning::No ANDROID_KEYSTORE_BASE64 secret – signing with the test key (not for Google Play)."
+          fi
+
+      - name: Build App Bundle and APK
+        if: inputs.app == 'both' || inputs.app == matrix.app
+        working-directory: ${{ matrix.app }}
+        env:
+          BQUEE_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          BQUEE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          BQUEE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          flutter pub get
+          flutter build appbundle --release
+          flutter build apk --release
+          rm -f "$RUNNER_TEMP/upload.jks"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: inputs.app == 'both' || inputs.app == matrix.app
+        with:
+          name: android-${{ matrix.app }}
+          path: |
+            ${{ matrix.app }}/build/app/outputs/bundle/release/app-release.aab
+            ${{ matrix.app }}/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 14
+
+  ios:
+    runs-on: macos-latest
+    environment: release
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        app: [mobile, customer]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: inputs.app == 'both' || inputs.app == matrix.app
+
+      - name: Flutter (fixed version)
+        if: inputs.app == 'both' || inputs.app == matrix.app
+        run: |
+          git clone --depth 1 -b "$FLUTTER_VERSION" https://github.com/flutter/flutter.git "$HOME/flutter"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+
+      - name: Unsigned iPhone release build
+        if: inputs.app == 'both' || inputs.app == matrix.app
+        working-directory: ${{ matrix.app }}
+        run: |
+          flutter pub get
+          flutter build ios --release --no-codesign
+          cd build/ios/iphoneos && mkdir -p Payload && cp -R Runner.app Payload/ && zip -qr "$GITHUB_WORKSPACE/${{ matrix.app }}-unsigned.ipa" Payload
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: inputs.app == 'both' || inputs.app == matrix.app
+        with:
+          name: ios-${{ matrix.app }}
+          path: ${{ matrix.app }}-unsigned.ipa
+          retention-days: 14
