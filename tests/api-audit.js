@@ -1472,6 +1472,80 @@ const login = async (username, password) => {
       pubSite.defaultCurrency === 'USD',
   );
   check('"Free" and "Talk to us" stay as words', pubSite.plans.filter((p) => !p.prices).length === 2);
+
+  // "Get the BQuee app" buttons on business pages: links from the super admin, switch per business / in bulk.
+  await deny(
+    'customer app link must be https',
+    [400],
+    'PUT',
+    '/api/admin/site',
+    { ...reset.content, customerApp: { playUrl: 'javascript:alert(1)' } },
+    sa,
+  );
+  await ok(
+    'admin adds the customer app store link',
+    'PUT',
+    '/api/admin/site',
+    {
+      ...reset.content,
+      customerApp: { playUrl: 'https://play.google.com/store/apps/details?id=com.bquee.customer', appStoreUrl: '' },
+    },
+    sa,
+  );
+  const appBiz = (await ok('admin data for app buttons', 'GET', '/api/admin/data', null, sa)).salons[0];
+  const appPage1 = await ok('business page with app buttons', 'GET', '/api/public/salon/' + appBiz.slug);
+  check(
+    'business page shows the app buttons that have links',
+    appPage1.appLinks &&
+      /^https:\/\/play\.google\.com\//.test(appPage1.appLinks.play) &&
+      appPage1.appLinks.appStore === '',
+  );
+  await ok(
+    'switch app buttons off for one business',
+    'PUT',
+    `/api/admin/salons/${appBiz.id}/features`,
+    { features: { appButtons: false } },
+    sa,
+  );
+  check(
+    '…that business page has none',
+    (await ok('page after switch-off', 'GET', '/api/public/salon/' + appBiz.slug)).appLinks === null,
+  );
+  await ok(
+    'switch app buttons on in bulk',
+    'POST',
+    '/api/admin/salons/bulk',
+    { ids: [appBiz.id], features: { appButtons: true } },
+    sa,
+  );
+  check(
+    '…bulk switch brings them back',
+    !!(await ok('page after bulk', 'GET', '/api/public/salon/' + appBiz.slug)).appLinks,
+  );
+
+  // Section titles of the home page are editable; an empty title goes back to the built-in one.
+  const headed = await ok(
+    'admin renames section titles',
+    'PUT',
+    '/api/admin/site',
+    {
+      ...reset.content,
+      headings: {
+        ...reset.content.headings,
+        plans: { kicker: 'Plans', title: 'Prices for every size', text: 'Pick one.' },
+        faqs: { kicker: 'FAQ', title: '', text: '' },
+      },
+    },
+    sa,
+  );
+  check(
+    'new pricing title saved; empty FAQ title back to the built-in one',
+    headed.content.headings.plans.title === 'Prices for every size' &&
+      headed.content.headings.faqs.title === 'Questions, answered' &&
+      headed.content.headings.features.title === 'Everything your queue needs',
+  );
+  const homeHtml = await (await fetch(BASE + '/')).text();
+  check('Google sees the new section title too', homeHtml.includes('Prices for every size'));
   await deny('package required when pricing is on', [400], 'POST', '/api/public/signup', {
     businessName: 'No Pkg',
     ownerName: 'N',
@@ -1788,9 +1862,18 @@ const login = async (username, password) => {
     ['a link instead of a file', 'https://evil.example/x.png'],
     ['javascript link', 'javascript:alert(1)'],
   ];
+  // Every refusal says the reason in plain words (no codes, no "Broken file").
+  const why = {
+    'picture over the size limit': /This picture is [\d.]+ (KB|MB) – the largest allowed here is [\d.]+ (KB|MB)/,
+    'cut-off PNG': /damaged or incomplete/,
+    'ZIP hidden after a JPG': /extra hidden data after the picture/,
+    'PNG with fake 20000 px size': /too large in pixels/,
+    'not base64 at all': /PNG, JPG or WEBP/,
+  };
   for (const [label, photo] of attacks) {
     const r = await upload(label, photo);
     check('refused: ' + label, r.status === 400);
+    if (why[label]) check('…and says why: ' + label, why[label].test(r.data.error || ''), r.data.error);
   }
   const after = await ok('reviews after attacks', 'GET', '/api/owner/data', null, op);
   check('no attack was stored', after.testimonials.filter((x) => x.photo).length === accepted.length);

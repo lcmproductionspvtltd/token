@@ -82,37 +82,39 @@ export function Logo({ light }) {
   );
 }
 
-/** Store buttons. Without a link yet they read "Coming soon". */
-function StoreButtons({ app }) {
+/** Store buttons. Without a link yet they read "Coming soon" (or are left out with onlyLinked). */
+export function StoreButtons({ app, onlyLinked = false }) {
   const items = [
     ['playUrl', 'Get it on', 'Google Play', 'play', 'play'],
     ['appStoreUrl', 'Download on the', 'App Store', 'phoneapp', 'ios'],
   ];
   return (
     <div className="store-row">
-      {items.map(([key, small, big, icon, kind]) => {
-        const href = app && app[key];
-        const inner = (
-          <>
-            <span className="store-ico">
-              <Icon name={icon} />
+      {items
+        .filter(([key]) => !onlyLinked || (app && app[key]))
+        .map(([key, small, big, icon, kind]) => {
+          const href = app && app[key];
+          const inner = (
+            <>
+              <span className="store-ico">
+                <Icon name={icon} />
+              </span>
+              <span className="store-txt">
+                <small>{href ? small : 'Coming soon'}</small>
+                <b>{big}</b>
+              </span>
+            </>
+          );
+          return href ? (
+            <a key={key} className={'store-btn ' + kind} href={href} target="_blank" rel="noopener noreferrer">
+              {inner}
+            </a>
+          ) : (
+            <span key={key} className={'store-btn soon ' + kind} aria-label={big + ' – coming soon'}>
+              {inner}
             </span>
-            <span className="store-txt">
-              <small>{href ? small : 'Coming soon'}</small>
-              <b>{big}</b>
-            </span>
-          </>
-        );
-        return href ? (
-          <a key={key} className={'store-btn ' + kind} href={href} target="_blank" rel="noopener noreferrer">
-            {inner}
-          </a>
-        ) : (
-          <span key={key} className={'store-btn soon ' + kind} aria-label={big + ' – coming soon'}>
-            {inner}
-          </span>
-        );
-      })}
+          );
+        })}
     </div>
   );
 }
@@ -478,11 +480,7 @@ export function Home() {
         {on.replace && site.replace && site.replace.length > 0 && (
           <section id="why" className="site-sec site-why">
             <div className="site-wrap">
-              <SectionHead
-                kicker="Why switch"
-                title="Replace paper tokens and token machines"
-                text="The everyday problems of paper tokens, token dispensers and crowded waiting rooms – and how BQuee solves each one."
-              />
+              <SectionHead {...head(site, 'replace')} />
               <ul className="site-why-list">
                 {site.replace.map((r, i) => (
                   <li key={i}>
@@ -505,11 +503,7 @@ export function Home() {
         {on.features && site.features.length > 0 && (
           <section id="features" className="site-sec">
             <div className="site-wrap">
-              <SectionHead
-                kicker="Features"
-                title="Everything your queue needs"
-                text="One simple system for customers, staff and owners."
-              />
+              <SectionHead {...head(site, 'features')} />
               <div className="site-features">
                 {site.features.map((f, i) => (
                   <article key={i} className="site-feature">
@@ -551,13 +545,7 @@ export function Home() {
         {on.steps && site.steps.length > 0 && (
           <section id="how" className="site-sec site-how">
             <div className="site-wrap">
-              <SectionHead
-                kicker="How it works"
-                title="Live in an afternoon"
-                text="No hardware and no training – just a QR code and your phone."
-                center
-                light
-              />
+              <SectionHead {...head(site, 'steps')} center light />
               <ol className="site-steps" style={{ '--n': Math.min(site.steps.length, 4) }}>
                 {site.steps.map((s, i) => (
                   <li key={i}>
@@ -620,11 +608,7 @@ export function Home() {
         {on.locations && site.locations && site.locations.length > 0 && (
           <section id="locations" className="site-sec site-places">
             <div className="site-wrap">
-              <SectionHead
-                kicker="Locations"
-                title="Queue management across the UAE, GCC, India and Europe"
-                text="BQuee runs in any phone browser – no token machine, display or installation – so salons, clinics and service centres can start the same day, wherever they are."
-              />
+              <SectionHead {...head(site, 'locations')} />
               <div className="site-places-grid">
                 {site.locations.map((l, i) => (
                   <article key={i}>
@@ -642,12 +626,7 @@ export function Home() {
         {on.plans && site.plans.length > 0 && (
           <section id="pricing" className="site-sec tint">
             <div className="site-wrap">
-              <SectionHead
-                kicker="Pricing"
-                title="Simple, honest pricing"
-                text="Start free. Upgrade when your queue grows."
-                center
-              />
+              <SectionHead {...head(site, 'plans')} center />
               <CurrencyPicker site={site} code={currency} onPick={setCurrency} className="center" />
               <div className="site-plans">
                 {site.plans.map((p, i) => (
@@ -688,7 +667,7 @@ export function Home() {
         {on.testimonials && site.testimonials.length > 0 && (
           <section className="site-sec site-reviews">
             <div className="site-wrap">
-              <SectionHead kicker="Reviews" title="Loved by busy businesses" />
+              <SectionHead {...head(site, 'testimonials')} />
               <QuoteSlider items={site.testimonials} />
             </div>
           </section>
@@ -698,11 +677,7 @@ export function Home() {
         {on.faqs && site.faqs.length > 0 && (
           <section id="faq" className="site-sec tint">
             <div className="site-wrap site-faq-wrap">
-              <SectionHead
-                kicker="FAQ"
-                title="Questions, answered"
-                text={hasContact && on.contact ? 'Still wondering about something? Get in touch below.' : ''}
-              />
+              <SectionHead {...head(site, 'faqs')} text={hasContact && on.contact ? head(site, 'faqs').text : ''} />
               <div className="site-faq">
                 {site.faqs.map((f, i) => (
                   <details key={i}>
@@ -722,11 +697,7 @@ export function Home() {
         {on.contact && hasContact && (
           <section id="contact" className="site-sec">
             <div className="site-wrap">
-              <SectionHead
-                kicker="Contact"
-                title="Talk to us"
-                text="Questions, a demo or help with setup – we reply quickly."
-              />
+              <SectionHead {...head(site, 'contact')} />
               <div className="site-contact">
                 {contact.whatsapp && (
                   <a
@@ -800,6 +771,12 @@ export function Home() {
     </div>
   );
 }
+
+/** A section's heading as the super admin set it (Admin → Website → Section titles). */
+const head = (site, key) => {
+  const h = (site.headings && site.headings[key]) || {};
+  return { kicker: h.kicker, title: h.title, text: h.text };
+};
 
 function SectionHead({ kicker, title, text, center, light }) {
   return (

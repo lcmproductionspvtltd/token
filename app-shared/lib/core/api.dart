@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/services.dart' show PlatformException;
+
 import 'json.dart';
 
 class ApiException implements Exception {
@@ -83,9 +85,7 @@ class Api {
       data = <String, dynamic>{};
     }
     if (res.statusCode >= 400) {
-      final msg = data is Map && data['error'] != null
-          ? data['error'].toString()
-          : 'Something went wrong (${res.statusCode}).';
+      final msg = data is Map && data['error'] != null ? data['error'].toString() : messageForStatus(res.statusCode);
       if (res.statusCode == 401 && onUnauthorized != null) onUnauthorized!();
       throw ApiException(res.statusCode, msg);
     }
@@ -96,3 +96,33 @@ class Api {
 /// The server connection that shared code uses (pictures, account requests).
 /// Each app points it at its own session's connection once at start-up: `serverApi = session.api`.
 Api serverApi = Api('');
+
+/// What to tell people when an answer has no message of its own (for example a "too big" refusal
+/// from the web server, or BQuee restarting) – never a bare code. Same wording as the website.
+String messageForStatus(int status) => switch (status) {
+      400 => 'Some details aren’t right. Check the form and try again.',
+      401 => 'Your sign-in has ended. Please sign in again.',
+      403 => 'You don’t have permission to do this. Refresh and try again.',
+      404 => 'This item no longer exists. Refresh and try again.',
+      408 => 'The server took too long to answer. Try again.',
+      409 => 'Someone changed this at the same time. Refresh and try again.',
+      413 => 'This file is too big to upload. Choose a smaller picture and try again.',
+      429 => 'Too many tries in a short time. Wait a minute and try again.',
+      500 => 'Something went wrong on our side. Try again in a moment – if it keeps happening, contact support.',
+      502 => 'BQuee is restarting. Wait a few seconds and try again.',
+      503 => 'BQuee is busy right now. Wait a few seconds and try again.',
+      504 => 'The server took too long to answer. Try again in a moment.',
+      _ => 'Something went wrong (code $status). Try again – if it keeps happening, contact support.',
+    };
+
+/// A sentence for any error, never a code or a Dart class name ("PlatformException(…)").
+String friendlyError(Object e) {
+  if (e is ApiException) return e.message;
+  if (e is PlatformException) {
+    final m = (e.message ?? '').trim();
+    return m.isNotEmpty && !m.contains('Exception') ? m : 'The phone couldn’t do this. Try again – if it keeps happening, restart the app.';
+  }
+  if (e is FormatException) return 'The server sent an answer the app couldn’t read. Update the app and try again.';
+  if (e is TimeoutException) return 'The server is taking too long to answer. Check your connection and try again.';
+  return 'Something went wrong. Check your connection and try again.';
+}

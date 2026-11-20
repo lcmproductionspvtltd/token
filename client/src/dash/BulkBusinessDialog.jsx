@@ -46,7 +46,7 @@ function Choice({ label, hint, icon, value, onChange, on = 'On', off = 'Off' }) 
 
 export function BulkBusinessDialog({ ids, canEdit, canToggle, onClose, onDone }) {
   const [active, setActive] = useState('');
-  const [flags, setFlags] = useState({ maskContacts: '', reportExport: '', staffReports: '' });
+  const [flags, setFlags] = useState({ maskContacts: '', reportExport: '', staffReports: '', appButtons: '' });
   const [menus, setMenus] = useState({});
   const setFlag = (k) => (v) => setFlags((x) => ({ ...x, [k]: v }));
 
@@ -138,6 +138,13 @@ export function BulkBusinessDialog({ ids, canEdit, canToggle, onClose, onDone })
               icon="chart"
               value={flags.staffReports}
               onChange={setFlag('staffReports')}
+            />
+            <Choice
+              label="BQuee app download buttons"
+              hint="Google Play / App Store buttons on the business page"
+              icon="phone"
+              value={flags.appButtons}
+              onChange={setFlag('appButtons')}
             />
           </div>
         </>

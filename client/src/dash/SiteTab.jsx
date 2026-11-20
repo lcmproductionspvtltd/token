@@ -202,10 +202,13 @@ export function SiteTab() {
       <StepBar steps={PAGES} at={page} onPick={go} canPick={() => true} />
 
       {page === 0 && (
-        <div className="site-editor-grid">
-          <SectionsPanel c={c} put={put} />
-          <SignupPanel c={c} put={put} text={text} />
-        </div>
+        <>
+          <div className="site-editor-grid">
+            <SectionsPanel c={c} put={put} />
+            <SignupPanel c={c} put={put} text={text} />
+          </div>
+          <HeadingsPanel text={text} />
+        </>
       )}
       {page === 1 && (
         <>
@@ -315,6 +318,38 @@ function SectionsPanel({ c, put }) {
   );
 }
 
+const HEADINGS = [
+  ['replace', 'Why switch (problems and solutions)'],
+  ['features', 'Features'],
+  ['steps', 'How it works'],
+  ['locations', 'Locations'],
+  ['plans', 'Pricing'],
+  ['testimonials', 'Reviews'],
+  ['faqs', 'FAQ'],
+  ['contact', 'Contact'],
+];
+
+/** The heading of each home page section: small label, title and the line under it. */
+function HeadingsPanel({ text }) {
+  return (
+    <Panel
+      title="Section titles"
+      sub="What each section of the home page is called. A title left empty goes back to the built-in one."
+    >
+      {HEADINGS.map(([key, label]) => (
+        <fieldset key={key} className="heading-set">
+          <legend>{label}</legend>
+          <div className="form-row">
+            {text(['headings', key, 'kicker'], 'Small label above', 30)}
+            {text(['headings', key, 'title'], 'Title', 100)}
+          </div>
+          {text(['headings', key, 'text'], 'Line under the title', 300, true)}
+        </fieldset>
+      ))}
+    </Panel>
+  );
+}
+
 /** Whether businesses can sign up, trial or approval, and the plan name. */
 function SignupPanel({ c, put, text }) {
   return (
@@ -391,6 +426,16 @@ function TypesAndAppPanels({ text }) {
         <div className="form-row">
           {text(['app', 'playUrl'], 'Google Play link (https://…)', 300)}
           {text(['app', 'appStoreUrl'], 'App Store link (https://…)', 300)}
+        </div>
+      </Panel>
+
+      <Panel
+        title="Customer app on business pages"
+        sub="“Get the BQuee app” buttons on every business’s page. Leave both empty to hide them; switch them off for one business or many in Businesses → Menus & features."
+      >
+        <div className="form-row">
+          {text(['customerApp', 'playUrl'], 'BQuee app – Google Play link (https://…)', 300)}
+          {text(['customerApp', 'appStoreUrl'], 'BQuee app – App Store link (https://…)', 300)}
         </div>
       </Panel>
     </>

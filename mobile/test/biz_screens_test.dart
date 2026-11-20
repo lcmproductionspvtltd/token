@@ -150,6 +150,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Enter username'), findsOneWidget, reason: 'a new business needs the owner sign-in');
     expect(find.text('Plan name'), findsNothing);
+    expect(find.byTooltip('Show password'), findsOneWidget, reason: 'owner password has an eye button');
+    await tester.tap(find.byTooltip('Show password'));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Hide password'), findsOneWidget, reason: 'the password is now shown');
   });
 
   testWidgets('change many businesses: every setting starts at "No change"', (tester) async {

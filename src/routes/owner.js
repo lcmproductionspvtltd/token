@@ -185,7 +185,7 @@ module.exports = function ownerRoutes(router, { db, auth, tokens, catalog, uploa
       name: body.name !== undefined ? v.required(v.text(body.name, 80), 'Business name') : salon.name,
       slug,
       tagline: pick('tagline', 'tagline'),
-      about: pick('about', 'about', 1000),
+      about: pick('about', 'about', 400),
       hours: pick('hours', 'hours'),
       phone: pick('phone', 'phone', 20),
       whatsapp: pick('whatsapp', 'whatsapp', 20),

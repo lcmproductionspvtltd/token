@@ -78,7 +78,7 @@ class ErrorView extends StatelessWidget {
     return EmptyState(
       icon: 'refresh',
       title: 'Couldn’t load this',
-      text: error is ApiException ? (error as ApiException).message : 'Check your connection and try again.',
+      text: friendlyError(error),
       action: Btn('Try again', icon: 'refresh', kind: BtnKind.soft, onPressed: onRetry),
     );
   }

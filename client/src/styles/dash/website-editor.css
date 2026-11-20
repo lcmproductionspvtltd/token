@@ -204,3 +204,17 @@
   font-size: 0.88rem;
   line-height: 1.5;
 }
+
+/* Section titles: one small group per home page section */
+.heading-set {
+  margin: 0 0 14px;
+  padding: 14px 16px 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+.heading-set legend {
+  padding: 0 6px;
+  font-weight: 600;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+}

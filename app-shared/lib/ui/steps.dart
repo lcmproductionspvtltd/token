@@ -194,7 +194,7 @@ class _StepFormPageState extends State<StepFormPage> {
       if (mounted) {
         setState(() {
           busy = false;
-          error = e is ApiException ? e.message : e.toString();
+          error = friendlyError(e);
         });
       }
     }

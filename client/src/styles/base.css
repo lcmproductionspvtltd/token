@@ -474,6 +474,37 @@ button {
   background: var(--porcelain);
   color: var(--ink-3);
 }
+/* password box with a show/hide eye */
+.reveal-pw {
+  position: relative;
+  display: block;
+}
+.field .reveal-pw input {
+  padding-right: 48px;
+}
+.reveal-eye {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.reveal-eye:hover {
+  background: var(--brand-wash);
+  color: var(--brand-ink);
+}
+.reveal-eye .i {
+  width: 18px;
+  height: 18px;
+}
 select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23777085' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");

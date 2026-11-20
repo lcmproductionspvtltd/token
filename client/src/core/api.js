@@ -59,6 +59,27 @@ function csrfToken() {
   return m ? decodeURIComponent(m[1]) : '';
 }
 
+/**
+ * What to tell people when an answer has no message of its own (for example nginx refusing a big upload,
+ * or the server restarting) – never a bare code like "Request failed (413)".
+ */
+const STATUS_TEXT = {
+  400: 'Some details aren’t right. Check the form and try again.',
+  401: 'Your sign-in has ended. Please sign in again.',
+  403: 'You don’t have permission to do this – or the page was open too long. Refresh the page and try again.',
+  404: 'This item no longer exists. Refresh the page.',
+  408: 'The server took too long to answer. Try again.',
+  409: 'Someone changed this at the same time. Refresh the page and try again.',
+  413: 'This file is too big to upload. Choose a smaller picture and try again.',
+  429: 'Too many tries in a short time. Wait a minute and try again.',
+  500: 'Something went wrong on our side. Try again in a moment – if it keeps happening, contact support.',
+  502: 'BQuee is restarting. Wait a few seconds and try again.',
+  503: 'BQuee is busy right now. Wait a few seconds and try again.',
+  504: 'The server took too long to answer. Try again in a moment.',
+};
+export const messageForStatus = (status) =>
+  STATUS_TEXT[status] || `Something went wrong (code ${status}). Try again – if it keeps happening, contact support.`;
+
 /** Calls the JSON API. Throws an Error with `.status` for non-2xx responses. */
 export async function api(method, url, body) {
   const headers = { 'Content-Type': 'application/json', 'X-BQuee-Client': 'web' };
@@ -79,7 +100,7 @@ export async function api(method, url, body) {
   const data = await response.json().catch(() => ({}));
   if (response.status === 401 && session && !url.startsWith('/api/login')) setSession(null);
   if (!response.ok) {
-    const error = new Error(data.error || `Request failed (${response.status})`);
+    const error = new Error(data.error || messageForStatus(response.status));
     error.status = response.status;
     throw error;
   }

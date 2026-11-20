@@ -268,6 +268,13 @@ class _AdminWebsiteState extends State<AdminWebsite> {
                   ),
                 ],
               ),
+              for (final h in _kHeadings)
+                group(
+                  'edit',
+                  'Section title – ${h.$2}',
+                  c.m('headings').m(h.$1).s('title'),
+                  () => _editHeading(context, c, h.$1, h.$2),
+                ),
             ],
             if (page == 1) ...[
               group(
@@ -312,6 +319,17 @@ class _AdminWebsiteState extends State<AdminWebsite> {
                   ('appStoreUrl', 'App Store link (https://…)', 'link', 300),
                 ]),
                 tags: [if (!sec.b('app', true)) const Tag('Hidden on page')],
+              ),
+              group(
+                'phone',
+                'Customer app on business pages',
+                (c.m('customerApp').s('playUrl').isEmpty && c.m('customerApp').s('appStoreUrl').isEmpty)
+                    ? 'No links – buttons hidden'
+                    : 'Buttons shown on business pages',
+                () => _editFields(context, c, 'Customer app on business pages', 'customerApp', const [
+                  ('playUrl', 'BQuee app – Google Play link (https://…)', 'link', 300),
+                  ('appStoreUrl', 'BQuee app – App Store link (https://…)', 'link', 300),
+                ]),
               ),
             ],
             if (page == 3) ...[listGroup('plans'), listGroup('testimonials')],
@@ -826,4 +844,41 @@ class _IconPicker extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Home page sections whose heading the super admin can change (same list as the website editor).
+const _kHeadings = [
+  ('replace', 'Why switch'),
+  ('features', 'Features'),
+  ('steps', 'How it works'),
+  ('locations', 'Locations'),
+  ('plans', 'Pricing'),
+  ('testimonials', 'Reviews'),
+  ('faqs', 'FAQ'),
+  ('contact', 'Contact'),
+];
+
+/// One section's heading: small label above, title, line under it. An empty title goes back to the built-in one.
+Future<bool> _editHeading(BuildContext context, Json content, String key, String label) {
+  final next = _copy(content);
+  final all = next.m('headings');
+  final h = all.m(key);
+  final kicker = TextEditingController(text: h.s('kicker'));
+  final title = TextEditingController(text: h.s('title'));
+  final text = TextEditingController(text: h.s('text'));
+  return FormPage.open(
+    context,
+    title: 'Section title – $label',
+    submitLabel: 'Save',
+    builder: (context, setState) => [
+      FieldX('Small label above', kicker, maxLength: 30, caps: TextCapitalization.sentences),
+      FieldX('Title', title, maxLength: 100, caps: TextCapitalization.sentences, helper: 'Leave empty for the built-in title'),
+      FieldX('Line under the title', text, maxLength: 300, maxLines: 4, caps: TextCapitalization.sentences),
+    ],
+    onSubmit: () async {
+      all[key] = {'kicker': kicker.text.trim(), 'title': title.text.trim(), 'text': text.text.trim()};
+      next['headings'] = all;
+      await _save(next);
+    },
+  );
 }

@@ -195,9 +195,26 @@
   object-fit: contain;
   border-radius: 12px;
 }
+/* Logo alone in the header (no name next to it): a little bigger, no frame. */
+.ld-logo.only.mark.img {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+.ld-logo.only.mark.img img {
+  height: 44px;
+  max-width: 220px;
+  border-radius: 10px;
+}
+.ld-nav.solid .ld-logo.only.mark.img img {
+  height: 38px;
+}
 @media (max-width: 640px) {
   .ld-logo.mark.img img {
     max-width: 120px;
+  }
+  .ld-logo.only.mark.img img {
+    max-width: 160px;
   }
 }
 

@@ -27,6 +27,12 @@ const LIMITS = {
 };
 
 const URL_PREFIX = '/uploads/';
+
+const sizeText = (n) =>
+  n >= 1_000_000 ? (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + ' MB' : Math.round(n / 1000) + ' KB';
+/** "This picture is 3.2 MB – the largest allowed here is 1 MB. …" */
+const tooBig = (size, max) =>
+  `This picture is ${sizeText(size)} – the largest allowed here is ${sizeText(max)}. Choose a smaller picture or crop it, then try again.`;
 const fileNameOf = (url) => (url && url.startsWith(URL_PREFIX) ? path.basename(url) : '');
 
 function diskStore(uploadsDir) {
@@ -85,11 +91,14 @@ function createUploadService({ storage = 'disk', uploadsDir, db }) {
     const text = String(input);
     // Size check on the text first, so a huge upload is refused before it is decoded.
     if (text.length > Math.ceil(maxBytes / 3) * 4 + 40)
-      throw badRequest(`Image is too large (max ${Math.round(maxBytes / 1000)} KB)`);
+      throw badRequest(tooBig(Math.floor((text.length * 3) / 4), maxBytes));
     const match = /^data:image\/(?:png|jpeg|jpg|webp);base64,([A-Za-z0-9+/]+={0,2})$/.exec(text);
-    if (!match) throw badRequest('Images must be PNG, JPG or WEBP');
+    if (!match)
+      throw badRequest(
+        'This file type can’t be used. Choose a PNG, JPG or WEBP picture (iPhone HEIC photos: share them as JPG first).',
+      );
     const bytes = Buffer.from(match[1], 'base64');
-    if (bytes.length > maxBytes) throw badRequest(`Image is too large (max ${Math.round(maxBytes / 1000)} KB)`);
+    if (bytes.length > maxBytes) throw badRequest(tooBig(bytes.length, maxBytes));
     let type;
     try {
       type = inspectImage(bytes);

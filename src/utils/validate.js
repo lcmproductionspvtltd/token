@@ -6,7 +6,8 @@ const { badRequest } = require('../http/errors');
 
 /** Text input: a string (a number or true/false is turned into text). Lists and objects are refused. */
 function text(value, max = 200) {
-  if (value !== null && typeof value === 'object') throw badRequest('Invalid value');
+  if (value !== null && typeof value === 'object')
+    throw badRequest('One of the values isn’t in the right format. Check the form and try again.');
   return String(value == null ? '' : value)
     .trim()
     .slice(0, max);

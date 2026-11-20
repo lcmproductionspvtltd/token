@@ -91,6 +91,12 @@ export function FeaturesDialog({ salon, onClose, reload }) {
           label="Staff reports"
           hint="Staff can see their own reports"
         />
+        <Switch
+          checked={f.appButtons}
+          onChange={(v) => set('appButtons', v)}
+          label="BQuee app download buttons"
+          hint="Google Play and App Store buttons for the customer app on this business’s page"
+        />
       </div>
     </FormDialog>
   );

@@ -131,7 +131,7 @@ export function SettingsTab({ d, reload }) {
             <input {...bind('slug')} maxLength={60} autoCapitalize="none" />
           </Field>
           <Field label="About your business">
-            <textarea {...bind('about')} maxLength={1000} rows={3} />
+            <textarea {...bind('about')} maxLength={400} rows={3} />
           </Field>
           <div className="form-row">
             <Field label="Opening hours" hint="e.g. Mon–Sun · 9 AM – 9 PM">

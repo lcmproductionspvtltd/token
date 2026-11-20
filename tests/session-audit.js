@@ -333,6 +333,13 @@ const cookiesOf = (r) => (r.headers.getSetCookie ? r.headers.getSetCookie() : []
     body: { website: 'https://shop.example', instagram: '@sess.shop' },
   });
   check('normal business links are fine', fine.status === 200);
+  await req('PUT', '/api/owner/salon', { token: ownToken, body: { about: 'x'.repeat(900) } });
+  const afterAbout = await req('GET', '/api/owner/data', { token: ownToken });
+  check(
+    'the "about" text is kept to 400 characters (so the Visit card keeps its size)',
+    afterAbout.status === 200 && afterAbout.data.salon.about.length === 400,
+    JSON.stringify(afterAbout.data.salon || afterAbout.data).slice(0, 120),
+  );
 
   await db.end();
   /* ---------- audit 4.1 / 4.4: CSRF on every kind of change, CORS, cookie scope, safe errors ---------- */

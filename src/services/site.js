@@ -132,6 +132,39 @@ const DEFAULTS = {
     playUrl: '',
     appStoreUrl: '',
   },
+  // Headings of the home page sections (small label above, title, line under it).
+  headings: {
+    replace: {
+      kicker: 'Why switch',
+      title: 'Replace paper tokens and token machines',
+      text: 'The everyday problems of paper tokens, token dispensers and crowded waiting rooms – and how BQuee solves each one.',
+    },
+    features: {
+      kicker: 'Features',
+      title: 'Everything your queue needs',
+      text: 'One simple system for customers, staff and owners.',
+    },
+    steps: {
+      kicker: 'How it works',
+      title: 'Live in an afternoon',
+      text: 'No hardware and no training – just a QR code and your phone.',
+    },
+    locations: {
+      kicker: 'Locations',
+      title: 'Queue management across the UAE, GCC, India and Europe',
+      text: 'BQuee runs in any phone browser – no token machine, display or installation – so salons, clinics and service centres can start the same day, wherever they are.',
+    },
+    plans: { kicker: 'Pricing', title: 'Simple, honest pricing', text: 'Start free. Upgrade when your queue grows.' },
+    testimonials: { kicker: 'Reviews', title: 'Loved by busy businesses', text: '' },
+    faqs: { kicker: 'FAQ', title: 'Questions, answered', text: 'Still wondering about something? Get in touch below.' },
+    contact: {
+      kicker: 'Contact',
+      title: 'Talk to us',
+      text: 'Questions, a demo or help with setup – we reply quickly.',
+    },
+  },
+  // The customer app (BQuee) in the stores – shown on every business page unless switched off.
+  customerApp: { playUrl: '', appStoreUrl: '' },
   plans: [
     {
       name: 'Starter',
@@ -402,6 +435,21 @@ function clean(body) {
       t(r && r.problem, 120) ? { problem: t(r.problem, 120), solution: t(r.solution, 240) } : null,
     );
   }
+  if (b.headings && typeof b.headings === 'object') {
+    // A heading left without a title goes back to the built-in one.
+    out.headings = {};
+    for (const key of Object.keys(DEFAULTS.headings)) {
+      const h = b.headings[key];
+      if (h && typeof h === 'object' && t(h.title, 100))
+        out.headings[key] = { kicker: t(h.kicker, 30), title: t(h.title, 100), text: t(h.text, 300) };
+    }
+  }
+  if (b.customerApp && typeof b.customerApp === 'object') {
+    out.customerApp = {
+      playUrl: link(b.customerApp.playUrl, 'Customer app Google Play link'),
+      appStoreUrl: link(b.customerApp.appStoreUrl, 'Customer app App Store link'),
+    };
+  }
   if (Array.isArray(b.locations)) {
     out.locations = list(b.locations, 20, (l) =>
       t(l && l.region, 60) ? { region: t(l.region, 60), places: t(l.places, 300) } : null,
@@ -436,4 +484,4 @@ function createSiteService(db) {
   return { get, save, reset };
 }
 
-module.exports = { createSiteService, FEATURE_ICONS, clean, merge };
+module.exports = { createSiteService, FEATURE_ICONS, HEADING_KEYS: Object.keys(DEFAULTS.headings), clean, merge };

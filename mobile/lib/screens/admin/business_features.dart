@@ -16,7 +16,7 @@ Future<bool> editBusinessesBulk(BuildContext context, List<String> ids) async {
   final canToggle = session.can('salons.toggle');
   final canEdit = session.can('salons.edit');
   var active = '';
-  final flags = {'maskContacts': '', 'reportExport': '', 'staffReports': ''};
+  final flags = {'maskContacts': '', 'reportExport': '', 'staffReports': '', 'appButtons': ''};
   final menus = {for (final m in kFeatureMenus) m.$1: ''};
   bool? asBool(String v) => v == 'on'
       ? true
@@ -104,6 +104,12 @@ Future<bool> editBusinessesBulk(BuildContext context, List<String> ids) async {
               flags['staffReports']!,
               (v) => setState(() => flags['staffReports'] = v),
             ),
+            row(
+              'BQuee app download buttons',
+              'Google Play / App Store buttons on the business page',
+              flags['appButtons']!,
+              (v) => setState(() => flags['appButtons'] = v),
+            ),
           ],
         ),
       ],
@@ -151,6 +157,7 @@ Future<bool> editFeatures(BuildContext context, Json x) async {
   var mask = f.b('maskContacts');
   var allowExport = f.b('reportExport', true);
   var staffReports = f.b('staffReports', true);
+  var appButtons = f.b('appButtons', true);
   final ok = await FormPage.open(
     context,
     title: 'Menus & features',
@@ -200,12 +207,18 @@ Future<bool> editFeatures(BuildContext context, Json x) async {
             value: staffReports,
             onChanged: (v) => setState(() => staffReports = v),
           ),
+          SwitchRow(
+            'BQuee app download buttons',
+            hint: 'Google Play and App Store buttons for the customer app on this business’s page',
+            value: appButtons,
+            onChanged: (v) => setState(() => appButtons = v),
+          ),
         ],
       ),
     ],
     onSubmit: () async {
       await session.api.put('/api/admin/salons/${x.s('id')}/features', {
-        'features': {'maskContacts': mask, 'reportExport': allowExport, 'staffReports': staffReports, 'menus': menus},
+        'features': {'maskContacts': mask, 'reportExport': allowExport, 'staffReports': staffReports, 'appButtons': appButtons, 'menus': menus},
       });
     },
   );

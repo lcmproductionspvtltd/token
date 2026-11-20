@@ -12,6 +12,38 @@ import 'marks.dart';
 
 /* ---------- forms ---------- */
 
+/// A password field with an eye button to show or hide what was typed.
+class PasswordX extends StatefulWidget {
+  final String label;
+  final TextEditingController controller;
+  final String? helper;
+  final bool required;
+  final String? Function(String value)? validate;
+  const PasswordX(this.label, this.controller, {super.key, this.helper, this.required = false, this.validate});
+
+  @override
+  State<PasswordX> createState() => _PasswordXState();
+}
+
+class _PasswordXState extends State<PasswordX> {
+  bool hide = true;
+
+  @override
+  Widget build(BuildContext context) => FieldX(
+        widget.label,
+        widget.controller,
+        obscure: hide,
+        required: widget.required,
+        helper: widget.helper,
+        validate: widget.validate,
+        suffix: IconButton(
+          tooltip: hide ? 'Show password' : 'Hide password',
+          icon: AppIcon('eye', size: 20, color: hide ? Tk.ink3 : Theme.of(context).colorScheme.primary),
+          onPressed: () => setState(() => hide = !hide),
+        ),
+      );
+}
+
 class FieldX extends StatelessWidget {
   final String label;
   final TextEditingController controller;
@@ -27,6 +59,7 @@ class FieldX extends StatelessWidget {
   final TextCapitalization caps;
   final bool autofocus;
   final ValueChanged<String>? onChanged;
+  final Widget? suffix;
   const FieldX(
     this.label,
     this.controller, {
@@ -43,6 +76,7 @@ class FieldX extends StatelessWidget {
     this.caps = TextCapitalization.none,
     this.autofocus = false,
     this.onChanged,
+    this.suffix,
   });
 
   @override
@@ -65,6 +99,7 @@ class FieldX extends StatelessWidget {
           hintText: hint,
           helperText: helper,
           counterText: '',
+          suffixIcon: suffix,
           prefixIcon: icon == null
               ? null
               : Padding(
@@ -305,7 +340,7 @@ class _FormPageState extends State<FormPage> {
       if (mounted) {
         setState(() {
           busy = false;
-          error = e is ApiException ? e.message : e.toString();
+          error = friendlyError(e);
         });
       }
     }

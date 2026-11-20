@@ -7,8 +7,11 @@ const { badRequest, notFound } = require('../http/errors');
 const { today } = require('../utils/time');
 const queue = require('../services/queue');
 const serialize = require('../services/serializers');
+const { featuresOf } = require('../services/features');
+const { createSiteService } = require('../services/site');
 
 module.exports = function publicRoutes(router, { db, auth, tokens, catalog, limiter }) {
+  const site = createSiteService(db);
   const salonIsOpen = (s) => s.is_active && (!s.expires_on || s.expires_on >= today());
 
   async function findSalon(where, value) {
@@ -32,14 +35,20 @@ module.exports = function publicRoutes(router, { db, auth, tokens, catalog, limi
       ? { ...service, price: service.branchPrices[branchId] }
       : service;
 
+  function appLinksFor(salon, app) {
+    if (!featuresOf(salon.features).appButtons || !app || !(app.playUrl || app.appStoreUrl)) return null;
+    return { play: app.playUrl || '', appStore: app.appStoreUrl || '' };
+  }
+
   /** Landing page data for one or more branches of a salon. */
   async function landing(salon, branches) {
     const branchIds = branches.map((b) => b.id);
-    const [staff, services, offers, testimonials] = await Promise.all([
+    const [staff, services, offers, testimonials, content] = await Promise.all([
       catalog.staff(salon.id, { activeOnly: true, branchIds }),
       catalog.services(salon.id, { activeOnly: true }),
       catalog.offers(salon.id, { liveOnly: true }),
       catalog.testimonials(salon.id, { activeOnly: true }),
+      site.get(),
     ]);
     const open = salonIsOpen(salon);
 
@@ -74,6 +83,8 @@ module.exports = function publicRoutes(router, { db, auth, tokens, catalog, limi
       offers,
       testimonials,
       team: staff.map(({ id, name, title, photo, branchId }) => ({ id, name, title, photo, branchId })),
+      // "Get the BQuee app" buttons: links set by the super admin, unless switched off for this business.
+      appLinks: appLinksFor(salon, content.customerApp),
     };
   }
 

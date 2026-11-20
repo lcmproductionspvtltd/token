@@ -24,6 +24,7 @@ import {
 import { Link, navigate } from '../core/router.jsx';
 import { Button, Dialog, ErrorPage, Icon, PageLoader, SalonMark, toast, useInterval, useLoad } from '../core/ui.jsx';
 import { QueueCheck } from './QueueCheck.jsx';
+import { StoreButtons } from '../pages/Home.jsx';
 import { CheckTokenDialog, DEFAULT_COVER, OfferCoupon, ReviewCard, Stars, todaysTokens } from './parts.jsx';
 
 export function SalonPage({ slug }) {
@@ -397,12 +398,19 @@ function LandingView({ d, scoped }) {
     <div className={'ld' + (menuOpen ? ' menu-open' : '')}>
       <header className={'ld-nav v2' + (solid || menuOpen ? ' solid' : '')}>
         <div className="ld-nav-pill">
-          <a className="ld-brand" href="#top" onClick={() => setMenuOpen(false)}>
-            <SalonMark salon={s} className="ld-logo" />
-            <span className="ld-brand-text">
-              <b>{s.name}</b>
-              {s.tagline && <small>{s.tagline}</small>}
-            </span>
+          {/* With a logo the header shows only the logo; without one, the name. */}
+          <a className="ld-brand" href="#top" onClick={() => setMenuOpen(false)} aria-label={s.name}>
+            {s.logo ? (
+              <SalonMark salon={s} className="ld-logo only" />
+            ) : (
+              <>
+                <SalonMark salon={s} className="ld-logo" />
+                <span className="ld-brand-text">
+                  <b>{s.name}</b>
+                  {s.tagline && <small>{s.tagline}</small>}
+                </span>
+              </>
+            )}
           </a>
           <nav className="ld-links" aria-label="Sections">
             {links.map(([id, label]) => (
@@ -653,7 +661,7 @@ function LandingView({ d, scoped }) {
                   {s.hours}
                 </p>
               )}
-              {s.about && <p className="ld-about">{s.about}</p>}
+              {s.about && <About text={s.about} />}
               {address && (
                 <a
                   className="btn primary ld-directions"
@@ -667,7 +675,12 @@ function LandingView({ d, scoped }) {
               )}
             </div>
             {contacts.length > 0 && (
-              <ul className={'ld-tiles' + (contacts.length > 4 ? ' many' : '')}>
+              <ul
+                className={
+                  'ld-tiles' +
+                  (contacts.length > 4 ? ' many' : contacts.length <= 2 ? ' stack n' + contacts.length : '')
+                }
+              >
                 {contacts.map((q) => (
                   <li key={q.label}>
                     <a
@@ -688,6 +701,16 @@ function LandingView({ d, scoped }) {
             )}
           </div>
         </Reveal>
+
+        {d.appLinks && (
+          <section className="ld-sec ld-getapp" aria-labelledby="getapp-title">
+            <div>
+              <h2 id="getapp-title">Get the BQuee app</h2>
+              <p>Book your token at {s.name} from your phone and see your turn live.</p>
+            </div>
+            <StoreButtons app={{ playUrl: d.appLinks.play, appStoreUrl: d.appLinks.appStore }} onlyLinked />
+          </section>
+        )}
       </main>
 
       <footer className="ld-footer">
@@ -848,5 +871,21 @@ function LandingView({ d, scoped }) {
         </Dialog>
       )}
     </div>
+  );
+}
+
+/** The "about" text, cut to a few lines so the Visit card keeps its size; "Read more" shows the rest. */
+function About({ text }) {
+  const [open, setOpen] = useState(false);
+  const long = text.length > 220;
+  return (
+    <>
+      <p className={'ld-about' + (long && !open ? ' clamp' : '')}>{text}</p>
+      {long && (
+        <button type="button" className="ld-more" onClick={() => setOpen(!open)} aria-expanded={open}>
+          {open ? 'Show less' : 'Read more'}
+        </button>
+      )}
+    </>
   );
 }

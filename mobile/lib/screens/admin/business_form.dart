@@ -106,10 +106,9 @@ Future<Json?> editBusiness(BuildContext context, Json? business, List<Json> cats
             FieldX('Mobile', ownerMobile, keyboard: TextInputType.phone, maxLength: 20),
             FieldX('Email', ownerEmail, keyboard: TextInputType.emailAddress),
             FieldX('Username', username, required: isNew),
-            FieldX(
+            PasswordX(
               isNew ? 'Password' : 'New password',
               password,
-              obscure: true,
               required: isNew,
               helper: isNew ? 'At least 8 characters.' : 'Leave blank to keep the current one.',
               validate: (v) => v.isNotEmpty && v.length < 8 ? 'Use at least 8 characters' : null,

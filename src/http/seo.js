@@ -140,6 +140,7 @@ function createSeo({ db, config, headers, log = console }) {
           h.secondary || 'Sign in',
         )}</a></p></div></section>`,
     );
+    const H = (key) => (c.headings && c.headings[key]) || {};
     if (on.stats && c.stats.length)
       parts.push(
         `<ul class="seo-pre-stats site-wrap">${c.stats.map((s) => `<li><b>${esc(s.value)}</b> ${esc(s.label)}</li>`).join('')}</ul>`,
@@ -148,18 +149,18 @@ function createSeo({ db, config, headers, log = console }) {
       parts.push(
         sec(
           'why',
-          'Replace paper tokens and token machines',
+          H('replace').title,
           `<ul>${c.replace.map((r) => `<li><p>${esc(r.problem)}</p><p>${esc(r.solution)}</p></li>`).join('')}</ul>`,
-          'The everyday problems of paper tokens, token dispensers and crowded waiting rooms – and how BQuee solves each one.',
+          H('replace').text,
         ),
       );
     if (on.features && c.features.length)
       parts.push(
         sec(
           'features',
-          'Everything your queue needs',
+          H('features').title,
           c.features.map((f) => `<h3>${esc(f.title)}</h3><p>${esc(f.text)}</p>`).join(''),
-          'One simple system for customers, staff and owners.',
+          H('features').text,
         ),
       );
     if (on.categories && c.categories.length)
@@ -175,9 +176,9 @@ function createSeo({ db, config, headers, log = console }) {
       parts.push(
         sec(
           'how',
-          'Live in an afternoon',
+          H('steps').title,
           `<ol>${c.steps.map((s) => `<li><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></li>`).join('')}</ol>`,
-          'No hardware and no training – just a QR code and your phone.',
+          H('steps').text,
         ),
       );
     if (on.app && c.app && c.app.title) parts.push(sec('', c.app.title, '', c.app.text));
@@ -185,16 +186,16 @@ function createSeo({ db, config, headers, log = console }) {
       parts.push(
         sec(
           'locations',
-          'Queue management across the UAE, GCC, India and Europe',
+          H('locations').title,
           c.locations.map((l) => `<h3>${esc(l.region)}</h3><p>${esc(l.places)}</p>`).join(''),
-          'BQuee runs in any phone browser – no token machine, display or installation – so salons, clinics and service centres can start the same day, wherever they are.',
+          H('locations').text,
         ),
       );
     if (on.plans && c.plans.length)
       parts.push(
         sec(
           'pricing',
-          'Simple pricing',
+          H('plans').title,
           c.plans
             .map(
               (p) =>
@@ -213,7 +214,7 @@ function createSeo({ db, config, headers, log = console }) {
       parts.push(
         sec(
           '',
-          'What businesses say',
+          H('testimonials').title,
           c.testimonials
             .map(
               (t) =>
@@ -223,15 +224,13 @@ function createSeo({ db, config, headers, log = console }) {
         ),
       );
     if (on.faqs && c.faqs.length)
-      parts.push(
-        sec('faq', 'Questions and answers', c.faqs.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')),
-      );
+      parts.push(sec('faq', H('faqs').title, c.faqs.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')));
     const contact = c.contact || {};
     if (on.contact && (contact.email || contact.phone || contact.address))
       parts.push(
         sec(
           'contact',
-          'Contact us',
+          H('contact').title,
           [
             contact.email && `<p>Email: <a href="mailto:${esc(contact.email)}">${esc(contact.email)}</a></p>`,
             contact.phone && `<p>Phone: ${esc(contact.phone)}</p>`,

@@ -13,6 +13,7 @@ const FLAGS = {
   maskContacts: false, // hide customers' mobile numbers and emails from the owner and staff
   reportExport: true, // Excel (CSV) export in reports
   staffReports: true, // staff see their own reports
+  appButtons: true, // "Get the BQuee app" (Google Play / App Store) buttons on the business page
 };
 
 const MENU_LABELS = {

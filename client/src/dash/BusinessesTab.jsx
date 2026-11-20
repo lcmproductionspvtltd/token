@@ -16,6 +16,7 @@ import {
   Field,
   Icon,
   Pill,
+  RevealPassword,
   SalonMark,
   Switch,
   confirmAction,
@@ -603,7 +604,7 @@ function OwnerFields({ bind, isNew, salon, reload }) {
           label={isNew ? 'Password' : 'New password'}
           hint={isNew ? 'At least 8 characters.' : 'Leave blank to keep the current one.'}
         >
-          <input {...bind('password')} type="password" required={isNew} minLength={8} autoComplete="new-password" />
+          <RevealPassword {...bind('password')} required={isNew} minLength={8} autoComplete="new-password" />
         </Field>
       </div>
       {!isNew && salon.ownerUserId && (

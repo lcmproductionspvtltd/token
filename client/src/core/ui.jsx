@@ -622,3 +622,22 @@ export function NoMatches() {
     </Empty>
   );
 }
+
+/** A password box with an eye button to show or hide what was typed. */
+export function RevealPassword(props) {
+  const [show, setShow] = useState(false);
+  return (
+    <span className="reveal-pw">
+      <input {...props} type={show ? 'text' : 'password'} />
+      <button
+        type="button"
+        className="reveal-eye"
+        onClick={() => setShow((v) => !v)}
+        aria-label={show ? 'Hide password' : 'Show password'}
+        aria-pressed={show}
+      >
+        <Icon name={show ? 'x' : 'eye'} />
+      </button>
+    </span>
+  );
+}

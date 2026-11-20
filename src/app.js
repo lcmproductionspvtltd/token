@@ -26,7 +26,9 @@ function readJsonBody(req) {
     req.on('data', (chunk) => {
       size += chunk.length;
       if (size > MAX_BODY_BYTES) {
-        reject(new HttpError(413, 'Request is too large'));
+        reject(
+          new HttpError(413, 'This upload is too big (the limit is 4 MB). Choose a smaller picture and try again.'),
+        );
         req.destroy();
         return;
       }
@@ -37,10 +39,21 @@ function readJsonBody(req) {
       try {
         const body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
         // Every API takes a JSON object; anything else (a list, a bare string…) is refused.
-        if (!body || typeof body !== 'object' || Array.isArray(body)) return reject(new HttpError(400, 'Invalid JSON'));
+        if (!body || typeof body !== 'object' || Array.isArray(body))
+          return reject(
+            new HttpError(
+              400,
+              'The app sent something the server couldn’t read. Refresh the page (or update the app) and try again.',
+            ),
+          );
         resolve(body);
       } catch (err) {
-        reject(new HttpError(400, 'Invalid JSON'));
+        reject(
+          new HttpError(
+            400,
+            'The app sent something the server couldn’t read. Refresh the page (or update the app) and try again.',
+          ),
+        );
       }
     });
     req.on('error', reject);
@@ -237,7 +250,11 @@ function createApp({ db, config, log = console }) {
     try {
       if (req.method !== 'GET' && req.method !== 'HEAD' && pathname !== '/api/csp-report') assertSameSite(req);
       const match = router.match(req.method, pathname);
-      if (!match) throw new HttpError(404, 'Not found');
+      if (!match)
+        throw new HttpError(
+          404,
+          'This action doesn’t exist on the server. Refresh the page (or update the app) and try again.',
+        );
       const body = req.method === 'GET' || req.method === 'DELETE' ? {} : await readJsonBody(req);
       const result = await match.handler({
         req,
@@ -258,12 +275,20 @@ function createApp({ db, config, log = console }) {
           err.retryAfter ? { 'Retry-After': String(err.retryAfter) } : {},
         );
       if (err.status === 503) return sendJson(res, 503, { error: err.message }, { 'Retry-After': '5' });
-      if (err.code === '23505') return sendJson(res, 400, { error: 'That value is already in use' });
+      if (err.code === '23505')
+        return sendJson(res, 400, {
+          error: 'This is already used by another record (for example the same name or code). Use a different one.',
+        });
       if (err.code === '22P02' || err.code === '22007' || err.code === '22008')
-        return sendJson(res, 400, { error: 'Invalid value' });
+        return sendJson(res, 400, {
+          error:
+            'One of the values isn’t in the right format (for example a date or number). Check the form and try again.',
+        });
       // Logged with the request ID; never the body (it can hold passwords) or the session token.
       log.error(`[${requestId}] ${req.method} ${pathname} failed:`, err);
-      sendJson(res, 500, { error: 'Something went wrong. Please try again.' });
+      sendJson(res, 500, {
+        error: `Something went wrong on our side. Try again in a moment – if it keeps happening, contact support with reference ${requestId}.`,
+      });
     }
   }
 
