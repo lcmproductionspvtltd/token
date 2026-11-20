@@ -63,6 +63,8 @@ const NEVER_COMPRESS = new Set([
   '/api/public/signup',
 ]);
 
+const { createFx } = require('./services/fx');
+
 function createApp({ db, config, log = console }) {
   const headers = securityHeaders({ https: !!config.https.certFile || config.production });
   const services = {
@@ -72,6 +74,7 @@ function createApp({ db, config, log = console }) {
     catalog: createCatalogService(db),
     uploads: createUploadService({ storage: config.uploadsStorage, uploadsDir: config.uploadsDir, db }),
     limiter: new RateLimiter(db, log),
+    rates: createFx(db, { url: config.fxUrl, log }),
   };
   services.accountRequests = createAccountRequestService(services);
 

@@ -12,6 +12,7 @@ const { today } = require('../utils/time');
 const { hashPassword, validatePassword } = require('../services/auth');
 const { assertLoginAvailable } = require('../services/accounts');
 const { createSiteService, FEATURE_ICONS } = require('../services/site');
+const fx = require('../services/fx');
 const legal = require('../content/legal');
 
 function addDays(iso, days) {
@@ -20,8 +21,9 @@ function addDays(iso, days) {
   return d.toISOString().slice(0, 10);
 }
 
-module.exports = function siteRoutes(router, { db, auth, limiter }) {
+module.exports = function siteRoutes(router, { db, auth, limiter, rates }) {
   const site = createSiteService(db);
+  const fxRates = rates || fx.createFx(db, { url: 'off' });
   const superAdmin = (req) => auth.requireUser(req, 'superadmin');
 
   const categories = async () =>
@@ -29,9 +31,15 @@ module.exports = function siteRoutes(router, { db, auth, limiter }) {
 
   router.get('/api/public/site', async () => {
     const content = await site.get();
-    const { signup, ...rest } = content;
+    const { signup, plans, ...rest } = content;
+    // Each package's price in every currency; the page and the app show the visitor's own.
+    const { rates, updatedAt } = await fxRates.current();
     return {
       ...rest,
+      plans: plans.map((p) => ({ ...p, prices: fx.pricesFor(p.price, rates) })),
+      currencies: fx.CURRENCIES.map(({ code, name, countries }) => ({ code, name, countries })),
+      defaultCurrency: fx.DEFAULT_CODE,
+      ratesUpdatedAt: updatedAt || 0,
       signup: { enabled: signup.enabled, approval: signup.mode === 'approval', trialDays: signup.trialDays },
       categories: await categories(),
     };
@@ -118,7 +126,12 @@ module.exports = function siteRoutes(router, { db, auth, limiter }) {
       if (!pkg) throw badRequest('Choose a package');
     }
     const planName = pkg ? pkg.name : signup.planName;
-    const planAmount = pkg ? Number(String(pkg.price).replace(/[^0-9.]/g, '')) || 0 : 0;
+    // The price in the currency the owner saw (their country's), worked out again here – never taken
+    // from the browser. The business then uses that currency for its own prices too.
+    const parsed = pkg && fx.parsePrice(pkg.price);
+    const code = fx.CODES.includes(body.currency) ? body.currency : parsed ? parsed.code : 'INR';
+    const planAmount = pkg ? fx.amountFor(pkg.price, code, (await fxRates.current()).rates) : 0;
+    const currencySymbol = fx.CURRENCIES.find((c) => c.code === code).symbol.trim();
 
     const approval = signup.mode === 'approval';
     const salonId = newId(5);
@@ -130,7 +143,7 @@ module.exports = function siteRoutes(router, { db, auth, limiter }) {
                              expires_on, is_active, currency, category_id, self_signup, service_mode, staff_mode,
                              onboarded_by, onboarded_by_name, onboard_source, onboard_channel,
                              referral_link_id, referral_label, signup_package)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $20, $8, $9, '₹', $10, true, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $20, $8, $9, $21, $10, true, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
         [
           salonId,
           slug,
@@ -152,6 +165,7 @@ module.exports = function siteRoutes(router, { db, auth, limiter }) {
           referrer ? referrer.label : '',
           pkg ? pkg.name : '',
           planAmount,
+          currencySymbol,
         ],
       );
       await tx.query(

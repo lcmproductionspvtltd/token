@@ -1,6 +1,8 @@
 // Business sign-up. Only business owners can sign up – staff are added by their owner,
 // and the BQuee team is added by the super admin.
 
+import 'dart:io' show Platform;
+
 import 'package:bquee_shared/core/api.dart';
 import 'package:bquee_shared/core/json.dart';
 import 'package:bquee_shared/ui/icons.dart';
@@ -47,6 +49,7 @@ class _SignupScreenState extends State<SignupScreen> {
   String serviceMode = 'multiple';
   String staffMode = 'multiple';
   String package = '';
+  String currency = '';
   bool hide = true;
   bool busy = false;
   String error = '';
@@ -80,11 +83,30 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  /// Starts with the "popular" package selected.
+  /// Starts with the "popular" package selected, priced in the phone's country's currency.
   void _pickDefault() {
+    _pickCurrency();
     final list = _packages;
     if (list.isEmpty || list.any((p) => p.s('name') == package)) return;
     package = list.firstWhere((p) => p.b('highlight'), orElse: () => list.first).s('name');
+  }
+
+  /// The currency of the phone's country: its region setting (en_AE → UAE), else its time zone
+  /// (India +5:30, UAE +4); anything else gets the default (US dollars). The owner can change it.
+  void _pickCurrency() {
+    final list = site?.l('currencies') ?? <Json>[];
+    if (list.isEmpty || list.any((c) => c.s('code') == currency)) return;
+    String? byCountry(String country) {
+      for (final c in list) {
+        if ((c['countries'] as List? ?? const []).contains(country)) return c.s('code');
+      }
+      return null;
+    }
+
+    final region = RegExp(r'[-_]([A-Za-z]{2})\b').firstMatch(Platform.localeName)?.group(1)?.toUpperCase();
+    final zone = {330: 'IN', 240: 'AE'}[DateTime.now().timeZoneOffset.inMinutes];
+    currency =
+        (region != null ? byCountry(region) : null) ?? (zone != null ? byCountry(zone) : null) ?? site!.s('defaultCurrency', 'USD');
   }
 
   /// Packages from the home page pricing – only when the super admin shows pricing.
@@ -129,6 +151,7 @@ class _SignupScreenState extends State<SignupScreen> {
           'password': pass.text,
           'ref': referral.text.trim().toLowerCase(),
           if (_packages.isNotEmpty) 'package': package,
+          if (_packages.isNotEmpty && currency.isNotEmpty) 'currency': currency,
           'channel': 'app',
         }),
       );
@@ -261,9 +284,18 @@ class _SignupScreenState extends State<SignupScreen> {
                           SelectX<String>(
                             'Package',
                             value: package,
-                            options: [for (final p in _packages) MapEntry(p.s('name'), _packageLabel(p))],
+                            options: [for (final p in _packages) MapEntry(p.s('name'), _packageLabel(p, currency))],
                             onChanged: (v) => setState(() => package = v),
                           ),
+                          if (site!.l('currencies').isNotEmpty && currency.isNotEmpty)
+                            SelectX<String>(
+                              'Prices in',
+                              value: currency,
+                              options: [
+                                for (final c in site!.l('currencies')) MapEntry(c.s('code'), '${c.s('name')} (${c.s('code')})'),
+                              ],
+                              onChanged: (v) => setState(() => currency = v),
+                            ),
                         ],
                       ),
                     FieldGroup(
@@ -516,9 +548,10 @@ class _Message extends StatelessWidget {
 }
 
 /// One line for the package dropdown, same as the website:
-/// "Business – ₹999 per month (popular)", "Starter – Free · 14-day trial".
-String _packageLabel(Json p) {
+/// "Business – AED 42 per month (popular)", "Starter – Free · 14-day trial" – in the chosen currency.
+String _packageLabel(Json p, [String currency = '']) {
   final period = p.s('period');
   final joined = period.isEmpty ? '' : (RegExp(r'^per\b', caseSensitive: false).hasMatch(period) ? ' ' : ' · ') + period;
-  return p.s('name') + (p.s('price').isNotEmpty ? ' – ${p.s('price')}$joined' : '') + (p.b('highlight') ? ' (popular)' : '');
+  final price = p.m('prices').s(currency, p.s('price'));
+  return p.s('name') + (price.isNotEmpty ? ' – $price$joined' : '') + (p.b('highlight') ? ' (popular)' : '');
 }

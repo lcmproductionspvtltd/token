@@ -5,6 +5,7 @@ import { api } from '../core/api.js';
 import { applyBrand } from '../core/format.js';
 import { Link, navigate, useLocation } from '../core/router.jsx';
 import { Icon, LinkButton } from '../core/ui.jsx';
+import { CurrencyPicker, priceIn, useCurrency } from '../core/currency.jsx';
 
 const NAV = [
   ['features', 'Features'],
@@ -383,6 +384,7 @@ const STEP_ICONS = ['store', 'print', 'qr', 'camera', 'clock', 'check', 'users',
 
 export function Home() {
   const site = useSite();
+  const [currency, setCurrency] = useCurrency(site);
   useEffect(() => {
     applyBrand();
     rememberReferral();
@@ -646,13 +648,14 @@ export function Home() {
                 text="Start free. Upgrade when your queue grows."
                 center
               />
+              <CurrencyPicker site={site} code={currency} onPick={setCurrency} className="center" />
               <div className="site-plans">
                 {site.plans.map((p, i) => (
                   <article key={i} className={'site-plan' + (p.highlight ? ' best' : '')}>
                     {p.highlight && <span className="site-plan-tag">Most popular</span>}
                     <h3>{p.name}</h3>
                     <div className="site-price">
-                      <b>{p.price}</b>
+                      <b>{priceIn(p, currency)}</b>
                       {p.period && <span>{p.period}</span>}
                     </div>
                     <ul>

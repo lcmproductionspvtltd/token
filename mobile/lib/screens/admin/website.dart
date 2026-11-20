@@ -100,7 +100,7 @@ final List<_ListSpec> _lists = [
     {'name': '', 'price': '', 'period': '', 'features': '', 'highlight': false},
     const [
       ('name', 'Plan name', 'text', 40),
-      ('price', 'Price', 'text', 30),
+      ('price', 'Price, e.g. ₹999 or AED 149 – shown in each visitor’s currency', 'text', 30),
       ('period', 'Per (e.g. per month)', 'text', 40),
       ('features', 'What’s included – one per line', 'area', 600),
       ('highlight', 'Mark as most popular', 'check', 0),

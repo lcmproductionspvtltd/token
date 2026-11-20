@@ -85,6 +85,51 @@ void main() {
     expect(find.text('Starter – Free · 14-day trial'), findsOneWidget, reason: 'another plan can be chosen');
   });
 
+  testWidgets('business sign-up: package prices in the owner’s currency, which they can change', (tester) async {
+    _tallScreen(tester);
+    await tester.pumpWidget(
+      _app(
+        const SignupScreen(
+          site: {
+            'signup': {'enabled': true, 'approval': false, 'trialDays': 14},
+            'sections': {'plans': true},
+            'categories': <Map<String, dynamic>>[],
+            'defaultCurrency': 'USD',
+            'currencies': [
+              {'code': 'INR', 'name': 'Indian rupee', 'countries': ['IN']},
+              {'code': 'AED', 'name': 'UAE dirham', 'countries': ['AE']},
+              {'code': 'USD', 'name': 'US dollar', 'countries': <String>[]},
+            ],
+            'plans': [
+              {'name': 'Starter', 'price': 'Free', 'period': '14-day trial', 'highlight': false},
+              {
+                'name': 'Business',
+                'price': '₹999',
+                'period': 'per month',
+                'highlight': true,
+                'prices': {'INR': '₹999', 'AED': 'AED 42', 'USD': '\$12'},
+              },
+            ],
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(DropdownButtonFormField<String>), findsNWidgets(2), reason: 'package + "Prices in"');
+    expect(find.text('Prices in'), findsWidgets);
+    await tester.tap(find.byType(DropdownButtonFormField<String>).at(1));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('UAE dirham (AED)').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Business – AED 42 per month (popular)'), findsOneWidget, reason: 'price follows the currency');
+    expect(find.text('UAE dirham (AED)'), findsOneWidget);
+    await tester.tap(find.byType(DropdownButtonFormField<String>).at(1));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Indian rupee (INR)').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Business – ₹999 per month (popular)'), findsOneWidget);
+  });
+
   testWidgets('new business form: 4 steps, each checked before Next', (tester) async {
     _tallScreen(tester);
     await tester.pumpWidget(_opener((c) => editBusiness(c, null, const [], false)));

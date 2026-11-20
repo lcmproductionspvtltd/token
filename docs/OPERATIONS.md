@@ -73,6 +73,9 @@ lawyer how long finished tokens and reports are kept, and write it in your priva
   from their browser.
 - **Database**: watch disk space and connection count in the provider's dashboard. "Server busy" (503) answers
   mean the database pool is full – raise `DATABASE_POOL_SIZE` (default 10) or the database plan.
+- **Exchange rates** (package prices in each visitor's currency): fetched twice a day from open.er-api.com. A
+  failed fetch logs `{"alert":"fx_refresh_failed"}` and the last saved rates keep working – nothing to do unless
+  it repeats for days. `FX_URL=off` stops fetching.
 - **Certificates**: Render renews them itself. Own server: `certbot renew` runs from cron; the monitor above
   alerts if HTTPS fails.
 

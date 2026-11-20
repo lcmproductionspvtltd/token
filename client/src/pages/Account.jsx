@@ -14,6 +14,7 @@ import { BookingModes } from '../core/BookingModes.jsx';
 import { StepBar } from '../core/Steps.jsx';
 import { SiteFooter, SiteHeader, forgetReferral, rememberReferral, savedReferral, useSite } from './Home.jsx';
 import { MfaStep } from './MfaStep.jsx';
+import { CurrencyPicker, priceIn, useCurrency } from '../core/currency.jsx';
 
 const EMPTY = {
   businessName: '',
@@ -192,6 +193,9 @@ function SignUpForm({ site, onPending }) {
   // When the home page shows pricing, the owner picks one of those packages.
   const packages = site && site.sections && site.sections.plans ? site.plans || [] : [];
   const [pkg, setPkg] = useState('');
+  // Prices in the owner's own currency (their country, or the one they pick); the server works out
+  // the amount again from the package and this currency.
+  const [currency, setCurrency] = useCurrency(site);
   useEffect(() => {
     if (packages.length && !packages.some((p) => p.name === pkg))
       setPkg((packages.find((p) => p.highlight) || packages[0]).name);
@@ -228,6 +232,7 @@ function SignUpForm({ site, onPending }) {
         ref: ref ? ref.code : '',
         channel: 'web',
         package: packages.length ? pkg : '',
+        currency: packages.length ? currency : '',
       });
       forgetReferral();
       if (r.pending) {
@@ -288,11 +293,14 @@ function SignUpForm({ site, onPending }) {
               <select value={pkg} onChange={(e) => setPkg(e.target.value)} aria-label="Package">
                 {packages.map((p) => (
                   <option key={p.name} value={p.name}>
-                    {packageLabel(p)}
+                    {packageLabel(p, currency)}
                   </option>
                 ))}
               </select>
             </AField>
+          )}
+          {packages.length > 0 && (
+            <CurrencyPicker site={site} code={currency} onPick={setCurrency} className="in-form" />
           )}
           <AField label="Business name *" icon="store">
             <input
@@ -422,9 +430,10 @@ function SignUpForm({ site, onPending }) {
 }
 
 /** One line for the package dropdown: "Business – ₹999 per month (popular)", "Starter – Free · 14-day trial". */
-const packageLabel = (p) => {
+const packageLabel = (p, currency) => {
   const period = p.period ? (/^per\b/i.test(p.period) ? ' ' : ' · ') + p.period : '';
-  return p.name + (p.price ? ` – ${p.price}${period}` : '') + (p.highlight ? ' (popular)' : '');
+  const price = priceIn(p, currency);
+  return p.name + (price ? ` – ${price}${period}` : '') + (p.highlight ? ' (popular)' : '');
 };
 
 export function Account({ query }) {

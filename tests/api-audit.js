@@ -1459,6 +1459,19 @@ const login = async (username, password) => {
   );
   const pubSite = await ok('public site has packages', 'GET', '/api/public/site');
   check('pricing on with packages', pubSite.sections.plans === true && pubSite.plans.length > 0);
+  // Prices in each visitor's currency (test servers use the built-in rates: 1 USD = 88 INR = 3.6725 AED).
+  const bizPlan = pubSite.plans.find((p) => p.name === 'Business');
+  check(
+    'each package priced in all 8 currencies (UAE, India, GCC, US$)',
+    bizPlan.prices.INR === '₹999' &&
+      bizPlan.prices.AED === 'AED 42' &&
+      bizPlan.prices.USD === '$12' &&
+      bizPlan.prices.KWD === 'KWD 3.5' &&
+      pubSite.currencies.length === 8 &&
+      pubSite.currencies.find((c) => c.code === 'AED').countries.includes('AE') &&
+      pubSite.defaultCurrency === 'USD',
+  );
+  check('"Free" and "Talk to us" stay as words', pubSite.plans.filter((p) => !p.prices).length === 2);
   await deny('package required when pricing is on', [400], 'POST', '/api/public/signup', {
     businessName: 'No Pkg',
     ownerName: 'N',
@@ -1496,6 +1509,20 @@ const login = async (username, password) => {
       rc.onboard.label === 'Facebook ads',
   );
   check('package saved as plan', rc.signupPackage === 'Business' && rc.plan === 'Business' && rc.amount === 999);
+  await ok('UAE business signs up (prices shown in AED)', 'POST', '/api/public/signup', {
+    businessName: 'Dubai Lounge',
+    ownerName: 'Omar',
+    mobile: '971501234567',
+    username: 'dubaiowner',
+    password: 'Dubai@12345-bq',
+    package: 'Business',
+    currency: 'AED',
+    amount: 1, // a browser can't choose its own price
+  });
+  const ob2b = await ok('admin data after UAE sign-up', 'GET', '/api/admin/data', null, sa);
+  const dxb = ob2b.salons.find((x) => x.name === 'Dubai Lounge');
+  check('UAE sign-up: AED 42 a month, business currency AED', dxb.amount === 42 && dxb.currency === 'AED');
+  check('no currency sent → the price’s own (₹)', rc.currency === '₹');
   check('unknown code = direct sign-up', pl.onboard.source === 'signup' && !pl.onboard.byName && pl.plan === 'Starter');
   const rl2 = await ok('link counts', 'GET', '/api/admin/referral-links', null, sa);
   check('FB link counted', rl2.links.find((l) => l.id === fb.id).referred === 1 && Array.isArray(rl2.people));

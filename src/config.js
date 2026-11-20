@@ -36,6 +36,8 @@ const publicHosts = [publicUrl && new URL(publicUrl).host, ...String(env.PUBLIC_
 
 module.exports = {
   production: env.NODE_ENV === 'production',
+  // Exchange-rate service for package prices; 'off' = built-in/saved rates only.
+  fxUrl: env.FX_URL || 'https://open.er-api.com/v6/latest/USD',
   publicUrl, // used for canonical links, the sitemap and link previews
   publicHosts,
 

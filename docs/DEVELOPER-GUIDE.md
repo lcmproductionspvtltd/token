@@ -294,7 +294,16 @@ business are active and the role is allowed.
 All environment variables are read in `src/config.js`: `DATABASE_URL`, `DATABASE_POOL_SIZE`, `PORT`, `TZ`,
 `NODE_ENV`, `PUBLIC_URL` / `RENDER_EXTERNAL_URL` / `PUBLIC_HOSTS`, `APP_SECRET`, `TRUST_PROXY`,
 `ADMIN_USERNAME` / `ADMIN_EMAIL` / `ADMIN_PASSWORD`, `SEED_DEMO_DATA`, `UPLOADS_STORAGE` / `UPLOADS_DIR`,
-`HTTPS_CERT` / `HTTPS_KEY` / `HTTP_REDIRECT_PORT`, `API_REQUESTS_PER_MINUTE`. See README section 4.
+`HTTPS_CERT` / `HTTPS_KEY` / `HTTP_REDIRECT_PORT`, `API_REQUESTS_PER_MINUTE`, `FX_URL`. See README section 4.
+
+**Package prices by country** (`src/services/fx.js`): the super admin writes each package price once in any
+currency ("₹999", "AED 149"). `/api/public/site` adds `plans[].prices` – that price in INR, AED, SAR, QAR,
+OMR, KWD, BHD and USD – plus `currencies` and `defaultCurrency`. The website and the BQuee Biz app pick the
+visitor's currency from the device's time zone and region (`client/src/core/currency.jsx`,
+`mobile/lib/screens/signup.dart`), with a "Prices in" menu to change it. Sign-up sends `currency`; the server
+works the amount out again and makes that the business's currency. Rates come from open.er-api.com twice a day
+(the one outside service, chosen by the owner) and are saved in `site_content` key `fx`; when it can't be
+reached the saved – or built-in – rates are used. `FX_URL=off` stops fetching (tests do this).
 
 **`TZ` matters:** "today" (token dates, daily numbers, reports) follows the server's time zone. Set
 `TZ=Asia/Kolkata` (or the businesses' zone).
