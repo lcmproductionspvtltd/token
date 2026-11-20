@@ -320,3 +320,63 @@
 .acct-form .form-steps {
   margin: 4px 0 2px;
 }
+
+/* Continue with Google / Apple */
+.acct-social {
+  display: grid;
+  gap: 10px;
+  margin: 4px 0 2px;
+}
+.social-btn {
+  justify-content: center;
+  gap: 12px;
+}
+.social-mark {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+}
+.social-mark .i {
+  width: 15px;
+  height: 15px;
+}
+.acct-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0;
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.acct-or::before,
+.acct-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.acct-social-note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: var(--brand-wash);
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+}
+.acct-social-note .i {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  color: var(--brand);
+}

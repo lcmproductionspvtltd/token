@@ -19,7 +19,7 @@ const { createAccountRequestService } = require('./services/account-requests');
 
 const MAX_BODY_BYTES = 4 * 1024 * 1024; // images arrive as base64 inside JSON; the largest (cover) is 2.5 MB
 
-function readJsonBody(req) {
+function readJsonBody(req, { form = false } = {}) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
@@ -36,6 +36,9 @@ function readJsonBody(req) {
     });
     req.on('end', () => {
       if (!size) return resolve({});
+      // Apple's sign-in answer arrives as a web form, not JSON (only on its own return address).
+      if (form && /application\/x-www-form-urlencoded/i.test(String(req.headers['content-type'] || '')))
+        return resolve(Object.fromEntries(new URLSearchParams(Buffer.concat(chunks).toString('utf8'))));
       try {
         const body = JSON.parse(Buffer.concat(chunks).toString('utf8'));
         // Every API takes a JSON object; anything else (a list, a bare string…) is refused.
@@ -77,6 +80,7 @@ const NEVER_COMPRESS = new Set([
 ]);
 
 const { createFx } = require('./services/fx');
+const { createOAuth } = require('./services/oauth');
 
 function createApp({ db, config, log = console }) {
   const headers = securityHeaders({ https: !!config.https.certFile || config.production });
@@ -88,6 +92,7 @@ function createApp({ db, config, log = console }) {
     uploads: createUploadService({ storage: config.uploadsStorage, uploadsDir: config.uploadsDir, db }),
     limiter: new RateLimiter(db, log),
     rates: createFx(db, { url: config.fxUrl, log }),
+    oauth: createOAuth(db, config, { log }),
   };
   services.accountRequests = createAccountRequestService(services);
 
@@ -103,6 +108,7 @@ function createApp({ db, config, log = console }) {
     require('./routes/admin-catalog'),
     require('./routes/reports'),
     require('./routes/site'),
+    require('./routes/oauth'),
     require('./routes/customer'),
     require('./routes/support'),
     require('./routes/account-requests'),
@@ -248,14 +254,18 @@ function createApp({ db, config, log = console }) {
     }
 
     try {
-      if (req.method !== 'GET' && req.method !== 'HEAD' && pathname !== '/api/csp-report') assertSameSite(req);
+      // The browser report and Apple's sign-in answer are posted by the browser/Apple, not by the BQuee page
+      // (Apple's carries its own one-time state instead).
+      const fromOutside = pathname === '/api/csp-report' || pathname === '/api/oauth/apple/callback';
+      if (req.method !== 'GET' && req.method !== 'HEAD' && !fromOutside) assertSameSite(req);
       const match = router.match(req.method, pathname);
       if (!match)
         throw new HttpError(
           404,
           'This action doesn’t exist on the server. Refresh the page (or update the app) and try again.',
         );
-      const body = req.method === 'GET' || req.method === 'DELETE' ? {} : await readJsonBody(req);
+      const body =
+        req.method === 'GET' || req.method === 'DELETE' ? {} : await readJsonBody(req, { form: fromOutside });
       const result = await match.handler({
         req,
         params: match.params,
@@ -264,6 +274,7 @@ function createApp({ db, config, log = console }) {
         ip,
         res,
       });
+      if (res.headersSent) return; // the route answered itself (a redirect)
       const accept = NEVER_COMPRESS.has(pathname) ? null : req.headers['accept-encoding'];
       sendJson(res, 200, result === undefined ? { ok: true } : result, {}, accept);
     } catch (err) {

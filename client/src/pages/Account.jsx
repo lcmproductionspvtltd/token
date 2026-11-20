@@ -78,6 +78,38 @@ function PasswordInput({ value, onChange, autoComplete, placeholder, name }) {
   );
 }
 
+/**
+ * "Continue with Google / Apple" for business owners – only shown for providers set up on the server.
+ * The browser goes to Google/Apple and comes back to /login?social=… (see src/routes/oauth.js).
+ */
+function SocialButtons({ site, verb = 'Continue' }) {
+  const on = (site && site.social) || {};
+  if (!on.google && !on.apple) return null;
+  return (
+    <div className="acct-social">
+      {on.google && (
+        <a className="btn soft lg block social-btn" href="/api/oauth/google/start?client=web">
+          <span className="social-mark g" aria-hidden="true">
+            G
+          </span>
+          <span>{verb} with Google</span>
+        </a>
+      )}
+      {on.apple && (
+        <a className="btn soft lg block social-btn" href="/api/oauth/apple/start?client=web">
+          <span className="social-mark a" aria-hidden="true">
+            <Icon name="phoneapp" />
+          </span>
+          <span>{verb} with Apple</span>
+        </a>
+      )}
+      <p className="acct-or">
+        <span>or with your {verb === 'Continue' ? 'username' : 'details'}</span>
+      </p>
+    </div>
+  );
+}
+
 function SignInForm({ query }) {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
@@ -85,6 +117,30 @@ function SignInForm({ query }) {
   const [busy, setBusy] = useState(false);
   const [mfa, setMfa] = useState(null); // two-step sign-in step, after the right password
   const form = useRef(null);
+  const site = useSite();
+
+  // Back from Google/Apple: pick up the ticket (signed in, a two-step code, or off to sign up).
+  useEffect(() => {
+    const failed = query.get('social_error');
+    if (failed) setError(failed);
+    const ticket = query.get('social');
+    if (!ticket) return;
+    setBusy(true);
+    api('POST', '/api/oauth/exchange', { ticket })
+      .then((r) => {
+        if (r.signup) return navigate('/signup?social=' + encodeURIComponent(ticket), { replace: true });
+        if (r.mfa) {
+          setMfa(r.mfa);
+          setBusy(false);
+          return;
+        }
+        finish(r);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setBusy(false);
+      });
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -134,6 +190,7 @@ function SignInForm({ query }) {
       <p className="acct-sub">
         Sign in to your dashboard. One sign-in for super admins, the BQuee team, business owners and staff.
       </p>
+      <SocialButtons site={site} />
       <AField label="Username or email" icon="user">
         <input
           name="username"
@@ -170,15 +227,28 @@ function SignInForm({ query }) {
   );
 }
 
-function SignUpForm({ site, onPending }) {
+function SignUpForm({ site, onPending, query }) {
   const [f, setF] = useState(EMPTY);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [ref, setRef] = useState(null); // { code, name }
   const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
   const [at, setAt] = useState(0);
-  const [mfa, setMfa] = useState(null); // owners set up two-step sign-in right after signing up
+  const [mfa, setMfa] = useState(null); // only if this account must use two-step sign-in
   const top = useRef(null);
+  // Signing up with Google/Apple: { ticket, provider, email, name } – no username or password needed.
+  const [social, setSocial] = useState(null);
+  useEffect(() => {
+    const ticket = query && query.get('social');
+    if (!ticket) return;
+    api('POST', '/api/oauth/exchange', { ticket })
+      .then((r) => {
+        if (!r.signup) return;
+        setSocial(r.signup);
+        setF((x) => ({ ...x, ownerName: x.ownerName || r.signup.name, email: r.signup.email }));
+      })
+      .catch((err) => setError(err.message));
+  }, []);
 
   // Invited through a referral link? Show who invited them.
   useEffect(() => {
@@ -220,7 +290,7 @@ function SignUpForm({ site, onPending }) {
     setError('');
     if (at === 0 && !f.businessName.trim()) return setError('Enter your business name.');
     if (at < SIGNUP_STEPS.length - 1) return go(at + 1);
-    if (!f.ownerName.trim() || !f.mobile.trim() || !f.username.trim() || !f.password) {
+    if (!f.ownerName.trim() || !f.mobile.trim() || (!social && (!f.username.trim() || !f.password))) {
       setError('Fill in every field marked *');
       return;
     }
@@ -233,6 +303,7 @@ function SignUpForm({ site, onPending }) {
         channel: 'web',
         package: packages.length ? pkg : '',
         currency: packages.length ? currency : '',
+        ...(social ? { social: social.ticket } : {}),
       });
       forgetReferral();
       if (r.pending) {
@@ -285,6 +356,7 @@ function SignUpForm({ site, onPending }) {
         </em>
       </div>
 
+      {!social && at === 0 && <SocialButtons site={site} verb="Sign up" />}
       <StepBar steps={SIGNUP_STEPS} at={at} onPick={go} />
       {at === 0 && (
         <>
@@ -359,37 +431,47 @@ function SignUpForm({ site, onPending }) {
               />
             </AField>
           </div>
-          <AField label="Email" icon="mail">
-            <input
-              value={f.email}
-              onChange={set('email')}
-              type="email"
-              autoComplete="email"
-              placeholder="you@business.com"
-              maxLength={120}
-            />
-          </AField>
-          <div className="acct-two">
-            <AField label="Username *" icon="user">
+          {social ? (
+            <p className="acct-social-note">
+              <Icon name="check" /> Signing up with {social.provider === 'apple' ? 'Apple' : 'Google'} as{' '}
+              <b>{social.email}</b> – you’ll sign in with {social.provider === 'apple' ? 'Apple' : 'Google'}, no
+              password needed.
+            </p>
+          ) : (
+            <AField label="Email" icon="mail">
               <input
-                value={f.username}
-                onChange={set('username')}
-                autoComplete="username"
-                autoCapitalize="none"
-                spellCheck="false"
-                maxLength={40}
-                placeholder="For signing in"
+                value={f.email}
+                onChange={set('email')}
+                type="email"
+                autoComplete="email"
+                placeholder="you@business.com"
+                maxLength={120}
               />
             </AField>
-            <AField label="Password *" icon="lock">
-              <PasswordInput
-                value={f.password}
-                onChange={set('password')}
-                autoComplete="new-password"
-                placeholder="8+ characters"
-              />
-            </AField>
-          </div>
+          )}
+          {!social && (
+            <div className="acct-two">
+              <AField label="Username *" icon="user">
+                <input
+                  value={f.username}
+                  onChange={set('username')}
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  spellCheck="false"
+                  maxLength={40}
+                  placeholder="For signing in"
+                />
+              </AField>
+              <AField label="Password *" icon="lock">
+                <PasswordInput
+                  value={f.password}
+                  onChange={set('password')}
+                  autoComplete="new-password"
+                  placeholder="8+ characters"
+                />
+              </AField>
+            </div>
+          )}
         </>
       )}
       {/* Hidden from people; bots fill it in. */}
@@ -531,7 +613,7 @@ export function Account({ query }) {
                   </div>
                   <div role="tabpanel">
                     {show === 'signin' && <SignInForm query={query} />}
-                    {show === 'signup' && <SignUpForm site={site} onPending={setPending} />}
+                    {show === 'signup' && <SignUpForm site={site} onPending={setPending} query={query} />}
                     {show === 'closed' && (
                       <div className="acct-form">
                         <h1>Sign-up is closed</h1>

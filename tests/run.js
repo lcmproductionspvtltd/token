@@ -67,6 +67,7 @@ async function waitForServer(url, timeoutMs = 10_000) {
   failed += await runNode(path.join(__dirname, 'rate-limiter.test.js'), { TEST_DATABASE_URL: DATABASE_URL });
   failed += await runNode(path.join(__dirname, 'startup.test.js'), { TEST_DATABASE_URL: DATABASE_URL });
   failed += await runNode(path.join(__dirname, 'fx.test.js'), { TEST_DATABASE_URL: DATABASE_URL });
+  failed += await runNode(path.join(__dirname, 'oauth.test.js'), { TEST_DATABASE_URL: DATABASE_URL });
 
   await resetDatabase();
   // Authenticator secrets of the test accounts, shared by the audits of this run (see helpers/session.js).

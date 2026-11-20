@@ -2,6 +2,7 @@
 // the camera for the token scanner. All in this one file so no Xcode project changes are needed.
 
 import AVFoundation
+import AuthenticationServices
 import Flutter
 import Security
 import UIKit
@@ -29,8 +30,10 @@ import UIKit
 }
 
 final class BQueeNative: NSObject, FlutterStreamHandler, UIImagePickerControllerDelegate,
-  UINavigationControllerDelegate
+  UINavigationControllerDelegate, ASWebAuthenticationPresentationContextProviding
 {
+  private var authSession: ASWebAuthenticationSession?  // "Continue with Google / Apple"
+
   private let registrar: FlutterPluginRegistrar
   private var events: FlutterEventSink?
   private var pickResult: FlutterResult?
@@ -135,6 +138,24 @@ final class BQueeNative: NSObject, FlutterStreamHandler, UIImagePickerController
         return
       }
       UIApplication.shared.open(url, options: [:]) { ok in result(ok) }
+    case "webAuth":
+      // Apple's secure sign-in sheet: answers with the bqueebiz://oauth link the sign-in comes back
+      // with, or nil when the person closes it.
+      guard let s = args["url"] as? String, let url = URL(string: s),
+            let scheme = url.scheme?.lowercased(), scheme == "https" || scheme == "http" else {
+        result(nil)
+        return
+      }
+      let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "bqueebiz") { [weak self] back, _ in
+        result(back?.absoluteString)
+        self?.authSession = nil
+      }
+      session.presentationContextProvider = self
+      authSession = session
+      if !session.start() {
+        authSession = nil
+        result(nil)
+      }
     case "shareText":
       share(items: [args["text"] as? String ?? ""], result: result)
     case "shareFile":
@@ -166,6 +187,11 @@ final class BQueeNative: NSObject, FlutterStreamHandler, UIImagePickerController
     default:
       result(FlutterMethodNotImplemented)
     }
+  }
+
+  func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+    let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+    return scenes.compactMap { $0.keyWindow }.first ?? scenes.first?.windows.first ?? ASPresentationAnchor()
   }
 
   private func share(items: [Any], result: @escaping FlutterResult) {

@@ -8,6 +8,7 @@ import 'dart:convert';
 
 import 'package:bquee_shared/core/api.dart';
 import 'package:bquee_shared/core/json.dart';
+import 'package:bquee_shared/core/sha256.dart';
 import 'package:bquee_shared/core/native.dart';
 import 'package:bquee_shared/ui/theme.dart';
 import 'package:material_ui/material_ui.dart';
@@ -105,6 +106,27 @@ class Session extends ChangeNotifier {
     api.token = null;
     final r = asJson(await api.post('/api/login', {'username': username.trim(), 'password': password}));
     if (r['mfa'] != null) return r.m('mfa');
+    await _signedIn(r);
+    return null;
+  }
+
+  /// "Continue with Google / Apple" (business owners). The sign-in page opens in Apple's secure sheet
+  /// (iPhone) or the browser (Android) and comes back to bqueebiz://oauth; PKCE makes sure only this
+  /// app can pick it up. Returns null when signed in; {'mfa': step} when a two-step code is needed;
+  /// {'signup': details} for a new business; {'cancelled': true} when the person closed it.
+  Future<Json?> socialSignIn(String provider) async {
+    final p = newPkce();
+    final back = await Native.webAuth('$kDefaultServer/api/oauth/$provider/start?client=app&challenge=${p.challenge}');
+    if (back == null) return {'cancelled': true};
+    final q = Uri.parse(back).queryParameters;
+    if (q['social_error'] != null) throw ApiException(400, q['social_error']!);
+    final ticket = q['social'];
+    if (ticket == null || ticket.isEmpty) throw ApiException(400, 'Sign-in didn’t finish. Please try again.');
+    api.base = kDefaultServer;
+    api.token = null;
+    final r = asJson(await api.post('/api/oauth/exchange', {'ticket': ticket, 'verifier': p.verifier}));
+    if (r['signup'] != null) return {'signup': {...r.m('signup'), 'verifier': p.verifier}};
+    if (r['mfa'] != null) return {'mfa': r.m('mfa')};
     await _signedIn(r);
     return null;
   }

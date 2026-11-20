@@ -36,6 +36,17 @@ const publicHosts = [publicUrl && new URL(publicUrl).host, ...String(env.PUBLIC_
 
 module.exports = {
   production: env.NODE_ENV === 'production',
+  // "Continue with Google / Apple" for business owners (src/services/oauth.js). Empty = button hidden.
+  oauth: {
+    google: { clientId: env.GOOGLE_CLIENT_ID || '', clientSecret: env.GOOGLE_CLIENT_SECRET || '' },
+    apple: {
+      servicesId: env.APPLE_SERVICES_ID || '',
+      teamId: env.APPLE_TEAM_ID || '',
+      keyId: env.APPLE_KEY_ID || '',
+      privateKey: env.APPLE_PRIVATE_KEY || '',
+    },
+    fakeBase: env.OAUTH_TEST_PROVIDER || '', // tests only (ignored in production)
+  },
   // Exchange-rate service for package prices; 'off' = built-in/saved rates only.
   fxUrl: env.FX_URL || 'https://open.er-api.com/v6/latest/USD',
   publicUrl, // used for canonical links, the sitemap and link previews

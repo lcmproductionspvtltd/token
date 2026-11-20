@@ -260,6 +260,15 @@ function createAuthService(db, config) {
       return loginStep(user, req, res);
     },
 
+    /** Signs in the owner a Google/Apple sign-in found: same checks and steps as a password sign-in. */
+    async loginLinked(userId, req, res) {
+      const { rows } = await db.query(`${USER_QUERY} WHERE u.id = $1`, [userId]);
+      const user = rows[0];
+      if (!user || user.role !== 'owner') throw unauthorized('Please sign in again.');
+      assertCanUseAccount(user);
+      return loginStep(user, req, res);
+    },
+
     /** Signs in an account that was just created (business sign-up): same steps as a normal sign-in. */
     async loginNewUser(userId, req, res) {
       const { rows } = await db.query(`${USER_QUERY} WHERE u.id = $1`, [userId]);

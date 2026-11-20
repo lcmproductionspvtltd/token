@@ -2,7 +2,7 @@
 
 Generated from the live schema by `scripts/db-doc.js`. PostgreSQL; ids are random text keys.
 
-27 tables · 39 foreign keys · 34 value rules · 82 indexes
+30 tables · 41 foreign keys · 37 value rules · 88 indexes
 
 ## account_requests
 
@@ -173,6 +173,47 @@ Keys and rules:
 - Primary key: `PRIMARY KEY (id)`
 
 Indexes: `(expires_at)`, `(user_id)`, `UNIQUE (id)`
+
+## oauth_states
+
+| Column | Type | Required | Default |
+|---|---|---|---|
+| id | text | yes |  |
+| provider | text | yes |  |
+| client | text | yes |  |
+| nonce | text | yes |  |
+| binding | text | yes |  |
+| expires_at | timestamp with time zone | yes |  |
+
+Keys and rules:
+
+- Rule: `CHECK ((client = ANY (ARRAY['web'::text, 'app'::text])))`
+- Primary key: `PRIMARY KEY (id)`
+
+Indexes: `(expires_at)`, `UNIQUE (id)`
+
+## oauth_tickets
+
+| Column | Type | Required | Default |
+|---|---|---|---|
+| id | text | yes |  |
+| kind | text | yes |  |
+| provider | text | yes |  |
+| subject | text | yes |  |
+| email | text | yes | ''::text |
+| name | text | yes | ''::text |
+| user_id | text |  |  |
+| client | text | yes |  |
+| binding | text | yes |  |
+| expires_at | timestamp with time zone | yes |  |
+
+Keys and rules:
+
+- Rule: `CHECK ((kind = ANY (ARRAY['login'::text, 'signup'::text])))`
+- Links to: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
+- Primary key: `PRIMARY KEY (id)`
+
+Indexes: `(expires_at)`, `UNIQUE (id)`
 
 ## offers
 
@@ -594,6 +635,24 @@ Keys and rules:
 - Unique: `UNIQUE (branch_id, token_date, cycle, number)`
 
 Indexes: `(branch_id, token_date)`, `(customer_id, created_at DESC) WHERE (customer_id IS NOT NULL)`, `(offer_id)`, `(token_date) WHERE (status = ANY (ARRAY['waiting'::text, 'serving'::text]))`, `(salon_id, token_date)`, `UNIQUE (branch_id, token_date, cycle, number)`, `UNIQUE (id)`
+
+## user_identities
+
+| Column | Type | Required | Default |
+|---|---|---|---|
+| provider | text | yes |  |
+| subject | text | yes |  |
+| user_id | text | yes |  |
+| email | text | yes | ''::text |
+| created_at | timestamp with time zone | yes | now() |
+
+Keys and rules:
+
+- Rule: `CHECK ((provider = ANY (ARRAY['google'::text, 'apple'::text])))`
+- Links to: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`
+- Primary key: `PRIMARY KEY (provider, subject)`
+
+Indexes: `(user_id)`, `UNIQUE (provider, subject)`
 
 ## users
 

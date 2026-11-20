@@ -12,6 +12,7 @@ import 'package:material_ui/material_ui.dart';
 import '../core/session.dart';
 import 'mfa.dart';
 import 'signup.dart';
+import 'social.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -152,6 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 style: TextStyle(color: Tk.ink3, fontSize: 13.5),
                               ),
                               const SizedBox(height: 18),
+                              SocialButtons(site: site),
                               FieldX(
                                 'Username or email',
                                 user,

@@ -130,6 +130,59 @@ void main() {
     expect(find.text('Business – ₹999 per month (popular)'), findsOneWidget);
   });
 
+  testWidgets('sign-up: Google / Apple buttons only when the server offers them', (tester) async {
+    _tallScreen(tester);
+    const base = {
+      'signup': {'enabled': true, 'approval': false, 'trialDays': 14},
+      'sections': {'plans': false},
+      'categories': <Map<String, dynamic>>[],
+    };
+    await tester.pumpWidget(_app(const SignupScreen(site: base)));
+    await tester.pumpAndSettle();
+    expect(find.text('Sign up with Google'), findsNothing);
+    await tester.pumpWidget(
+      _app(
+        const SignupScreen(
+          site: {
+            ...base,
+            'social': {'google': true, 'apple': true},
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Sign up with Google'), findsOneWidget);
+    expect(find.text('Sign up with Apple'), findsOneWidget);
+  });
+
+  testWidgets('sign-up with Google: no username or password, email from Google', (tester) async {
+    _tallScreen(tester);
+    await tester.pumpWidget(
+      _app(
+        const SignupScreen(
+          site: {
+            'signup': {'enabled': true, 'approval': false, 'trialDays': 14},
+            'sections': {'plans': false},
+            'categories': <Map<String, dynamic>>[],
+            'social': {'google': true},
+          },
+          social: {'ticket': 't', 'verifier': 'v', 'provider': 'google', 'email': 'sana@gmail.test', 'name': 'Sana K'},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Sign up with Google'), findsNothing, reason: 'already signing up with Google');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Business name *'), 'Sana Salon');
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Signing up with Google as sana@gmail.test'), findsOneWidget);
+    expect(find.text('Username *'), findsNothing);
+    expect(find.text('Password *'), findsNothing);
+    expect(find.text('Sana K'), findsOneWidget, reason: 'name filled in from Google');
+  });
+
   testWidgets('new business form: 4 steps, each checked before Next', (tester) async {
     _tallScreen(tester);
     await tester.pumpWidget(_opener((c) => editBusiness(c, null, const [], false)));

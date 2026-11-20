@@ -97,6 +97,30 @@ Then set `TRUST_PROXY=1` so BQuee sees real visitor addresses.
    (for example within 72 hours under GDPR, or as India's DPDP rules require) – the authorities.
 5. Afterwards: write a short note (what happened, why, what was changed) and add a test that would have caught it.
 
+## Google and Apple sign-in
+
+Business owners can sign in and sign up with "Continue with Google / Apple" on the website and in BQuee Biz.
+A button shows only when its settings are filled in (`.env`, then `pm2 restart bquee --update-env`).
+
+**Google** (Google Cloud Console → APIs & Services):
+
+1. OAuth consent screen: app name BQuee, support email, links https://bquee.com/privacy and /terms.
+2. Credentials → Create credentials → OAuth client ID → _Web application_.
+   Authorised redirect URI: `https://bquee.com/api/oauth/google/callback`.
+3. Put the client ID and secret in `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`.
+
+**Apple** (developer.apple.com → Certificates, Identifiers & Profiles):
+
+1. Identifiers → the App ID `com.bquee.app` → tick _Sign in with Apple_.
+2. Identifiers → + → _Services IDs_ (e.g. `com.bquee.web`) → tick _Sign in with Apple_ → Configure:
+   domain `bquee.com`, return URL `https://bquee.com/api/oauth/apple/callback`.
+3. Keys → + → _Sign in with Apple_ → download `AuthKey_XXXX.p8` (only once!).
+4. `APPLE_SERVICES_ID` = the Services ID, `APPLE_TEAM_ID` = your team ID, `APPLE_KEY_ID` = the key's ID,
+   `APPLE_PRIVATE_KEY` = the .p8 file's text on one line with `\n` for line breaks.
+
+How it works and what is checked: `src/services/oauth.js`. Staff, the BQuee team and the super admin keep
+signing in with their password (and code).
+
 ## 9. Releasing a new version
 
 1. Push to GitHub. The **Checks** run (all server tests, web bundle, secret scan, both apps' analyze and tests).

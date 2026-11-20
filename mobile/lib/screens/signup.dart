@@ -14,6 +14,7 @@ import 'package:material_ui/material_ui.dart';
 import '../core/session.dart';
 import '../ui/booking_modes.dart';
 import 'mfa.dart';
+import 'social.dart';
 
 /// The sign-up form's steps, in order (same as the website).
 const _kSteps = ['Business', 'Booking', 'Your account'];
@@ -29,7 +30,10 @@ Future<Json?> loadPublicSite() async {
 
 class SignupScreen extends StatefulWidget {
   final Json? site;
-  const SignupScreen({super.key, this.site});
+
+  /// Signing up with Google/Apple: {ticket, provider, email, name, verifier} – no username or password.
+  final Json? social;
+  const SignupScreen({super.key, this.site, this.social});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -62,6 +66,11 @@ class _SignupScreenState extends State<SignupScreen> {
     super.initState();
     site = widget.site;
     _pickDefault();
+    final social = widget.social;
+    if (social != null) {
+      owner.text = social.s('name');
+      email.text = social.s('email');
+    }
     if (site == null) {
       loadPublicSite().then((s) {
         if (mounted && s != null) {
@@ -152,6 +161,7 @@ class _SignupScreenState extends State<SignupScreen> {
           'ref': referral.text.trim().toLowerCase(),
           if (_packages.isNotEmpty) 'package': package,
           if (_packages.isNotEmpty && currency.isNotEmpty) 'currency': currency,
+          if (widget.social != null) ...{'social': widget.social!.s('ticket'), 'verifier': widget.social!.s('verifier')},
           'channel': 'app',
         }),
       );
@@ -276,6 +286,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   StepBar(steps: _kSteps, at: at, onPick: _go),
                   if (at == 0) ...[
+                    if (widget.social == null) SocialButtons(site: site, verb: 'Sign up'),
                     if (_packages.isNotEmpty)
                       FieldGroup(
                         'Package',
@@ -360,16 +371,26 @@ class _SignupScreenState extends State<SignupScreen> {
                           keyboard: TextInputType.phone,
                           maxLength: 20,
                         ),
-                        FieldX(
-                          'Email',
-                          email,
-                          icon: 'mail',
-                          keyboard: TextInputType.emailAddress,
-                          maxLength: 120,
-                          validate: (s) => s.isEmpty || s.contains('@') ? null : 'Enter a valid email',
-                        ),
+                        if (widget.social == null)
+                          FieldX(
+                            'Email',
+                            email,
+                            icon: 'mail',
+                            keyboard: TextInputType.emailAddress,
+                            maxLength: 120,
+                            validate: (s) => s.isEmpty || s.contains('@') ? null : 'Enter a valid email',
+                          )
+                        else
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: Text(
+                              'Signing up with ${widget.social!.s('provider') == 'apple' ? 'Apple' : 'Google'} as ${widget.social!.s('email')} – you’ll sign in with it, no password needed.',
+                              style: const TextStyle(color: Tk.ink2, height: 1.4),
+                            ),
+                          ),
                       ],
                     ),
+                    if (widget.social == null)
                     FieldGroup(
                       'Sign-in details',
                       children: [

@@ -31,6 +31,7 @@ class MainActivity : FlutterActivity() {
     private var pendingPickMax = 1200
     private var pendingCamera: MethodChannel.Result? = null
     private var camera: QrCamera? = null
+    private var pendingAuth: MethodChannel.Result? = null // "Continue with Google / Apple" in the browser
 
     companion object {
         private const val REQ_PICK = 4101
@@ -107,6 +108,28 @@ class MainActivity : FlutterActivity() {
     /** Only these kinds of links are opened (no javascript:, file:, content: or app-internal schemes). */
     private val allowedSchemes = setOf("https", "http", "tel", "mailto", "sms", "whatsapp", "geo", "otpauth")
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val link = intent.data
+        if (link != null && link.scheme == "bqueebiz" && link.host == "oauth") {
+            pendingAuth?.success(link.toString())
+            pendingAuth = null
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Back in the app without the sign-in link (browser closed): tell the app it was cancelled.
+        val waiting = pendingAuth ?: return
+        window.decorView.postDelayed({
+            if (pendingAuth === waiting) {
+                waiting.success(null)
+                pendingAuth = null
+            }
+        }, 1500)
+    }
+
     private fun handle(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "getPref" -> result.success(prefs.getString(call.argument<String>("key") ?: "", null))
@@ -125,6 +148,24 @@ class MainActivity : FlutterActivity() {
                 result.success(true)
             }
             "openUrl" -> result.success(openUrl(call.argument<String>("url") ?: ""))
+            "webAuth" -> {
+                // Opens the sign-in page in the browser; answered with the bqueebiz://oauth link it comes
+                // back with (onNewIntent), or null when the person returns without finishing.
+                pendingAuth?.success(null)
+                pendingAuth = result
+                val url = call.argument<String>("url") ?: ""
+                if (!url.startsWith("https://") && !url.startsWith("http://")) {
+                    pendingAuth = null
+                    result.success(null)
+                } else {
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    } catch (e: ActivityNotFoundException) {
+                        pendingAuth = null
+                        result.error("no_browser", "No web browser is installed on this phone.", null)
+                    }
+                }
+            }
             "shareText" -> {
                 val send = Intent(Intent.ACTION_SEND).apply {
                     type = "text/plain"

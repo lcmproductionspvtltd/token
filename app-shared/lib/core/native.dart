@@ -95,6 +95,16 @@ class Native {
     }
   }
 
+  /// "Continue with Google / Apple": shows the sign-in page (iPhone: Apple's secure sheet; Android:
+  /// the browser) and returns the bqueebiz://oauth… link it comes back with, or null if closed.
+  static Future<String?> webAuth(String url) async {
+    try {
+      return await _ch.invokeMethod<String>('webAuth', {'url': url});
+    } on MissingPluginException {
+      return null;
+    }
+  }
+
   /// Opens the photo picker; returns a resized JPEG as a data URL, or null if cancelled.
   static Future<String?> pickImage({int maxSize = 1200}) async {
     try {

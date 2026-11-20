@@ -195,9 +195,17 @@
   object-fit: contain;
   border-radius: 12px;
 }
-/* Logo alone in the header (no name next to it): a little bigger, no frame. */
-.ld-logo.only.mark.img {
+/* Logo alone in the header (no name next to it): a little bigger, no frame, never squeezed. */
+.ld-brand:has(.ld-logo.only) {
+  flex: none;
+}
+.ld-nav .ld-logo.only.mark.img {
+  flex: none;
+  width: auto;
+  height: auto;
+  min-width: 0;
   padding: 0;
+  overflow: visible;
   background: none;
   box-shadow: none;
 }
