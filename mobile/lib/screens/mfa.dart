@@ -22,7 +22,13 @@ Future<void> openMfa(BuildContext context, Json mfa) =>
 
 class MfaScreen extends StatefulWidget {
   final Json mfa;
-  const MfaScreen({super.key, required this.mfa});
+
+  /// Sends the code; returns backup codes (after a setup). Default: the sign-in step.
+  final Future<List<String>> Function(String code)? submit;
+
+  /// After the last step. Default: back to the first screen (signed in).
+  final VoidCallback? onFinished;
+  const MfaScreen({super.key, required this.mfa, this.submit, this.onFinished});
 
   @override
   State<MfaScreen> createState() => _MfaScreenState();
@@ -43,7 +49,7 @@ class _MfaScreenState extends State<MfaScreen> {
     super.dispose();
   }
 
-  void _close() => Navigator.of(context).popUntil((r) => r.isFirst);
+  void _close() => widget.onFinished != null ? widget.onFinished!() : Navigator.of(context).popUntil((r) => r.isFirst);
 
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
@@ -56,7 +62,9 @@ class _MfaScreenState extends State<MfaScreen> {
       error = '';
     });
     try {
-      final codes = await session.completeMfa(widget.mfa.s('challenge'), value);
+      final codes = widget.submit != null
+          ? await widget.submit!(value)
+          : await session.completeMfa(widget.mfa.s('challenge'), value);
       if (!mounted) return;
       if (codes.isNotEmpty) {
         setState(() {

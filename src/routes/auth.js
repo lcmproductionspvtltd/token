@@ -62,6 +62,22 @@ module.exports = function authRoutes(router, { db, auth, limiter }) {
     return { backupCodes: await auth.renewBackupCodes(user, body.code) };
   });
 
+  // Business owners switch two-step sign-in on (QR code → code from the app) or off (needs a code).
+  router.post('/api/me/mfa/setup', async ({ req, ip }) => {
+    await limiter.check('mfa', ip, 30, 10 * 60_000);
+    return auth.startMfaSetup(await auth.requireUser(req));
+  });
+  router.post('/api/me/mfa/enable', async ({ req, body, ip }) => {
+    await limiter.check('mfa', ip, 30, 10 * 60_000);
+    const user = await auth.requireUser(req);
+    return { backupCodes: await auth.confirmMfaSetup(user, body.challenge, body.code) };
+  });
+  router.post('/api/me/mfa/disable', async ({ req, body, ip }) => {
+    await limiter.check('mfa', ip, 30, 10 * 60_000);
+    await auth.disableMfa(await auth.requireUser(req), body.code);
+    return { ok: true };
+  });
+
   router.post('/api/session/rotate', async ({ req }) => auth.rotateSession(req));
 
   // Signed-in devices, and signing out all the others.

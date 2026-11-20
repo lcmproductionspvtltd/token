@@ -28,7 +28,11 @@ const scrypt = promisify(crypto.scrypt);
 const MIN_PASSWORD_LENGTH = 8;
 const MIN_ADMIN_PASSWORD_LENGTH = 12; // super admin and BQuee team
 const ADMIN_ROLES = ['superadmin', 'platform_staff'];
-const MFA_ROLES = ['superadmin', 'platform_staff', 'owner'];
+// Two-step sign-in: always required for the accounts that can see every business; business owners
+// choose to switch it on (then it is asked at every sign-in). Staff and customers don't use it.
+const MFA_REQUIRED = ['superadmin', 'platform_staff'];
+const MFA_OPTIONAL = ['owner'];
+const MFA_ROLES = [...MFA_REQUIRED, ...MFA_OPTIONAL];
 // How long a session lasts before signing in again: shorter for the most powerful accounts.
 const SESSION_HOURS = { superadmin: 12, platform_staff: 12, owner: 14 * 24, staff: 30 * 24 };
 const CHALLENGE_MINUTES = 10;
@@ -85,7 +89,9 @@ function toPublicUser(row) {
     // Menus and features the super admin allows for this business.
     ...(row.salon_id ? { features: featuresOf(row.salon_features) } : {}),
     mfa: {
-      required: MFA_ROLES.includes(row.role),
+      required: MFA_REQUIRED.includes(row.role),
+      // An owner can switch it on or off in their menu.
+      optional: MFA_OPTIONAL.includes(row.role),
       enabled: !!row.mfa_enabled_at,
       backupCodesLeft: Number(row.mfa_backup_left || 0),
     },
@@ -217,8 +223,9 @@ function createAuthService(db, config) {
 
   /** After the right password: a session, or the two-step sign-in step this account needs first. */
   async function loginStep(user, req, res) {
-    if (!MFA_ROLES.includes(user.role)) return issueSession(user, req, res);
-    return newChallenge(user, user.mfa_enabled_at ? 'verify' : 'setup');
+    if (user.mfa_enabled_at && MFA_ROLES.includes(user.role)) return newChallenge(user, 'verify');
+    if (MFA_REQUIRED.includes(user.role)) return newChallenge(user, 'setup');
+    return issueSession(user, req, res);
   }
 
   async function sessionUser(req) {
@@ -366,7 +373,68 @@ function createAuthService(db, config) {
       return changed;
     },
 
-    /** For a lost phone: the account sets two-step sign-in up again at its next sign-in. */
+    /**
+     * An owner switches two-step sign-in on from their menu: a new secret (shown as a QR code), saved
+     * only once a right code from the authenticator app proves it was added.
+     */
+    async startMfaSetup(user) {
+      if (!MFA_OPTIONAL.includes(user.role)) throw forbidden('Two-step sign-in is always on for this account');
+      if (user.mfa_enabled_at) throw badRequest('Two-step sign-in is already on');
+      const { mfa } = await newChallenge(user, 'setup');
+      return { challenge: mfa.challenge, secret: mfa.secret, uri: mfa.uri, minutes: mfa.minutes };
+    },
+
+    async confirmMfaSetup(user, challengeToken, code) {
+      const {
+        rows: [ch],
+      } = await db.query(
+        "SELECT * FROM mfa_challenges WHERE id = $1 AND user_id = $2 AND purpose = 'setup' AND expires_at > now()",
+        [sha256(String(challengeToken || '')), user.id],
+      );
+      if (!ch) throw badRequest('This setup has expired. Start again from your menu.');
+      const secret = secretBox.open(ch.secret);
+      const step = totp.verify(secret, code, 0);
+      if (!step) {
+        await db.query('UPDATE mfa_challenges SET attempts = attempts + 1 WHERE id = $1', [ch.id]);
+        if (ch.attempts + 1 >= MAX_CODE_TRIES) {
+          await db.query('DELETE FROM mfa_challenges WHERE id = $1', [ch.id]);
+          throw badRequest('Too many wrong codes. Start the setup again.');
+        }
+        throw badRequest('Wrong code. Enter the 6-digit code your authenticator app shows for BQuee.');
+      }
+      const codes = newBackupCodes();
+      await db.query(
+        `UPDATE users SET mfa_secret = $2, mfa_enabled_at = now(), mfa_last_step = $3, mfa_backup_codes = $4 WHERE id = $1`,
+        [user.id, secretBox.seal(secret), step, codes.map(backupHash)],
+      );
+      await db.query('DELETE FROM mfa_challenges WHERE id = $1', [ch.id]);
+      return codes;
+    },
+
+    /** An owner switches it off: needs a current code (or a backup code), so a stolen session can't. */
+    async disableMfa(user, code) {
+      if (!MFA_OPTIONAL.includes(user.role)) throw forbidden('Two-step sign-in can’t be switched off for this account');
+      if (!user.mfa_enabled_at) return;
+      const given = String(code || '').trim();
+      let ok = false;
+      if (/^\d{6}$/.test(given.replace(/\s/g, '')))
+        ok = !!totp.verify(secretBox.open(user.mfa_secret), given, Number(user.mfa_last_step || 0));
+      else if (given) {
+        const { rows } = await db.query('SELECT 1 FROM users WHERE id = $1 AND $2 = ANY (mfa_backup_codes)', [
+          user.id,
+          backupHash(given),
+        ]);
+        ok = rows.length > 0;
+      }
+      if (!ok) throw badRequest('Wrong code. Enter the 6-digit code from your authenticator app (or a backup code).');
+      await db.query(
+        `UPDATE users SET mfa_secret = NULL, mfa_enabled_at = NULL, mfa_last_step = 0, mfa_backup_codes = '{}' WHERE id = $1`,
+        [user.id],
+      );
+      await db.query('DELETE FROM mfa_challenges WHERE user_id = $1', [user.id]);
+    },
+
+    /** For a lost phone: two-step sign-in is cleared (required accounts set it up again at the next sign-in). */
     async resetMfa(userId) {
       await db.query(
         `UPDATE users SET mfa_secret = NULL, mfa_enabled_at = NULL, mfa_last_step = 0, mfa_backup_codes = '{}' WHERE id = $1`,

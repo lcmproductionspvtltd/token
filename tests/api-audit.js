@@ -1057,18 +1057,14 @@ const login = async (username, password) => {
   };
   const signedUp = await ok('business signs up', 'POST', '/api/public/signup', { ...su, role: 'superadmin' });
   check(
-    'sign-up goes straight to setting up two-step sign-in (no session yet)',
-    signedUp.mfa &&
-      signedUp.mfa.step === 'setup' &&
-      signedUp.mfa.secret &&
-      !signedUp.token &&
-      signedUp.trialDays === 30,
+    'sign-up signs the owner straight in (two-step sign-in is their choice, off at first)',
+    !signedUp.mfa && signedUp.token && signedUp.user.role === 'owner' && signedUp.trialDays === 30,
+  );
+  check(
+    'the owner can switch two-step sign-in on; the BQuee team can’t switch it off',
+    signedUp.user.mfa.required === false && signedUp.user.mfa.optional === true && signedUp.user.mfa.enabled === false,
   );
   const signed = await finishMfa(BASE, 'sanaowner', signedUp);
-  check(
-    'after the code the owner is signed in, with backup codes',
-    signed.token && signed.user.role === 'owner' && signed.backupCodes.length === 10,
-  );
   const suData = await ok('new owner opens dashboard', 'GET', '/api/owner/data', null, signed.token);
   check('new business has a branch and trial plan', suData.branches.length === 1 && suData.salon.name === 'Signup Spa');
   const admSu = await ok('admin sees signed-up business', 'GET', '/api/admin/data', null, sa);

@@ -32,7 +32,42 @@ const cookiesOf = (r) => (r.headers.getSetCookie ? r.headers.getSetCookie() : []
     token: sa,
     body: { name: 'Sess Shop', username: 'sessown', password: 'Sess-Owner-2026', ownerEmail: 'sess@shop.test' },
   });
-  const ownToken0 = await signIn(BASE, 'sessown', 'Sess-Owner-2026'); // sets up two-step sign-in
+  const plain = await post(BASE, '/api/login', { login: 'sessown', password: 'Sess-Owner-2026' });
+  check(
+    'a new owner signs in with the password only (two-step sign-in is their choice)',
+    plain.status === 200 && plain.data.token && !plain.data.mfa,
+  );
+  const ownToken0 = plain.data.token;
+  // The owner switches two-step sign-in on from their menu.
+  const setupStart = await req('POST', '/api/me/mfa/setup', { token: ownToken0 });
+  check(
+    'owner starts setup: QR link and key',
+    setupStart.status === 200 && setupStart.data.uri.startsWith('otpauth://totp/BQuee:') && setupStart.data.secret,
+  );
+  const setupBad = await req('POST', '/api/me/mfa/enable', {
+    token: ownToken0,
+    body: { challenge: setupStart.data.challenge, code: '000000' },
+  });
+  check('a wrong code doesn’t switch it on', setupBad.status === 400 && /Wrong code/.test(setupBad.data.error));
+  const setupGood = await req('POST', '/api/me/mfa/enable', {
+    token: ownToken0,
+    // the previous 30-second code (still accepted), so the next sign-ins have fresh codes to use
+    body: { challenge: setupStart.data.challenge, code: codeFor(setupStart.data.secret, -1) },
+  });
+  check(
+    'the right code switches it on, with 10 backup codes',
+    setupGood.status === 200 && setupGood.data.backupCodes.length === 10,
+  );
+  accounts.set('sessown', {
+    secret: setupStart.data.secret,
+    lastStep: totp.stepAt() - 1,
+    backupCodes: setupGood.data.backupCodes,
+  });
+  check('it can’t be started twice', (await req('POST', '/api/me/mfa/setup', { token: ownToken0 })).status === 400);
+  check(
+    'the super admin can’t switch it off (always required)',
+    (await req('POST', '/api/me/mfa/disable', { token: sa, body: { code: '123456' } })).status === 403,
+  );
   const own0 = await req('GET', '/api/owner/data', { token: ownToken0 });
   const branchId = own0.data.branches[0].id;
   await req('POST', '/api/owner/staff', {
@@ -145,25 +180,27 @@ const cookiesOf = (r) => (r.headers.getSetCookie ? r.headers.getSetCookie() : []
   );
   const again = await post(BASE, '/api/login', { login: 'sessown', password: 'Sess-Owner-2026' });
   check(
-    'next sign-in sets two-step sign-in up again',
-    again.data.mfa && again.data.mfa.step === 'setup' && again.data.mfa.uri.startsWith('otpauth://totp/BQuee:'),
+    'after a reset the owner signs in with the password (two-step off until they turn it on again)',
+    again.status === 200 && again.data.token && !again.data.mfa,
   );
-  const setupWrong = await post(BASE, '/api/login/mfa', { challenge: again.data.mfa.challenge, code: '111111' });
-  check('setup needs a right code from the new secret', setupWrong.status === 401);
-  const setupOk = await post(BASE, '/api/login/mfa', {
-    challenge: again.data.mfa.challenge,
-    code: codeFor(again.data.mfa.secret),
+  const ownToken = again.data.token;
+  const reOn = await req('POST', '/api/me/mfa/setup', { token: ownToken });
+  const reOnOk = await req('POST', '/api/me/mfa/enable', {
+    token: ownToken,
+    body: { challenge: reOn.data.challenge, code: codeFor(reOn.data.secret) },
   });
-  check(
-    'setup with the right code signs in',
-    setupOk.status === 200 && setupOk.data.token && setupOk.data.backupCodes.length === 10,
-  );
-  accounts.set('sessown', {
-    secret: again.data.mfa.secret,
-    lastStep: totp.stepAt(),
-    backupCodes: setupOk.data.backupCodes,
+  check('…and can turn it on again', reOnOk.status === 200 && reOnOk.data.backupCodes.length === 10);
+  const offStep = totp.stepAt() + 1;
+  const offBad = await req('POST', '/api/me/mfa/disable', { token: ownToken, body: { code: '000000' } });
+  check('switching it off needs a right code', offBad.status === 400 && /Wrong code/.test(offBad.data.error));
+  const offOk = await req('POST', '/api/me/mfa/disable', {
+    token: ownToken,
+    body: { code: totp.codeAt(reOn.data.secret, offStep) },
   });
-  const ownToken = setupOk.data.token;
+  check('the owner switches it off with a code', offOk.status === 200);
+  const afterOff = await post(BASE, '/api/login', { login: 'sessown', password: 'Sess-Owner-2026' });
+  check('then the password alone signs in again', afterOff.status === 200 && afterOff.data.token && !afterOff.data.mfa);
+  accounts.delete('sessown');
 
   /* ---------- passwords and sessions ---------- */
   const shortTeam = await req('POST', '/api/admin/team', {

@@ -157,6 +157,56 @@ class _SecurityPageState extends State<_SecurityPage> {
     }
   }
 
+  /// Owners: switch two-step sign-in on – scan the QR code, enter a code, save the backup codes.
+  Future<void> _turnOn() async {
+    try {
+      final s = asJson(await session.api.post('/api/me/mfa/setup'));
+      if (!mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (c) => MfaScreen(
+            mfa: {'step': 'setup', 'secret': s.s('secret'), 'uri': s.s('uri'), 'challenge': s.s('challenge')},
+            submit: (code) async => asJson(
+              await session.api.post('/api/me/mfa/enable', {'challenge': s.s('challenge'), 'code': code}),
+            ).ls('backupCodes'),
+            onFinished: () => Navigator.of(c).pop(),
+          ),
+        ),
+      );
+      _load();
+    } catch (e) {
+      if (mounted) showError(context, e);
+    }
+  }
+
+  /// Owners: switch it off – needs a current code or a backup code.
+  Future<void> _turnOff() async {
+    final code = TextEditingController();
+    final entered = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Turn two-step sign-in off?'),
+        content: TextField(
+          controller: code,
+          autofocus: true,
+          maxLength: 20,
+          decoration: const InputDecoration(labelText: '6-digit code or a backup code', counterText: ''),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, code.text.trim()), child: const Text('Turn off')),
+        ],
+      ),
+    );
+    if (entered == null || entered.isEmpty || !mounted) return;
+    final r = await runAction(
+      context,
+      () => session.api.post('/api/me/mfa/disable', {'code': entered}),
+      done: 'Two-step sign-in is off',
+    );
+    if (r != null) _load();
+  }
+
   Future<void> _signOutOthers() async {
     final r = await runAction(
       context,
@@ -193,14 +243,16 @@ class _SecurityPageState extends State<_SecurityPage> {
                           ),
                           m.b('enabled')
                               ? const Tag('On', dot: true, tone: TagTone.green)
-                              : const Tag('Not needed for staff'),
+                              : Tag(m.b('optional') ? 'Off' : 'Not needed for staff'),
                         ],
                       ),
                       const SizedBox(height: 8),
                       Text(
                         m.b('enabled')
                             ? 'Each sign-in asks for a code from your authenticator app. You have ${m.i('backupCodesLeft')} unused backup codes for when your phone isn’t at hand.'
-                            : 'Staff accounts sign in with their password. Owners, the BQuee team and the super admin also use a code from an authenticator app.',
+                            : m.b('optional')
+                            ? 'Off – you sign in with your password only. Turn it on to also ask for a code from an authenticator app (Google Authenticator or similar), so nobody can sign in with your password alone.'
+                            : 'Staff accounts sign in with their password. The BQuee team and the super admin also use a code from an authenticator app.',
                         style: const TextStyle(color: Tk.ink2, height: 1.4),
                       ),
                       if (m.b('enabled')) ...[
@@ -211,6 +263,14 @@ class _SecurityPageState extends State<_SecurityPage> {
                           'Lost your phone and your backup codes? Ask the super admin to reset two-step sign-in for you.',
                           style: TextStyle(color: Tk.ink3, fontSize: 12),
                         ),
+                        if (m.b('optional')) ...[
+                          const SizedBox(height: 10),
+                          Btn('Turn two-step sign-in off', icon: 'x', kind: BtnKind.danger, small: true, onPressed: _turnOff),
+                        ],
+                      ],
+                      if (!m.b('enabled') && m.b('optional')) ...[
+                        const SizedBox(height: 12),
+                        Btn('Turn two-step sign-in on', icon: 'shield', small: true, onPressed: _turnOn),
                       ],
                     ],
                   ),

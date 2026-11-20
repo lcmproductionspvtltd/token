@@ -164,7 +164,7 @@ class _SignupScreenState extends State<SignupScreen> {
         }
         return;
       }
-      // Owners use two-step sign-in: a new owner sets it up right away.
+      // Only when this account must use two-step sign-in (owners switch it on later if they like).
       if (r['mfa'] != null) {
         if (mounted) {
           setState(() => busy = false);
