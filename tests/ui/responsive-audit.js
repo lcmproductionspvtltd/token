@@ -108,6 +108,19 @@ const WIDTHS = [320, 360, 390, 480, 600, 768, 900, 1024, 1280, 1440, 1920];
               if (out.length > 3) break;
             }
           }
+          // A business page's footer reaches the very bottom (no empty strip under it).
+          const foot = document.querySelector('.ld-footer');
+          if (foot) {
+            const gap = document.documentElement.scrollHeight - (foot.getBoundingClientRect().bottom + scrollY);
+            if (gap > 2) out.push('empty space under the footer: ' + Math.round(gap) + 'px');
+          }
+          // Contact tiles: the words sit next to the icon, not far below it.
+          for (const t of document.querySelectorAll('.ld-tile')) {
+            const i = t.querySelector('.ld-tile-icon');
+            const b = t.querySelector('b');
+            if (i && b && b.getBoundingClientRect().top - i.getBoundingClientRect().bottom > 4)
+              out.push('contact tile: text far below its icon');
+          }
           return out;
         });
         for (const x of r) problems.push(`${path} @${w}px: ${x}`);
