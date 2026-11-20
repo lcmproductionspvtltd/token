@@ -102,7 +102,7 @@ final List<_ListSpec> _lists = [
       ('name', 'Plan name', 'text', 40),
       ('price', 'Main price, e.g. ₹999, Free or Talk to us', 'text', 30),
       ('period', 'Per (e.g. per month)', 'text', 40),
-      ('priceUSD', 'Fixed price in US$ (also used for countries without their own price) – optional', 'number', 12),
+      ('priceUSD', 'Fixed price in US\$ (also used for countries without their own price) – optional', 'number', 12),
       ('priceINR', 'Fixed price in ₹ India – optional', 'number', 12),
       ('priceAED', 'Fixed price in AED UAE – optional', 'number', 12),
       ('priceSAR', 'Fixed price in SAR Saudi Arabia – optional', 'number', 12),
