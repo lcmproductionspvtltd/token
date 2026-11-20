@@ -138,7 +138,6 @@ const ticketOf = (location) => new URL(location, BASE).searchParams.get('social'
       ADMIN_EMAIL: 'boss@bquee.test',
       ADMIN_PASSWORD: 'Admin@12345-bq',
       APP_SECRET: 'test-key-for-all-servers-Qm7Vx2Lp9Rz4',
-      FX_URL: 'off',
       API_REQUESTS_PER_MINUTE: '100000',
       OAUTH_TEST_PROVIDER: FAKE,
       GOOGLE_CLIENT_ID: 'google-client.test',

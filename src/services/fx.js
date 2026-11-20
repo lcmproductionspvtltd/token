@@ -1,14 +1,18 @@
 'use strict';
 
 /**
- * Package prices in the visitor's own currency.
+ * Package prices in the visitor's own currency – self-contained, no outside service.
  *
- * The super admin writes each home-page package price once, in any of the currencies below
- * ("₹999", "AED 149", "$39"). BQuee converts it into every other currency with exchange rates it
- * fetches twice a day from a free rate service (open.er-api.com – no key, no account) and keeps in
- * the database. If that service can't be reached, the last saved rates are used, and before the
- * first fetch the built-in rates below (the Gulf currencies are fixed to the US dollar; INR is
- * approximate). FX_URL=off switches fetching off (tests, or servers without internet).
+ * In Admin → Website the super admin gives each package
+ *   - its main price ("₹999", "Free", "Talk to us"), and
+ *   - optionally a fixed price per currency (priceUSD, priceINR, priceAED, …), e.g. ₹999, AED 149, $39,
+ * and keeps a small table of rates: how much of each currency 1 US dollar is (1 US$ = 3.6725 AED).
+ *
+ * A visitor sees, in this order:
+ *   1. the fixed price for their currency, when the super admin set one;
+ *   2. otherwise the package's US$ price converted with the super admin's rate;
+ *   3. otherwise the main price converted the same way.
+ * Conversions are rounded up to a tidy figure (whole units; one decimal for OMR, KWD and BHD).
  */
 
 /** The currencies BQuee shows. `countries` = ISO country codes that see that currency. */
@@ -26,8 +30,18 @@ const CODES = CURRENCIES.map((c) => c.code);
 const BY_CODE = Object.fromEntries(CURRENCIES.map((c) => [c.code, c]));
 const DEFAULT_CODE = 'USD';
 
-/** Units per 1 US dollar, used until the first successful fetch. */
+/** Units per 1 US dollar until the super admin changes them (the Gulf currencies are fixed to the dollar). */
 const BUILT_IN_RATES = { USD: 1, INR: 88, AED: 3.6725, SAR: 3.75, QAR: 3.64, OMR: 0.3845, KWD: 0.307, BHD: 0.376 };
+
+/** The super admin's rates, each checked; anything missing or odd falls back to the built-in rate. */
+function ratesFrom(saved) {
+  const out = { ...BUILT_IN_RATES };
+  for (const code of CODES) {
+    const n = Number(saved && saved[code]);
+    if (code !== 'USD' && n > 0 && n < 1_000_000) out[code] = n;
+  }
+  return out;
+}
 
 /** "₹999", "Rs 999", "AED 149", "149 AED", "$39", "USD 39" → { amount, code }; anything else → null. */
 function parsePrice(text) {
@@ -51,86 +65,46 @@ function parsePrice(text) {
 function convert(amount, from, to, rates) {
   if (from === to) return amount;
   const r = rates || BUILT_IN_RATES;
-  const raw = (amount / (r[from] || BUILT_IN_RATES[from])) * (r[to] || BUILT_IN_RATES[to]);
+  const raw = (amount / r[from]) * r[to];
   const f = 10 ** BY_CODE[to].decimals;
   return Math.ceil(raw * f - 1e-9) / f;
 }
 
 function format(amount, code) {
   const c = BY_CODE[code];
-  const n = amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: c.decimals });
+  const n = amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
   return c.symbol + n;
 }
 
-/** A package's price in every currency: { INR: '₹999', AED: 'AED 42', … }, or null for "Free" / "Talk to us". */
-function pricesFor(priceText, rates) {
-  const p = parsePrice(priceText);
-  if (!p) return null;
-  return Object.fromEntries(CODES.map((code) => [code, format(convert(p.amount, p.code, code, rates), code)]));
+/** A package's fixed price in one currency (a number > 0), or 0 when none was set. */
+const fixed = (plan, code) => {
+  const n = Number(plan && plan['price' + code]);
+  return n > 0 ? n : 0;
+};
+
+/** What a package costs in `code`: a fixed price, else US$ converted, else the main price converted. */
+function amountFor(plan, code, rates) {
+  if (!BY_CODE[code]) return 0;
+  const own = fixed(plan, code);
+  if (own) return own;
+  const usd = fixed(plan, 'USD');
+  if (usd) return convert(usd, 'USD', code, rates);
+  const p = parsePrice(plan && plan.price);
+  return p ? convert(p.amount, p.code, code, rates) : 0;
 }
 
-/** The amount (a number) a business pays for a package in the currency it signed up with. */
-function amountFor(priceText, code, rates) {
-  const p = parsePrice(priceText);
-  if (!p) return 0;
-  return convert(p.amount, p.code, BY_CODE[code] ? code : p.code, rates);
+/** A package's price in every currency: { INR: '₹999', AED: 'AED 149', … }, or null for "Free" / "Talk to us". */
+function pricesFor(plan, rates) {
+  const anyFixed = CODES.some((c) => fixed(plan, c));
+  if (!anyFixed && !parsePrice(plan && plan.price)) return null;
+  return Object.fromEntries(CODES.map((code) => [code, format(amountFor(plan, code, rates), code)]));
 }
 
-function createFx(db, { url = 'https://open.er-api.com/v6/latest/USD', log = console } = {}) {
-  let cache = null; // { rates, updatedAt }
-
-  async function load() {
-    const { rows } = await db.query("SELECT data FROM site_content WHERE key = 'fx'");
-    const d = rows[0] && rows[0].data;
-    cache = d && d.rates ? d : { rates: { ...BUILT_IN_RATES }, updatedAt: 0, builtIn: true };
-    return cache;
-  }
-
-  async function current() {
-    return cache || load();
-  }
-
-  /** Fetches fresh rates; keeps the old ones when the service is down or answers nonsense. */
-  async function refresh() {
-    if (!url || url === 'off') return false;
-    try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
-      const body = await res.json();
-      const got = body && body.rates;
-      const rates = {};
-      for (const code of CODES) {
-        const n = Number(got && got[code]);
-        // A rate far from the built-in one is a broken answer, not a market move.
-        if (!(n > 0) || n > BUILT_IN_RATES[code] * 3 || n < BUILT_IN_RATES[code] / 3)
-          throw new Error(`bad ${code} rate`);
-        rates[code] = n;
-      }
-      rates.USD = 1;
-      const data = { rates, updatedAt: Date.now(), source: 'open.er-api.com' };
-      await db.query(
-        `INSERT INTO site_content (key, data, updated_at) VALUES ('fx', $1, now())
-         ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-        [JSON.stringify(data)],
-      );
-      cache = data;
-      return true;
-    } catch (err) {
-      log.error(JSON.stringify({ alert: 'fx_refresh_failed', error: String(err.message || err).slice(0, 200) }));
-      return false;
-    }
-  }
-
-  return {
-    current,
-    refresh,
-    /** Fetch now and then every `everyMs` (twice a day by default). */
-    start(everyMs = 12 * 60 * 60_000) {
-      load()
-        .then(refresh)
-        .catch(() => {});
-      return setInterval(() => refresh().catch(() => {}), everyMs).unref();
-    },
-  };
+/** The currency a package's own price is written in (for a sign-up that sends no currency). */
+function baseCode(plan) {
+  const p = parsePrice(plan && plan.price);
+  if (p) return p.code;
+  return CODES.find((c) => fixed(plan, c)) || 'INR';
 }
 
 module.exports = {
@@ -138,10 +112,11 @@ module.exports = {
   CODES,
   DEFAULT_CODE,
   BUILT_IN_RATES,
+  ratesFrom,
   parsePrice,
   convert,
   format,
-  pricesFor,
   amountFor,
-  createFx,
+  pricesFor,
+  baseCode,
 };

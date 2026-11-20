@@ -47,8 +47,6 @@ module.exports = {
     },
     fakeBase: env.OAUTH_TEST_PROVIDER || '', // tests only (ignored in production)
   },
-  // Exchange-rate service for package prices; 'off' = built-in/saved rates only.
-  fxUrl: env.FX_URL || 'https://open.er-api.com/v6/latest/USD',
   publicUrl, // used for canonical links, the sitemap and link previews
   publicHosts,
 

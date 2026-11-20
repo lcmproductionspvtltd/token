@@ -82,8 +82,16 @@ const LISTS = {
     blank: { name: '', price: '', period: '', features: '', highlight: false },
     fields: [
       ['name', 'Plan name', 'text', 40],
-      ['price', 'Price, e.g. ₹999 or AED 149 – shown in each visitor’s currency', 'text', 30],
+      ['price', 'Main price, e.g. ₹999, Free or Talk to us', 'text', 30],
       ['period', 'Per (e.g. per month)', 'text', 40],
+      ['priceUSD', 'Fixed price in US$ (also used for countries without their own price) – optional', 'number', 12],
+      ['priceINR', 'Fixed price in ₹ India – optional', 'number', 12],
+      ['priceAED', 'Fixed price in AED UAE – optional', 'number', 12],
+      ['priceSAR', 'Fixed price in SAR Saudi Arabia – optional', 'number', 12],
+      ['priceQAR', 'Fixed price in QAR Qatar – optional', 'number', 12],
+      ['priceOMR', 'Fixed price in OMR Oman – optional', 'number', 12],
+      ['priceKWD', 'Fixed price in KWD Kuwait – optional', 'number', 12],
+      ['priceBHD', 'Fixed price in BHD Bahrain – optional', 'number', 12],
       ['features', 'What’s included – one per line', 'area', 600],
       ['highlight', 'Mark as most popular', 'check'],
     ],
@@ -227,6 +235,22 @@ export function SiteTab() {
       {page === 3 && (
         <>
           <ListEditor spec={LISTS.plans} items={c.plans} onChange={(v) => put(['plans'], v)} icons={icons} />
+          <Panel
+            title="Currency rates"
+            sub="How much of each currency 1 US dollar is. A visitor whose currency a package has no fixed price in sees its US$ price (or main price) converted with these. Nothing is fetched from the internet – update them now and then (the Gulf currencies are fixed to the dollar; ₹ moves)."
+          >
+            <div className="form-row">
+              {text(['rates', 'INR'], '1 US$ = ? ₹ (India)', 12)}
+              {text(['rates', 'AED'], '1 US$ = ? AED (UAE)', 12)}
+              {text(['rates', 'SAR'], '1 US$ = ? SAR (Saudi Arabia)', 12)}
+              {text(['rates', 'QAR'], '1 US$ = ? QAR (Qatar)', 12)}
+            </div>
+            <div className="form-row">
+              {text(['rates', 'OMR'], '1 US$ = ? OMR (Oman)', 12)}
+              {text(['rates', 'KWD'], '1 US$ = ? KWD (Kuwait)', 12)}
+              {text(['rates', 'BHD'], '1 US$ = ? BHD (Bahrain)', 12)}
+            </div>
+          </Panel>
           <ListEditor
             spec={LISTS.testimonials}
             items={c.testimonials}
@@ -608,6 +632,8 @@ function ListEditor({ spec, items, onChange, icons }) {
                         <input
                           className="input"
                           maxLength={max}
+                          inputMode={type === 'number' ? 'decimal' : undefined}
+                          placeholder={type === 'number' ? 'e.g. 149' : undefined}
                           value={it[key] || ''}
                           onChange={(e) => update(i, key, e.target.value)}
                         />

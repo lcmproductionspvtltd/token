@@ -1,15 +1,13 @@
 'use strict';
 
 /**
- * Package prices in the visitor's currency (src/services/fx.js):
- *   - reading "₹999", "AED 149", "$39"; "Free" / "Talk to us" stay text
- *   - converting with tidy rounding (whole units; one decimal for OMR, KWD, BHD)
- *   - fetching rates from a (local, fake) rate service, keeping the old rates on a broken answer
+ * Package prices in the visitor's currency (src/services/fx.js) – self-contained:
+ *   1. the package's fixed price for that currency, when the super admin set one;
+ *   2. else its US$ price converted with the super admin's rate;
+ *   3. else its main price converted.
+ * Also: reading "₹999" / "AED 149" / "$39", tidy rounding, and the rates the super admin types.
  */
 
-const http = require('http');
-const { createPool } = require('../src/db/postgres');
-const { migrate } = require('../src/db/migrate');
 const fx = require('../src/services/fx');
 
 let passed = 0;
@@ -19,73 +17,57 @@ function check(name, ok, detail) {
   else failures.push(name + (detail ? ` – ${detail}` : ''));
   console.log(`${ok ? '✓' : '✗'} ${name}${ok || !detail ? '' : ' – ' + detail}`);
 }
-const quiet = { error() {}, warn() {}, log() {} };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const r = fx.BUILT_IN_RATES; // 1 USD = 88 INR = 3.6725 AED = 3.75 SAR = 0.307 KWD
 
-(async () => {
-  // Reading prices
-  check('₹999 → INR 999', same(fx.parsePrice('₹999'), { amount: 999, code: 'INR' }));
-  check('Rs. 1,499 → INR 1499', same(fx.parsePrice('Rs. 1,499'), { amount: 1499, code: 'INR' }));
-  check('AED 149 → AED', same(fx.parsePrice('AED 149'), { amount: 149, code: 'AED' }));
-  check('149 Dhs → AED', same(fx.parsePrice('149 Dhs'), { amount: 149, code: 'AED' }));
-  check('$39.50 → USD', same(fx.parsePrice('$39.50'), { amount: 39.5, code: 'USD' }));
-  check('SAR 150 → SAR', same(fx.parsePrice('SAR 150'), { amount: 150, code: 'SAR' }));
-  check('"Free" has no price', fx.parsePrice('Free') === null && fx.pricesFor('Free') === null);
-  check('"Talk to us" has no price', fx.pricesFor('Talk to us') === null);
+// Reading prices
+check('₹999 → INR 999', same(fx.parsePrice('₹999'), { amount: 999, code: 'INR' }));
+check('Rs. 1,499 → INR 1499', same(fx.parsePrice('Rs. 1,499'), { amount: 1499, code: 'INR' }));
+check('AED 149 → AED', same(fx.parsePrice('AED 149'), { amount: 149, code: 'AED' }));
+check('$39.50 → USD', same(fx.parsePrice('$39.50'), { amount: 39.5, code: 'USD' }));
+check('"Free" has no price', fx.parsePrice('Free') === null && fx.pricesFor({ price: 'Free' }, r) === null);
 
-  // Converting (built-in rates: 1 USD = 88 INR = 3.6725 AED = 0.307 KWD)
-  const r = fx.BUILT_IN_RATES;
-  check('same currency is unchanged', fx.convert(999, 'INR', 'INR', r) === 999);
-  check('₹999 → AED 42 (rounded up to a whole dirham)', fx.convert(999, 'INR', 'AED', r) === 42);
-  check('₹999 → $12', fx.convert(999, 'INR', 'USD', r) === 12);
-  check('₹999 → KWD 3.5 (one decimal)', fx.convert(999, 'INR', 'KWD', r) === 3.5);
-  check('AED 149 → ₹3571', fx.convert(149, 'AED', 'INR', r) === 3571);
-  const p = fx.pricesFor('₹999', r);
-  check('a price in all 8 currencies', p && Object.keys(p).length === 8 && p.INR === '₹999' && p.AED === 'AED 42');
-  check('big numbers get commas', fx.pricesFor('AED 1000', r).INR === '₹23,962');
-  check('sign-up amount in the chosen currency', fx.amountFor('₹999', 'SAR', r) === 43);
-  check('unknown currency → the price’s own', fx.amountFor('₹999', 'XYZ', r) === 999);
-  check(
-    'every GCC country + India has its currency',
-    ['AE', 'IN', 'SA', 'QA', 'OM', 'KW', 'BH'].every((c) => fx.CURRENCIES.some((x) => x.countries.includes(c))),
-  );
+// Your example: fixed prices for India, UAE and US$ – a Saudi visitor gets the US$ price in riyals.
+const business = { name: 'Business', price: '₹999', priceINR: 999, priceAED: 149, priceUSD: 39 };
+const p = fx.pricesFor(business, r);
+check('India sees the fixed ₹999', p.INR === '₹999');
+check('UAE sees the fixed AED 149 (not converted)', p.AED === 'AED 149');
+check('US$ visitors see the fixed $39', p.USD === '$39');
+check('Saudi (no fixed price) sees $39 × 3.75 = SAR 147', p.SAR === 'SAR 147', p.SAR);
+check('Kuwait sees $39 × 0.307 = KWD 12 (one decimal, rounded up)', p.KWD === 'KWD 12', p.KWD);
+check('all 8 currencies are priced', Object.keys(p).length === 8);
 
-  // Fetching rates (a local stand-in for the rate service)
-  if (!process.env.TEST_DATABASE_URL) {
-    console.log('(no TEST_DATABASE_URL – skipping the rate-fetch checks)');
-  } else {
-    const db = createPool({ connectionString: process.env.TEST_DATABASE_URL, max: 2 });
-    await migrate(db);
-    await db.query("DELETE FROM site_content WHERE key = 'fx'");
-    let answer = { result: 'success', rates: { ...r, INR: 90, AED: 3.6725 } };
-    const server = http.createServer((req, res) => res.end(JSON.stringify(answer)));
-    await new Promise((ok) => server.listen(0, ok));
-    const url = `http://127.0.0.1:${server.address().port}/latest`;
+// The super admin's own rate is used for the conversion.
+const myRates = fx.ratesFrom({ SAR: '3.80', INR: 90, AED: 'nonsense', USD: 5 });
+check('a typed rate replaces the built-in one', myRates.SAR === 3.8 && myRates.INR === 90);
+check('a bad rate keeps the built-in one; US$ is always 1', myRates.AED === 3.6725 && myRates.USD === 1);
+check('Saudi price follows the new rate: $39 × 3.80 = SAR 149', fx.pricesFor(business, myRates).SAR === 'SAR 149');
 
-    const rates = fx.createFx(db, { url, log: quiet });
-    check('before any fetch: built-in rates', (await rates.current()).rates.INR === 88);
-    check('a good answer is saved', (await rates.refresh()) === true && (await rates.current()).rates.INR === 90);
-    const fresh = fx.createFx(db, { url: 'off', log: quiet });
-    check('another server reads the saved rates', (await fresh.current()).rates.INR === 90);
+// No US$ price → the main price is converted.
+const plain = { name: 'Plain', price: '₹999' };
+check('no fixed prices: ₹999 → AED 42', fx.pricesFor(plain, r).AED === 'AED 42');
+check('no fixed prices: ₹999 → $12', fx.pricesFor(plain, r).USD === '$12');
+check(
+  'only a US$ price: "Talk to us" main text, $50 → ₹4,400',
+  fx.pricesFor({ price: 'Talk to us', priceUSD: 50 }, r).INR === '₹4,400',
+);
 
-    answer = { result: 'success', rates: { ...r, INR: 9000 } }; // nonsense
-    check('a broken answer is refused', (await rates.refresh()) === false);
-    check('…and the old rates stay', (await rates.current()).rates.INR === 90);
-    answer = { result: 'error' };
-    check(
-      'an error answer keeps the old rates',
-      (await rates.refresh()) === false && (await rates.current()).rates.INR === 90,
-    );
-    check('FX_URL=off never fetches', (await fresh.refresh()) === false);
+// What a business is charged at sign-up (the same rule, as a number).
+check('sign-up in SAR: 147', fx.amountFor(business, 'SAR', r) === 147);
+check('sign-up in AED: the fixed 149', fx.amountFor(business, 'AED', r) === 149);
+check('unknown currency → 0 (the server then uses the package’s own)', fx.amountFor(business, 'XYZ', r) === 0);
+check(
+  'the package’s own currency (no currency sent)',
+  fx.baseCode(business) === 'INR' && fx.baseCode({ priceAED: 99 }) === 'AED',
+);
+check(
+  'every GCC country + India has its currency',
+  ['AE', 'IN', 'SA', 'QA', 'OM', 'KW', 'BH'].every((c) => fx.CURRENCIES.some((x) => x.countries.includes(c))),
+);
+check(
+  'nothing is fetched from outside (no fetch in the service)',
+  !/fetch\(/.test(require('fs').readFileSync(require.resolve('../src/services/fx'), 'utf8')),
+);
 
-    server.close();
-    await db.query("DELETE FROM site_content WHERE key = 'fx'");
-    await db.end();
-  }
-
-  console.log(`Prices by currency: ${passed} passed, ${failures.length} failed`);
-  if (failures.length) process.exit(1);
-})().catch((e) => {
-  console.error('Currency test crashed:', e);
-  process.exit(1);
-});
+console.log(`Prices by currency: ${passed} passed, ${failures.length} failed`);
+if (failures.length) process.exit(1);

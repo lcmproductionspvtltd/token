@@ -105,7 +105,6 @@ async function waitForServer(url, timeoutMs = 10_000) {
             ADMIN_PASSWORD: 'Admin@12345-bq',
             // Every test server shares one key, like production servers must.
             APP_SECRET: 'test-key-for-all-servers-Qm7Vx2Lp9Rz4',
-            FX_URL: 'off',
           },
           stdio: ['ignore', 'ignore', 'inherit'],
         }),

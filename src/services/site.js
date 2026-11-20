@@ -1,5 +1,7 @@
 'use strict';
 
+const fx = require('./fx');
+
 /**
  * Content of the BQuee home (landing) page, edited by the super admin.
  * Stored as one JSON document; anything not saved yet falls back to DEFAULTS,
@@ -163,6 +165,8 @@ const DEFAULTS = {
       text: 'Questions, a demo or help with setup – we reply quickly.',
     },
   },
+  // Package prices: 1 US$ = this much of each currency (the super admin keeps these up to date).
+  rates: { ...fx.BUILT_IN_RATES },
   // The customer app (BQuee) in the stores – shown on every business page unless switched off.
   customerApp: { playUrl: '', appStoreUrl: '' },
   plans: [
@@ -361,6 +365,17 @@ function list(x, max, map) {
 }
 
 /** Cleans everything the super admin sends before saving. */
+/** A price or rate typed by the super admin: '' (none) or a positive number (commas allowed). */
+function amount(value, label) {
+  const raw = String(value == null ? '' : value)
+    .replace(/,/g, '')
+    .trim();
+  if (!raw) return '';
+  const n = Number(raw);
+  if (!(n > 0) || n >= 100_000_000) throw badRequest(`${label}: enter a number like 149 or 3.6725 (or leave it empty)`);
+  return Math.round(n * 10000) / 10000;
+}
+
 function clean(body) {
   const b = body || {};
   const hero = b.hero || {};
@@ -401,6 +416,8 @@ function clean(body) {
             period: t(p.period, 40),
             features: t(p.features, 600),
             highlight: !!p.highlight,
+            // Fixed price per currency (empty = worked out from the US$ price with the rates below).
+            ...Object.fromEntries(fx.CODES.map((c) => ['price' + c, amount(p['price' + c], 'Price in ' + c)])),
           }
         : null,
     ),
@@ -442,6 +459,14 @@ function clean(body) {
       const h = b.headings[key];
       if (h && typeof h === 'object' && t(h.title, 100))
         out.headings[key] = { kicker: t(h.kicker, 30), title: t(h.title, 100), text: t(h.text, 300) };
+    }
+  }
+  if (b.rates && typeof b.rates === 'object') {
+    // How much of each currency 1 US dollar is – used for currencies a package has no fixed price in.
+    out.rates = { USD: 1 };
+    for (const c of fx.CODES.filter((x) => x !== 'USD')) {
+      const n = amount(b.rates[c], `Rate for ${c}`);
+      out.rates[c] = n || fx.BUILT_IN_RATES[c];
     }
   }
   if (b.customerApp && typeof b.customerApp === 'object') {

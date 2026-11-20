@@ -38,8 +38,6 @@ async function main() {
   if (config.seedDemoData) await require('./scripts/seed').seedIfEmpty(db);
   // Expired sessions and rate-limit counts are removed hourly (one server at a time).
   require('./src/services/maintenance').createMaintenance(db).start();
-  // Exchange rates for package prices in each visitor's currency (twice a day; FX_URL=off to stop).
-  app.services.rates.start();
 
   const handler = (req, res) => {
     app.handle(req, res);

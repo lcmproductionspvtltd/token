@@ -1469,6 +1469,44 @@ const login = async (username, password) => {
   );
   check('"Free" and "Talk to us" stay as words', pubSite.plans.filter((p) => !p.prices).length === 2);
 
+  // Fixed prices for India, UAE and US$; Saudi (no fixed price) = US$ × the super admin's rate.
+  await deny(
+    'a rate must be a number',
+    [400],
+    'PUT',
+    '/api/admin/site',
+    { ...reset.content, rates: { ...reset.content.rates, SAR: 'abc' } },
+    sa,
+  );
+  const priced = await ok(
+    'admin sets fixed prices and a Saudi rate',
+    'PUT',
+    '/api/admin/site',
+    {
+      ...reset.content,
+      plans: reset.content.plans.map((p) =>
+        p.name === 'Business' ? { ...p, priceINR: '999', priceAED: '149', priceUSD: '39', priceSAR: '' } : p,
+      ),
+      rates: { ...reset.content.rates, SAR: '3.80' },
+    },
+    sa,
+  );
+  check(
+    'fixed prices and the rate are saved as numbers',
+    priced.content.plans.find((p) => p.name === 'Business').priceAED === 149 && priced.content.rates.SAR === 3.8,
+  );
+  const pubFixed = await ok('public site with fixed prices', 'GET', '/api/public/site');
+  const biz2 = pubFixed.plans.find((p) => p.name === 'Business');
+  check(
+    'India ₹999, UAE AED 149, US$ $39 – as typed; Saudi $39 × 3.80 = SAR 149',
+    biz2.prices.INR === '₹999' &&
+      biz2.prices.AED === 'AED 149' &&
+      biz2.prices.USD === '$39' &&
+      biz2.prices.SAR === 'SAR 149',
+    JSON.stringify(biz2.prices),
+  );
+  check('no outside rate service any more', !('ratesUpdatedAt' in pubFixed));
+
   // "Get the BQuee app" buttons on business pages: links from the super admin, switch per business / in bulk.
   await deny(
     'customer app link must be https',

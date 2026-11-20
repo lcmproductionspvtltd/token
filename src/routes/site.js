@@ -23,9 +23,8 @@ function addDays(iso, days) {
   return d.toISOString().slice(0, 10);
 }
 
-module.exports = function siteRoutes(router, { db, auth, limiter, rates, oauth }) {
+module.exports = function siteRoutes(router, { db, auth, limiter, oauth }) {
   const site = createSiteService(db);
-  const fxRates = rates || fx.createFx(db, { url: 'off' });
   const superAdmin = (req) => auth.requireUser(req, 'superadmin');
 
   const categories = async () =>
@@ -33,15 +32,15 @@ module.exports = function siteRoutes(router, { db, auth, limiter, rates, oauth }
 
   router.get('/api/public/site', async () => {
     const content = await site.get();
-    const { signup, plans, ...rest } = content;
-    // Each package's price in every currency; the page and the app show the visitor's own.
-    const { rates, updatedAt } = await fxRates.current();
+    const { signup, plans, rates: savedRates, ...rest } = content;
+    // Each package's price in every currency (fixed prices, else US$ with the super admin's rates);
+    // the page and the app show the visitor's own.
+    const rates = fx.ratesFrom(savedRates);
     return {
       ...rest,
-      plans: plans.map((p) => ({ ...p, prices: fx.pricesFor(p.price, rates) })),
+      plans: plans.map((p) => ({ ...p, prices: fx.pricesFor(p, rates) })),
       currencies: fx.CURRENCIES.map(({ code, name, countries }) => ({ code, name, countries })),
       defaultCurrency: fx.DEFAULT_CODE,
-      ratesUpdatedAt: updatedAt || 0,
       // Which "Continue with …" buttons to show (only providers set up on the server).
       social: oauth ? oauth.enabled() : { google: false, apple: false },
       signup: { enabled: signup.enabled, approval: signup.mode === 'approval', trialDays: signup.trialDays },
@@ -156,9 +155,8 @@ module.exports = function siteRoutes(router, { db, auth, limiter, rates, oauth }
     const planName = pkg ? pkg.name : signup.planName;
     // The price in the currency the owner saw (their country's), worked out again here – never taken
     // from the browser. The business then uses that currency for its own prices too.
-    const parsed = pkg && fx.parsePrice(pkg.price);
-    const code = fx.CODES.includes(body.currency) ? body.currency : parsed ? parsed.code : 'INR';
-    const planAmount = pkg ? fx.amountFor(pkg.price, code, (await fxRates.current()).rates) : 0;
+    const code = fx.CODES.includes(body.currency) ? body.currency : pkg ? fx.baseCode(pkg) : 'INR';
+    const planAmount = pkg ? fx.amountFor(pkg, code, fx.ratesFrom(content.rates)) : 0;
     const currencySymbol = fx.CURRENCIES.find((c) => c.code === code).symbol.trim();
 
     const approval = signup.mode === 'approval';
