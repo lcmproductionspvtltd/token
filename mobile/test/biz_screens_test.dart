@@ -143,6 +143,7 @@ void main() {
     await tester.pumpWidget(
       _app(
         const SignupScreen(
+          key: ValueKey('with-social'), // a fresh screen, not the one above
           site: {
             ...base,
             'social': {'google': true, 'apple': true},
@@ -217,8 +218,8 @@ void main() {
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
     expect(find.text('Change 2 businesses'), findsOneWidget);
-    // on/off + contacts + 8 owner menus + 2 features
-    expect(find.text('No change'), findsNWidgets(12));
+    // on/off + contacts + 8 owner menus + 3 features (export, staff reports, app buttons)
+    expect(find.text('No change'), findsNWidgets(13));
     expect(find.text('Hide'), findsOneWidget);
     await tester.tap(find.text('Apply to selected'));
     await tester.pumpAndSettle();
