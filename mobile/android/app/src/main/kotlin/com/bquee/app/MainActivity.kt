@@ -148,6 +148,7 @@ class MainActivity : FlutterActivity() {
                 result.success(true)
             }
             "openUrl" -> result.success(openUrl(call.argument<String>("url") ?: ""))
+            "timeZone" -> result.success(java.util.TimeZone.getDefault().id) // e.g. "Asia/Dubai"
             "webAuth" -> {
                 // Opens the sign-in page in the browser; answered with the bqueebiz://oauth link it comes
                 // back with (onNewIntent), or null when the person returns without finishing.

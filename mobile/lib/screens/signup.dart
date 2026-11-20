@@ -5,6 +5,7 @@ import 'dart:io' show Platform;
 
 import 'package:bquee_shared/core/api.dart';
 import 'package:bquee_shared/core/json.dart';
+import 'package:bquee_shared/core/native.dart';
 import 'package:bquee_shared/ui/icons.dart';
 import 'package:bquee_shared/ui/steps.dart';
 import 'package:bquee_shared/ui/theme.dart';
@@ -22,7 +23,10 @@ const _kSteps = ['Business', 'Booking', 'Your account'];
 /// Public sign-up settings and business types from the server (null when it can't be reached).
 Future<Json?> loadPublicSite() async {
   try {
-    return await session.api.getJson('/api/public/site');
+    // The phone's time zone and region tell the server which currency to show (no outside service).
+    final region = RegExp(r'[-_]([A-Za-z]{2})\b').firstMatch(Platform.localeName)?.group(1) ?? '';
+    final q = Uri(queryParameters: {'tz': await Native.timeZone(), 'region': region}).query;
+    return await session.api.getJson('/api/public/site?$q');
   } catch (_) {
     return null;
   }
@@ -100,22 +104,13 @@ class _SignupScreenState extends State<SignupScreen> {
     package = list.firstWhere((p) => p.b('highlight'), orElse: () => list.first).s('name');
   }
 
-  /// The currency of the phone's country: its region setting (en_AE → UAE), else its time zone
-  /// (India +5:30, UAE +4); anything else gets the default (US dollars). The owner can change it.
+  /// The currency of the phone's country (the server works it out from the time zone and region it
+  /// was sent); US\$ when that currency isn't on sale. The owner can change it ("Prices in").
   void _pickCurrency() {
     final list = site?.l('currencies') ?? <Json>[];
     if (list.isEmpty || list.any((c) => c.s('code') == currency)) return;
-    String? byCountry(String country) {
-      for (final c in list) {
-        if ((c['countries'] as List? ?? const []).contains(country)) return c.s('code');
-      }
-      return null;
-    }
-
-    final region = RegExp(r'[-_]([A-Za-z]{2})\b').firstMatch(Platform.localeName)?.group(1)?.toUpperCase();
-    final zone = {330: 'IN', 240: 'AE'}[DateTime.now().timeZoneOffset.inMinutes];
-    currency =
-        (region != null ? byCountry(region) : null) ?? (zone != null ? byCountry(zone) : null) ?? site!.s('defaultCurrency', 'USD');
+    final hint = site!.s('currencyHint', site!.s('defaultCurrency', 'USD'));
+    currency = list.any((c) => c.s('code') == hint) ? hint : list.first.s('code');
   }
 
   /// Packages from the home page pricing – only when the super admin shows pricing.

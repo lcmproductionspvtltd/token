@@ -46,6 +46,18 @@ export function forgetReferral() {
   }
 }
 
+/** The device's time zone and region, so the server can say which currency this visitor uses. */
+function deviceQuery() {
+  const q = new URLSearchParams();
+  try {
+    q.set('tz', Intl.DateTimeFormat().resolvedOptions().timeZone || '');
+  } catch (e) {}
+  const lang = (typeof navigator !== 'undefined' && navigator.language) || '';
+  const m = /[-_]([A-Za-z]{2})$/.exec(lang);
+  if (m) q.set('region', m[1]);
+  return q.toString();
+}
+
 /** Site content is cached for the session so going back to the home page is instant. */
 let cached = null;
 
@@ -53,7 +65,7 @@ export function useSite() {
   const [site, setSite] = useState(cached);
   useEffect(() => {
     let alive = true;
-    api('GET', '/api/public/site')
+    api('GET', '/api/public/site?' + deviceQuery())
       .then((s) => {
         cached = s;
         if (alive) setSite(s);

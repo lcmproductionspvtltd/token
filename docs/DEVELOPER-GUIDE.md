@@ -296,13 +296,14 @@ All environment variables are read in `src/config.js`: `DATABASE_URL`, `DATABASE
 `ADMIN_USERNAME` / `ADMIN_EMAIL` / `ADMIN_PASSWORD`, `SEED_DEMO_DATA`, `UPLOADS_STORAGE` / `UPLOADS_DIR`,
 `HTTPS_CERT` / `HTTPS_KEY` / `HTTP_REDIRECT_PORT`, `API_REQUESTS_PER_MINUTE`. See README section 4.
 
-**Package prices by country** (`src/services/fx.js`, self-contained): each package has its main price
-("₹999", "Free") and optional fixed prices per currency (`priceUSD`, `priceINR`, `priceAED`, …); the super
-admin keeps `rates` (1 US$ = … of each currency) in Website → Pricing. A visitor sees the fixed price for
-their currency, else the US$ price converted, else the main price converted. `/api/public/site` adds
-`plans[].prices` (all 8 currencies, formatted), `currencies` and `defaultCurrency`; the website and the
-BQuee Biz app pick the visitor's currency from the device's time zone and region, with a "Prices in" menu.
-Sign-up sends `currency`; the server works the amount out again and makes that the business's currency.
+**Package prices by country** (`src/services/fx.js`, `src/services/world.js`; self-contained): BQuee knows
+every currency (about 150, with their countries) and maps IANA time zones to countries. The super admin lists
+the currencies they sell in with a rate each (`currencies: [{ code, rate }]`, 1 US$ = rate) and gives packages
+optional fixed prices (`fixedPrices: "₹999, AED 149, $39"`). A visitor sees the fixed price for their currency,
+else the US$ price converted, else the main price converted; a currency not listed shows US$.
+`/api/public/site?tz=…&region=…` returns `plans[].prices`, `currencies` (on sale) and `currencyHint` (the
+visitor's currency from that time zone/region); the website and BQuee Biz send the device's values and show
+a "Prices in" menu. Sign-up sends `currency`; the server works the amount out again.
 
 **`TZ` matters:** "today" (token dates, daily numbers, reports) follows the server's time zone. Set
 `TZ=Asia/Kolkata` (or the businesses' zone).

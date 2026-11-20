@@ -46,6 +46,16 @@ class _ListSpec {
 }
 
 final List<_ListSpec> _lists = [
+  // The currencies packages are sold in (US\$ always): 1 US\$ = the rate. Self-contained – nothing fetched.
+  _ListSpec(
+    'currencies',
+    'Currencies you sell in',
+    'currency',
+    'tag',
+    200,
+    {'code': '', 'rate': ''},
+    const [('code', 'Currency code – e.g. GBP, EUR, PKR, LKR', 'text', 3), ('rate', '1 US\$ = ? of it (e.g. 0.79 for £)', 'number', 12)],
+  ),
   _ListSpec(
     'replace',
     'Replace paper tokens and token machines',
@@ -102,14 +112,7 @@ final List<_ListSpec> _lists = [
       ('name', 'Plan name', 'text', 40),
       ('price', 'Main price, e.g. ₹999, Free or Talk to us', 'text', 30),
       ('period', 'Per (e.g. per month)', 'text', 40),
-      ('priceUSD', 'Fixed price in US\$ (also used for countries without their own price) – optional', 'number', 12),
-      ('priceINR', 'Fixed price in ₹ India – optional', 'number', 12),
-      ('priceAED', 'Fixed price in AED UAE – optional', 'number', 12),
-      ('priceSAR', 'Fixed price in SAR Saudi Arabia – optional', 'number', 12),
-      ('priceQAR', 'Fixed price in QAR Qatar – optional', 'number', 12),
-      ('priceOMR', 'Fixed price in OMR Oman – optional', 'number', 12),
-      ('priceKWD', 'Fixed price in KWD Kuwait – optional', 'number', 12),
-      ('priceBHD', 'Fixed price in BHD Bahrain – optional', 'number', 12),
+      ('fixedPrices', 'Fixed prices – optional, e.g. ₹999, AED 149, \$39, £35 (others: the \$ price × your rate)', 'text', 300),
       ('features', 'What’s included – one per line', 'area', 600),
       ('highlight', 'Mark as most popular', 'check', 0),
     ],
@@ -276,20 +279,6 @@ class _AdminWebsiteState extends State<AdminWebsite> {
                   ),
                 ],
               ),
-              group(
-                'tag',
-                'Currency rates',
-                '1 US\$ = ${c.m('rates').s('AED')} AED · ${c.m('rates').s('INR')} ₹ · ${c.m('rates').s('SAR')} SAR',
-                () => _editFields(context, c, 'Currency rates (1 US\$ = …)', 'rates', const [
-                  ('INR', '1 US\$ = ? ₹ (India)', 'number', 12),
-                  ('AED', '1 US\$ = ? AED (UAE)', 'number', 12),
-                  ('SAR', '1 US\$ = ? SAR (Saudi Arabia)', 'number', 12),
-                  ('QAR', '1 US\$ = ? QAR (Qatar)', 'number', 12),
-                  ('OMR', '1 US\$ = ? OMR (Oman)', 'number', 12),
-                  ('KWD', '1 US\$ = ? KWD (Kuwait)', 'number', 12),
-                  ('BHD', '1 US\$ = ? BHD (Bahrain)', 'number', 12),
-                ]),
-              ),
               for (final h in _kHeadings)
                 group(
                   'edit',
@@ -354,7 +343,7 @@ class _AdminWebsiteState extends State<AdminWebsite> {
                 ]),
               ),
             ],
-            if (page == 3) ...[listGroup('plans'), listGroup('testimonials')],
+            if (page == 3) ...[listGroup('plans'), listGroup('currencies'), listGroup('testimonials')],
             if (page == 4) ...[
               listGroup('faqs'),
               group(

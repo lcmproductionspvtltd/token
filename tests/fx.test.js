@@ -1,14 +1,15 @@
 'use strict';
 
 /**
- * Package prices in the visitor's currency (src/services/fx.js) – self-contained:
- *   1. the package's fixed price for that currency, when the super admin set one;
+ * Package prices in the visitor's currency (src/services/fx.js) – self-contained, every currency:
+ *   1. the package's fixed price for that currency ("₹999, AED 149, $39, £35");
  *   2. else its US$ price converted with the super admin's rate;
  *   3. else its main price converted.
- * Also: reading "₹999" / "AED 149" / "$39", tidy rounding, and the rates the super admin types.
+ * A currency the super admin hasn't listed shows US$. The country comes from the device's time zone.
  */
 
 const fx = require('../src/services/fx');
+const world = require('../src/services/world');
 
 let passed = 0;
 const failures = [];
@@ -18,54 +19,75 @@ function check(name, ok, detail) {
   console.log(`${ok ? '✓' : '✗'} ${name}${ok || !detail ? '' : ' – ' + detail}`);
 }
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const r = fx.BUILT_IN_RATES; // 1 USD = 88 INR = 3.6725 AED = 3.75 SAR = 0.307 KWD
+
+// Built-in world data
+check('about 150 currencies built in', world.CURRENCIES.length >= 150);
+check('every country is covered once', new Set(world.CURRENCIES.flatMap((c) => c.countries)).size >= 240);
+check(
+  'time zones → countries (old names too)',
+  world.ZONES['Asia/Dubai'] === 'AE' &&
+    world.ZONES['Asia/Kolkata'] === 'IN' &&
+    world.ZONES['Asia/Calcutta'] === 'IN' &&
+    world.ZONES['Europe/London'] === 'GB' &&
+    world.ZONES['Asia/Karachi'] === 'PK',
+);
 
 // Reading prices
-check('₹999 → INR 999', same(fx.parsePrice('₹999'), { amount: 999, code: 'INR' }));
-check('Rs. 1,499 → INR 1499', same(fx.parsePrice('Rs. 1,499'), { amount: 1499, code: 'INR' }));
-check('AED 149 → AED', same(fx.parsePrice('AED 149'), { amount: 149, code: 'AED' }));
-check('$39.50 → USD', same(fx.parsePrice('$39.50'), { amount: 39.5, code: 'USD' }));
-check('"Free" has no price', fx.parsePrice('Free') === null && fx.pricesFor({ price: 'Free' }, r) === null);
-
-// Your example: fixed prices for India, UAE and US$ – a Saudi visitor gets the US$ price in riyals.
-const business = { name: 'Business', price: '₹999', priceINR: 999, priceAED: 149, priceUSD: 39 };
-const p = fx.pricesFor(business, r);
-check('India sees the fixed ₹999', p.INR === '₹999');
-check('UAE sees the fixed AED 149 (not converted)', p.AED === 'AED 149');
-check('US$ visitors see the fixed $39', p.USD === '$39');
-check('Saudi (no fixed price) sees $39 × 3.75 = SAR 147', p.SAR === 'SAR 147', p.SAR);
-check('Kuwait sees $39 × 0.307 = KWD 12 (one decimal, rounded up)', p.KWD === 'KWD 12', p.KWD);
-check('all 8 currencies are priced', Object.keys(p).length === 8);
-
-// The super admin's own rate is used for the conversion.
-const myRates = fx.ratesFrom({ SAR: '3.80', INR: 90, AED: 'nonsense', USD: 5 });
-check('a typed rate replaces the built-in one', myRates.SAR === 3.8 && myRates.INR === 90);
-check('a bad rate keeps the built-in one; US$ is always 1', myRates.AED === 3.6725 && myRates.USD === 1);
-check('Saudi price follows the new rate: $39 × 3.80 = SAR 149', fx.pricesFor(business, myRates).SAR === 'SAR 149');
-
-// No US$ price → the main price is converted.
-const plain = { name: 'Plain', price: '₹999' };
-check('no fixed prices: ₹999 → AED 42', fx.pricesFor(plain, r).AED === 'AED 42');
-check('no fixed prices: ₹999 → $12', fx.pricesFor(plain, r).USD === '$12');
+check('₹999 → INR', same(fx.parsePrice('₹999'), { amount: 999, code: 'INR' }));
+check('£35 → GBP, €40 → EUR', fx.parsePrice('£35').code === 'GBP' && fx.parsePrice('€40').code === 'EUR');
+check('PKR 9,999 → PKR 9999', same(fx.parsePrice('PKR 9,999'), { amount: 9999, code: 'PKR' }));
 check(
-  'only a US$ price: "Talk to us" main text, $50 → ₹4,400',
-  fx.pricesFor({ price: 'Talk to us', priceUSD: 50 }, r).INR === '₹4,400',
+  'fixed prices text',
+  same(fx.parseFixed('₹999, AED 149, $39, £35, PKR 9,999'), { INR: 999, AED: 149, USD: 39, GBP: 35, PKR: 9999 }),
 );
+let refused = '';
+try {
+  fx.parseFixed('₹999, banana');
+} catch (e) {
+  refused = e.message;
+}
+check('a piece it can’t read is named', refused === 'banana');
 
-// What a business is charged at sign-up (the same rule, as a number).
-check('sign-up in SAR: 147', fx.amountFor(business, 'SAR', r) === 147);
-check('sign-up in AED: the fixed 149', fx.amountFor(business, 'AED', r) === 149);
-check('unknown currency → 0 (the server then uses the package’s own)', fx.amountFor(business, 'XYZ', r) === 0);
+// Your example: you sell in ₹, AED and £ (with rates); fixed ₹999 / AED 149 / $39 for Business.
+const content = {
+  currencies: [
+    { code: 'INR', rate: 88 },
+    { code: 'AED', rate: 3.6725 },
+    { code: 'SAR', rate: 3.75 },
+    { code: 'GBP', rate: 0.79 },
+  ],
+};
+const active = fx.activeCurrencies(content);
+check('US$ is always on sale, first', active[0].code === 'USD' && active.length === 5);
+const business = { name: 'Business', price: '₹999', fixedPrices: '₹999, AED 149, $39' };
+const p = fx.pricesFor(business, active);
+check('India: your fixed ₹999', p.INR === '₹999');
+check('UAE: your fixed AED 149', p.AED === 'AED 149');
+check('Saudi (no fixed price): $39 × 3.75 = SAR 147', p.SAR === 'SAR 147', p.SAR);
+check('UK (no fixed price): $39 × 0.79 = £31', p.GBP === '£31', p.GBP);
+check('only the currencies on sale are priced', Object.keys(p).sort().join() === 'AED,GBP,INR,SAR,USD');
+
+// Which currency a visitor gets
+check('Dubai time zone → AED', fx.currencyHint({ tz: 'Asia/Dubai' }, active) === 'AED');
+check('London time zone → GBP', fx.currencyHint({ tz: 'Europe/London' }, active) === 'GBP');
+check('Karachi (PKR not on sale) → US$', fx.currencyHint({ tz: 'Asia/Karachi' }, active) === 'USD');
+check('no time zone, region IN → INR', fx.currencyHint({ region: 'in' }, active) === 'INR');
+
+// Fallbacks
+check('no fixed prices: ₹999 → AED 42', fx.pricesFor({ price: '₹999' }, active).AED === 'AED 42');
+check('"Free" has no price', fx.pricesFor({ price: 'Free' }, active) === null);
 check(
-  'the package’s own currency (no currency sent)',
-  fx.baseCode(business) === 'INR' && fx.baseCode({ priceAED: 99 }) === 'AED',
+  'the earlier priceAED field still counts',
+  fx.pricesFor({ price: '₹999', priceAED: 120 }, active).AED === 'AED 120',
 );
+check('sign-up amount in SAR: 147', fx.amountFor(business, 'SAR', fx.ratesOf(active)) === 147);
 check(
-  'every GCC country + India has its currency',
-  ['AE', 'IN', 'SA', 'QA', 'OM', 'KW', 'BH'].every((c) => fx.CURRENCIES.some((x) => x.countries.includes(c))),
+  'a currency not on sale costs nothing (the server uses US$)',
+  fx.amountFor(business, 'PKR', fx.ratesOf(active)) === 0,
 );
+check('earlier saved rates still apply', fx.activeCurrencies({ ...content, rates: { AED: 3.7 } })[2].rate === 3.7);
 check(
-  'nothing is fetched from outside (no fetch in the service)',
+  'nothing is fetched from outside',
   !/fetch\(/.test(require('fs').readFileSync(require.resolve('../src/services/fx'), 'utf8')),
 );
 

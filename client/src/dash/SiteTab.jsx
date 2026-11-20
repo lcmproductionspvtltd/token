@@ -84,14 +84,12 @@ const LISTS = {
       ['name', 'Plan name', 'text', 40],
       ['price', 'Main price, e.g. ₹999, Free or Talk to us', 'text', 30],
       ['period', 'Per (e.g. per month)', 'text', 40],
-      ['priceUSD', 'Fixed price in US$ (also used for countries without their own price) – optional', 'number', 12],
-      ['priceINR', 'Fixed price in ₹ India – optional', 'number', 12],
-      ['priceAED', 'Fixed price in AED UAE – optional', 'number', 12],
-      ['priceSAR', 'Fixed price in SAR Saudi Arabia – optional', 'number', 12],
-      ['priceQAR', 'Fixed price in QAR Qatar – optional', 'number', 12],
-      ['priceOMR', 'Fixed price in OMR Oman – optional', 'number', 12],
-      ['priceKWD', 'Fixed price in KWD Kuwait – optional', 'number', 12],
-      ['priceBHD', 'Fixed price in BHD Bahrain – optional', 'number', 12],
+      [
+        'fixedPrices',
+        'Fixed prices – optional, e.g. ₹999, AED 149, $39, £35 (others: the $ price × your rate)',
+        'text',
+        300,
+      ],
       ['features', 'What’s included – one per line', 'area', 600],
       ['highlight', 'Mark as most popular', 'check'],
     ],
@@ -106,6 +104,16 @@ const LISTS = {
       ['role', 'Business or role', 'text', 60],
       ['rating', 'Stars', 'stars'],
       ['text', 'What they said', 'area', 400],
+    ],
+  },
+  currencies: {
+    title: 'Currencies you sell in',
+    item: 'currency',
+    max: 200,
+    blank: { code: '', rate: '' },
+    fields: [
+      ['code', 'Currency code – e.g. GBP, EUR, PKR, LKR', 'text', 3],
+      ['rate', '1 US$ = ? of it (e.g. 0.79 for £)', 'number', 12],
     ],
   },
   faqs: {
@@ -235,22 +243,17 @@ export function SiteTab() {
       {page === 3 && (
         <>
           <ListEditor spec={LISTS.plans} items={c.plans} onChange={(v) => put(['plans'], v)} icons={icons} />
-          <Panel
-            title="Currency rates"
-            sub="How much of each currency 1 US dollar is. A visitor whose currency a package has no fixed price in sees its US$ price (or main price) converted with these. Nothing is fetched from the internet – update them now and then (the Gulf currencies are fixed to the dollar; ₹ moves)."
-          >
-            <div className="form-row">
-              {text(['rates', 'INR'], '1 US$ = ? ₹ (India)', 12)}
-              {text(['rates', 'AED'], '1 US$ = ? AED (UAE)', 12)}
-              {text(['rates', 'SAR'], '1 US$ = ? SAR (Saudi Arabia)', 12)}
-              {text(['rates', 'QAR'], '1 US$ = ? QAR (Qatar)', 12)}
-            </div>
-            <div className="form-row">
-              {text(['rates', 'OMR'], '1 US$ = ? OMR (Oman)', 12)}
-              {text(['rates', 'KWD'], '1 US$ = ? KWD (Kuwait)', 12)}
-              {text(['rates', 'BHD'], '1 US$ = ? BHD (Bahrain)', 12)}
-            </div>
-          </Panel>
+          <p className="hint-line">
+            Visitors see a package’s fixed price for their currency; otherwise its $ price converted with your rate
+            below. A country whose currency isn’t listed sees US$. Nothing is fetched from the internet – update the
+            rates now and then (the Gulf currencies are fixed to the dollar).
+          </p>
+          <ListEditor
+            spec={LISTS.currencies}
+            items={c.currencies || []}
+            onChange={(v) => put(['currencies'], v)}
+            icons={icons}
+          />
           <ListEditor
             spec={LISTS.testimonials}
             items={c.testimonials}

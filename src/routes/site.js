@@ -30,17 +30,19 @@ module.exports = function siteRoutes(router, { db, auth, limiter, oauth }) {
   const categories = async () =>
     (await db.query('SELECT id, name, icon, color FROM business_categories ORDER BY name')).rows;
 
-  router.get('/api/public/site', async () => {
+  router.get('/api/public/site', async ({ query }) => {
     const content = await site.get();
-    const { signup, plans, rates: savedRates, ...rest } = content;
-    // Each package's price in every currency (fixed prices, else US$ with the super admin's rates);
-    // the page and the app show the visitor's own.
-    const rates = fx.ratesFrom(savedRates);
+    const { signup, plans, rates: oldRates, currencies: onSale, ...rest } = content;
+    // Each package's price in every currency on sale (fixed prices, else US$ with the super admin's
+    // rates). The page / app send the device's time zone and region; the answer says which currency
+    // that is (US$ when it isn't on sale) – the visitor can still pick another.
+    const active = fx.activeCurrencies(content);
     return {
       ...rest,
-      plans: plans.map((p) => ({ ...p, prices: fx.pricesFor(p, rates) })),
-      currencies: fx.CURRENCIES.map(({ code, name, countries }) => ({ code, name, countries })),
+      plans: plans.map((p) => ({ ...p, prices: fx.pricesFor(p, active) })),
+      currencies: active.map(({ code, name, countries }) => ({ code, name, countries })),
       defaultCurrency: fx.DEFAULT_CODE,
+      currencyHint: fx.currencyHint({ tz: query.tz, region: query.region }, active),
       // Which "Continue with …" buttons to show (only providers set up on the server).
       social: oauth ? oauth.enabled() : { google: false, apple: false },
       signup: { enabled: signup.enabled, approval: signup.mode === 'approval', trialDays: signup.trialDays },
@@ -155,9 +157,12 @@ module.exports = function siteRoutes(router, { db, auth, limiter, oauth }) {
     const planName = pkg ? pkg.name : signup.planName;
     // The price in the currency the owner saw (their country's), worked out again here – never taken
     // from the browser. The business then uses that currency for its own prices too.
-    const code = fx.CODES.includes(body.currency) ? body.currency : pkg ? fx.baseCode(pkg) : 'INR';
-    const planAmount = pkg ? fx.amountFor(pkg, code, fx.ratesFrom(content.rates)) : 0;
-    const currencySymbol = fx.CURRENCIES.find((c) => c.code === code).symbol.trim();
+    const active = fx.activeCurrencies(content);
+    const onSale = (c) => active.some((x) => x.code === c);
+    const asked = String(body.currency || '').toUpperCase();
+    const code = onSale(asked) ? asked : pkg && onSale(fx.baseCode(pkg)) ? fx.baseCode(pkg) : 'USD';
+    const planAmount = pkg ? fx.amountFor(pkg, code, fx.ratesOf(active)) : 0;
+    const currencySymbol = fx.BY_CODE[code].symbol.trim();
 
     const approval = signup.mode === 'approval';
     const salonId = newId(5);

@@ -73,9 +73,9 @@ lawyer how long finished tokens and reports are kept, and write it in your priva
   from their browser.
 - **Database**: watch disk space and connection count in the provider's dashboard. "Server busy" (503) answers
   mean the database pool is full – raise `DATABASE_POOL_SIZE` (default 10) or the database plan.
-- **Package prices by currency**: fixed prices and the rates (1 US$ = …) are set by the super admin in
-  Website → Pricing. Nothing is fetched from outside; update the rates now and then (₹ moves, the Gulf
-  currencies are fixed to the dollar).
+- **Package prices by currency**: Website → Pricing. "Currencies you sell in" (code + 1 US$ = rate) and each
+  package's "Fixed prices" (e.g. `₹999, AED 149, $39`). Nothing is fetched from outside; update the rates now
+  and then (₹ and £ move, the Gulf currencies are fixed to the dollar). Unlisted currencies show US$.
 - **Certificates**: Render renews them itself. Own server: `certbot renew` runs from cron; the monitor above
   alerts if HTTPS fails.
 

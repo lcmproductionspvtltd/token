@@ -138,6 +138,8 @@ final class BQueeNative: NSObject, FlutterStreamHandler, UIImagePickerController
         return
       }
       UIApplication.shared.open(url, options: [:]) { ok in result(ok) }
+    case "timeZone":
+      result(TimeZone.current.identifier)  // e.g. "Asia/Dubai"
     case "webAuth":
       // Apple's secure sign-in sheet: answers with the bqueebiz://oauth link the sign-in comes back
       // with, or nil when the person closes it.

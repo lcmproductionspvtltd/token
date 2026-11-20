@@ -165,8 +165,8 @@ const DEFAULTS = {
       text: 'Questions, a demo or help with setup – we reply quickly.',
     },
   },
-  // Package prices: 1 US$ = this much of each currency (the super admin keeps these up to date).
-  rates: { ...fx.BUILT_IN_RATES },
+  // The currencies packages are sold in besides US$, each with its rate (1 US$ = this much of it).
+  currencies: fx.STARTER.map((c) => ({ ...c })),
   // The customer app (BQuee) in the stores – shown on every business page unless switched off.
   customerApp: { playUrl: '', appStoreUrl: '' },
   plans: [
@@ -365,6 +365,21 @@ function list(x, max, map) {
 }
 
 /** Cleans everything the super admin sends before saving. */
+/** A package's fixed prices as text, checked: "₹999, AED 149, $39". The earlier priceINR/priceAED… fields fold in. */
+function fixedPricesText(p) {
+  const text = t(p.fixedPrices, 300);
+  try {
+    fx.parseFixed(text);
+  } catch (err) {
+    throw badRequest(
+      `Fixed prices for ${t(p.name, 40)}: couldn’t read “${err.message}” – write e.g. ₹999, AED 149, $39`,
+    );
+  }
+  if (text) return text;
+  const old = Object.entries(fx.fixedOf({ ...p, fixedPrices: '' })).map(([code, n]) => `${code} ${n}`);
+  return old.join(', ');
+}
+
 /** A price or rate typed by the super admin: '' (none) or a positive number (commas allowed). */
 function amount(value, label) {
   const raw = String(value == null ? '' : value)
@@ -416,8 +431,8 @@ function clean(body) {
             period: t(p.period, 40),
             features: t(p.features, 600),
             highlight: !!p.highlight,
-            // Fixed price per currency (empty = worked out from the US$ price with the rates below).
-            ...Object.fromEntries(fx.CODES.map((c) => ['price' + c, amount(p['price' + c], 'Price in ' + c)])),
+            // Fixed prices, e.g. "₹999, AED 149, $39" (others: the US$ price converted with the rates).
+            fixedPrices: fixedPricesText(p),
           }
         : null,
     ),
@@ -461,12 +476,21 @@ function clean(body) {
         out.headings[key] = { kicker: t(h.kicker, 30), title: t(h.title, 100), text: t(h.text, 300) };
     }
   }
-  if (b.rates && typeof b.rates === 'object') {
-    // How much of each currency 1 US dollar is – used for currencies a package has no fixed price in.
-    out.rates = { USD: 1 };
-    for (const c of fx.CODES.filter((x) => x !== 'USD')) {
-      const n = amount(b.rates[c], `Rate for ${c}`);
-      out.rates[c] = n || fx.BUILT_IN_RATES[c];
+  if (Array.isArray(b.currencies)) {
+    // The currencies packages are sold in, each with 1 US$ = its rate.
+    out.currencies = [];
+    for (const item of b.currencies.slice(0, 200)) {
+      const code = String((item && item.code) || '')
+        .trim()
+        .toUpperCase();
+      if (!code && !String((item && item.rate) || '').trim()) continue; // an empty row
+      if (!fx.BY_CODE[code])
+        throw badRequest(`Currencies: “${code || '(empty)'}” isn’t a currency code – use e.g. GBP, EUR, PKR`);
+      if (code === 'USD') continue; // always on sale, rate 1
+      if (out.currencies.some((c) => c.code === code)) throw badRequest(`Currencies: ${code} is listed twice`);
+      const rate = amount(item.rate, `Rate for ${code}`);
+      if (!rate) throw badRequest(`Currencies: enter how much 1 US$ is in ${code}`);
+      out.currencies.push({ code, rate });
     }
   }
   if (b.customerApp && typeof b.customerApp === 'object') {

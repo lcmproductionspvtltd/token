@@ -1469,41 +1469,68 @@ const login = async (username, password) => {
   );
   check('"Free" and "Talk to us" stay as words', pubSite.plans.filter((p) => !p.prices).length === 2);
 
-  // Fixed prices for India, UAE and US$; Saudi (no fixed price) = US$ × the super admin's rate.
+  // Your currencies: ₹, AED, SAR, £ with rates; fixed ₹999 / AED 149 / $39. Saudi and UK = US$ × rate.
   await deny(
-    'a rate must be a number',
+    'a currency code must be real',
     [400],
     'PUT',
     '/api/admin/site',
-    { ...reset.content, rates: { ...reset.content.rates, SAR: 'abc' } },
+    { ...reset.content, currencies: [{ code: 'XYZ', rate: 1 }] },
+    sa,
+  );
+  await deny(
+    'a currency needs a rate',
+    [400],
+    'PUT',
+    '/api/admin/site',
+    { ...reset.content, currencies: [{ code: 'GBP', rate: '' }] },
+    sa,
+  );
+  await deny(
+    'fixed prices must be readable',
+    [400],
+    'PUT',
+    '/api/admin/site',
+    { ...reset.content, plans: reset.content.plans.map((p) => ({ ...p, fixedPrices: '₹999, banana' })) },
     sa,
   );
   const priced = await ok(
-    'admin sets fixed prices and a Saudi rate',
+    'admin lists currencies and sets fixed prices',
     'PUT',
     '/api/admin/site',
     {
       ...reset.content,
-      plans: reset.content.plans.map((p) =>
-        p.name === 'Business' ? { ...p, priceINR: '999', priceAED: '149', priceUSD: '39', priceSAR: '' } : p,
-      ),
-      rates: { ...reset.content.rates, SAR: '3.80' },
+      plans: reset.content.plans.map((p) => (p.name === 'Business' ? { ...p, fixedPrices: '₹999, AED 149, $39' } : p)),
+      currencies: [
+        { code: 'INR', rate: '88' },
+        { code: 'aed', rate: '3.6725' },
+        { code: 'SAR', rate: '3.80' },
+        { code: 'GBP', rate: '0.79' },
+        { code: '', rate: '' },
+      ],
     },
     sa,
   );
   check(
-    'fixed prices and the rate are saved as numbers',
-    priced.content.plans.find((p) => p.name === 'Business').priceAED === 149 && priced.content.rates.SAR === 3.8,
+    'currencies saved (codes in capitals, empty row dropped)',
+    priced.content.currencies.map((c) => c.code).join() === 'INR,AED,SAR,GBP' &&
+      priced.content.currencies[2].rate === 3.8,
   );
-  const pubFixed = await ok('public site with fixed prices', 'GET', '/api/public/site');
+  const pubFixed = await ok('public site from Dubai', 'GET', '/api/public/site?tz=Asia%2FDubai');
   const biz2 = pubFixed.plans.find((p) => p.name === 'Business');
   check(
-    'India ₹999, UAE AED 149, US$ $39 – as typed; Saudi $39 × 3.80 = SAR 149',
+    'India ₹999, UAE AED 149, US$ $39 as typed; Saudi $39 × 3.80 = SAR 149; UK $39 × 0.79 = £31',
     biz2.prices.INR === '₹999' &&
       biz2.prices.AED === 'AED 149' &&
       biz2.prices.USD === '$39' &&
-      biz2.prices.SAR === 'SAR 149',
+      biz2.prices.SAR === 'SAR 149' &&
+      biz2.prices.GBP === '£31',
     JSON.stringify(biz2.prices),
+  );
+  check('a visitor in Dubai is offered AED', pubFixed.currencyHint === 'AED');
+  check(
+    'a visitor in Pakistan (PKR not listed) is offered US$',
+    (await ok('public site from Karachi', 'GET', '/api/public/site?tz=Asia%2FKarachi')).currencyHint === 'USD',
   );
   check('no outside rate service any more', !('ratesUpdatedAt' in pubFixed));
 

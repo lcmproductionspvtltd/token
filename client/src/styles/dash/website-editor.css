@@ -218,3 +218,12 @@
   font-size: var(--t-sm);
   color: var(--ink-2);
 }
+
+/* a short explanation above an editor */
+.hint-line {
+  margin: 4px 2px 12px;
+  max-width: 80ch;
+  color: var(--ink-3);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+}

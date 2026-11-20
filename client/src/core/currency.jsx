@@ -1,40 +1,9 @@
-// Which currency to show package prices in: the visitor's country, guessed from the device's time
-// zone and language region (no outside service), or the one they picked in the "Prices in" menu.
+// Which currency to show package prices in: the visitor's country (the server works it out from the
+// device's time zone and region – no outside service), or the one they picked in "Prices in".
 
 import { useEffect, useState } from 'react';
 
-const ZONES = {
-  'Asia/Dubai': 'AE',
-  'Asia/Kolkata': 'IN',
-  'Asia/Calcutta': 'IN',
-  'Asia/Riyadh': 'SA',
-  'Asia/Qatar': 'QA',
-  'Asia/Muscat': 'OM',
-  'Asia/Kuwait': 'KW',
-  'Asia/Bahrain': 'BH',
-};
 const KEY = 'bq_currency';
-
-function deviceCountries() {
-  const out = [];
-  try {
-    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (ZONES[zone]) out.push(ZONES[zone]);
-  } catch (e) {}
-  for (const lang of (typeof navigator !== 'undefined' && navigator.languages) || []) {
-    const m = /[-_]([A-Za-z]{2})$/.exec(lang);
-    if (m) out.push(m[1].toUpperCase());
-  }
-  return out;
-}
-
-export function guessCurrency(currencies, fallback) {
-  for (const country of deviceCountries()) {
-    const c = currencies.find((x) => (x.countries || []).includes(country));
-    if (c) return c.code;
-  }
-  return fallback;
-}
 
 /** [code, setCode] – remembered in this browser when the visitor picks one. */
 export function useCurrency(site) {
@@ -46,9 +15,7 @@ export function useCurrency(site) {
     try {
       saved = localStorage.getItem(KEY) || '';
     } catch (e) {}
-    setCode(
-      currencies.some((c) => c.code === saved) ? saved : guessCurrency(currencies, site.defaultCurrency || 'USD'),
-    );
+    setCode(currencies.some((c) => c.code === saved) ? saved : site.currencyHint || site.defaultCurrency || 'USD');
   }, [currencies.length]);
   const pick = (next) => {
     setCode(next);

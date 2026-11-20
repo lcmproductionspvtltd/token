@@ -3,47 +3,69 @@
 /**
  * Package prices in the visitor's own currency – self-contained, no outside service.
  *
- * In Admin → Website the super admin gives each package
- *   - its main price ("₹999", "Free", "Talk to us"), and
- *   - optionally a fixed price per currency (priceUSD, priceINR, priceAED, …), e.g. ₹999, AED 149, $39,
- * and keeps a small table of rates: how much of each currency 1 US dollar is (1 US$ = 3.6725 AED).
- *
+ * BQuee knows every currency (src/services/world.js). In Admin → Website the super admin:
+ *   - lists the currencies they sell in, each with its rate (1 US$ = 3.6725 AED, 88 ₹, 0.79 £ …);
+ *   - gives each package its main price ("₹999", "Free", "Talk to us") and, optionally, fixed prices
+ *     ("₹999, AED 149, $39, £35").
  * A visitor sees, in this order:
- *   1. the fixed price for their currency, when the super admin set one;
- *   2. otherwise the package's US$ price converted with the super admin's rate;
- *   3. otherwise the main price converted the same way.
- * Conversions are rounded up to a tidy figure (whole units; one decimal for OMR, KWD and BHD).
+ *   1. the package's fixed price for their currency;
+ *   2. otherwise its US$ price converted with the super admin's rate;
+ *   3. otherwise its main price converted the same way.
+ * A visitor whose currency isn't in the list sees US dollars. Their country comes from their device
+ * (time zone, region setting) – never from an outside service – and they can change it ("Prices in").
+ * Conversions are rounded up to a tidy figure (whole units; one decimal for OMR, KWD, BHD, JOD).
  */
 
-/** The currencies BQuee shows. `countries` = ISO country codes that see that currency. */
-const CURRENCIES = [
-  { code: 'INR', symbol: '₹', name: 'Indian rupee', countries: ['IN'], decimals: 0 },
-  { code: 'AED', symbol: 'AED ', name: 'UAE dirham', countries: ['AE'], decimals: 0 },
-  { code: 'SAR', symbol: 'SAR ', name: 'Saudi riyal', countries: ['SA'], decimals: 0 },
-  { code: 'QAR', symbol: 'QAR ', name: 'Qatari riyal', countries: ['QA'], decimals: 0 },
-  { code: 'OMR', symbol: 'OMR ', name: 'Omani rial', countries: ['OM'], decimals: 1 },
-  { code: 'KWD', symbol: 'KWD ', name: 'Kuwaiti dinar', countries: ['KW'], decimals: 1 },
-  { code: 'BHD', symbol: 'BHD ', name: 'Bahraini dinar', countries: ['BH'], decimals: 1 },
-  { code: 'USD', symbol: '$', name: 'US dollar', countries: [], decimals: 0 }, // everyone else
-];
-const CODES = CURRENCIES.map((c) => c.code);
-const BY_CODE = Object.fromEntries(CURRENCIES.map((c) => [c.code, c]));
+const world = require('./world');
+
+const WORLD = world.CURRENCIES;
+const BY_CODE = Object.fromEntries(WORLD.map((c) => [c.code, c]));
 const DEFAULT_CODE = 'USD';
 
-/** Units per 1 US dollar until the super admin changes them (the Gulf currencies are fixed to the dollar). */
-const BUILT_IN_RATES = { USD: 1, INR: 88, AED: 3.6725, SAR: 3.75, QAR: 3.64, OMR: 0.3845, KWD: 0.307, BHD: 0.376 };
+/** The currencies a new BQuee starts with (the Gulf currencies are fixed to the US dollar). */
+const STARTER = [
+  { code: 'INR', rate: 88 },
+  { code: 'AED', rate: 3.6725 },
+  { code: 'SAR', rate: 3.75 },
+  { code: 'QAR', rate: 3.64 },
+  { code: 'OMR', rate: 0.3845 },
+  { code: 'KWD', rate: 0.307 },
+  { code: 'BHD', rate: 0.376 },
+];
 
-/** The super admin's rates, each checked; anything missing or odd falls back to the built-in rate. */
-function ratesFrom(saved) {
-  const out = { ...BUILT_IN_RATES };
-  for (const code of CODES) {
-    const n = Number(saved && saved[code]);
-    if (code !== 'USD' && n > 0 && n < 1_000_000) out[code] = n;
+/** Symbols people type, and what they mean (ambiguous ones like ¥ need the code: JPY or CNY). */
+const SYMBOLS = {
+  '₹': 'INR',
+  '£': 'GBP',
+  '€': 'EUR',
+  '₩': 'KRW',
+  '₪': 'ILS',
+  '₦': 'NGN',
+  '₱': 'PHP',
+  '฿': 'THB',
+  '₫': 'VND',
+};
+
+/**
+ * The currencies on sale: US$ plus the super admin's list, each { code, name, symbol, decimals,
+ * countries, rate }. `content.rates` is the earlier form ({ AED: 3.6725 }) and still read.
+ */
+function activeCurrencies(content) {
+  const list = Array.isArray(content && content.currencies) ? content.currencies : STARTER;
+  const legacy = (content && content.rates) || {};
+  const out = [{ ...BY_CODE.USD, rate: 1 }];
+  for (const item of list) {
+    const meta = item && BY_CODE[String(item.code || '').toUpperCase()];
+    if (!meta || meta.code === 'USD' || out.some((c) => c.code === meta.code)) continue;
+    const rate = Number(legacy[meta.code]) > 0 ? Number(legacy[meta.code]) : Number(item.rate);
+    if (rate > 0 && rate < 1e9) out.push({ ...meta, rate });
   }
   return out;
 }
 
-/** "₹999", "Rs 999", "AED 149", "149 AED", "$39", "USD 39" → { amount, code }; anything else → null. */
+const ratesOf = (active) => Object.fromEntries(active.map((c) => [c.code, c.rate]));
+
+/** "₹999", "Rs 999", "AED 149", "149 AED", "$39", "£35", "USD 39" → { amount, code }; else null. */
 function parsePrice(text) {
   const s = String(text || '').trim();
   const m = s.match(/(\d[\d,]*(?:\.\d+)?)/);
@@ -51,9 +73,12 @@ function parsePrice(text) {
   const amount = Number(m[1].replace(/,/g, ''));
   if (!(amount > 0)) return null;
   const rest = s.replace(m[1], ' ').toUpperCase();
-  let code = CODES.find((c) => new RegExp(`\\b${c}\\b`).test(rest));
+  const word = (rest.match(/\b[A-Z]{3}\b/g) || []).find((w) => BY_CODE[w]);
+  let code = word;
   if (!code) {
-    if (/₹|\bRS\.?\b/.test(rest)) code = 'INR';
+    const sym = Object.keys(SYMBOLS).find((x) => rest.includes(x));
+    if (sym) code = SYMBOLS[sym];
+    else if (/\bRS\.?\b/.test(rest)) code = 'INR';
     else if (/\bDHS?\b|د\.إ/.test(rest)) code = 'AED';
     else if (/\$/.test(rest)) code = 'USD';
     else code = 'INR'; // the built-in prices are in rupees
@@ -61,62 +86,108 @@ function parsePrice(text) {
   return { amount, code };
 }
 
-/** Converts and rounds up to a tidy figure (whole units; one decimal for OMR, KWD and BHD). */
+/**
+ * "₹999, AED 149, $39, £35" → { INR: 999, AED: 149, USD: 39, GBP: 35 }. Throws (with the piece it
+ * couldn't read) so the super admin sees what to fix.
+ */
+function parseFixed(text) {
+  const out = {};
+  for (const piece of String(text || '')
+    .split(/[;\n]|,(?!\d{3}\b)/)
+    .map((x) => x.trim())
+    .filter(Boolean)) {
+    const p = parsePrice(piece);
+    const hasCurrency = /[A-Za-z]{3}|[₹£€₩₪₦₱฿₫$]|\bRs\b|\bDhs?\b/i.test(piece.replace(/[\d.,\s]/g, ' '));
+    if (!p || !hasCurrency) throw new Error(piece);
+    out[p.code] = p.amount;
+  }
+  return out;
+}
+
+/** A package's fixed prices: its "₹999, AED 149" text plus the earlier priceINR/priceAED… fields. */
+function fixedOf(plan) {
+  const out = {};
+  for (const code of Object.keys(BY_CODE)) {
+    const n = Number(plan && plan['price' + code]);
+    if (n > 0) out[code] = n;
+  }
+  try {
+    Object.assign(out, parseFixed(plan && plan.fixedPrices));
+  } catch (err) {
+    // saved text is checked when it is saved; ignore anything odd here
+  }
+  return out;
+}
+
+/** Converts and rounds up to a tidy figure (whole units; one decimal for the strong dinars/rials). */
 function convert(amount, from, to, rates) {
   if (from === to) return amount;
-  const r = rates || BUILT_IN_RATES;
-  const raw = (amount / r[from]) * r[to];
+  if (!(rates[from] > 0) || !(rates[to] > 0)) return 0;
+  const raw = (amount / rates[from]) * rates[to];
   const f = 10 ** BY_CODE[to].decimals;
   return Math.ceil(raw * f - 1e-9) / f;
 }
 
 function format(amount, code) {
   const c = BY_CODE[code];
-  const n = amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
-  return c.symbol + n;
+  return c.symbol + amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 3 });
 }
-
-/** A package's fixed price in one currency (a number > 0), or 0 when none was set. */
-const fixed = (plan, code) => {
-  const n = Number(plan && plan['price' + code]);
-  return n > 0 ? n : 0;
-};
 
 /** What a package costs in `code`: a fixed price, else US$ converted, else the main price converted. */
 function amountFor(plan, code, rates) {
-  if (!BY_CODE[code]) return 0;
-  const own = fixed(plan, code);
-  if (own) return own;
-  const usd = fixed(plan, 'USD');
-  if (usd) return convert(usd, 'USD', code, rates);
+  if (!(rates[code] > 0)) return 0;
+  const fixed = fixedOf(plan);
+  if (fixed[code]) return fixed[code];
+  if (fixed.USD) return convert(fixed.USD, 'USD', code, rates);
   const p = parsePrice(plan && plan.price);
-  return p ? convert(p.amount, p.code, code, rates) : 0;
+  if (p && rates[p.code] > 0) return convert(p.amount, p.code, code, rates);
+  // A fixed price in some other currency on sale.
+  const other = Object.keys(fixed).find((c) => rates[c] > 0);
+  return other ? convert(fixed[other], other, code, rates) : 0;
 }
 
-/** A package's price in every currency: { INR: '₹999', AED: 'AED 149', … }, or null for "Free" / "Talk to us". */
-function pricesFor(plan, rates) {
-  const anyFixed = CODES.some((c) => fixed(plan, c));
-  if (!anyFixed && !parsePrice(plan && plan.price)) return null;
-  return Object.fromEntries(CODES.map((code) => [code, format(amountFor(plan, code, rates), code)]));
+/** A package's price in every currency on sale: { INR: '₹999', AED: 'AED 149', … }, or null for "Free". */
+function pricesFor(plan, active) {
+  const rates = ratesOf(active);
+  const out = {};
+  for (const c of active) {
+    const n = amountFor(plan, c.code, rates);
+    if (n > 0) out[c.code] = format(n, c.code);
+  }
+  return Object.keys(out).length ? out : null;
 }
 
 /** The currency a package's own price is written in (for a sign-up that sends no currency). */
 function baseCode(plan) {
   const p = parsePrice(plan && plan.price);
   if (p) return p.code;
-  return CODES.find((c) => fixed(plan, c)) || 'INR';
+  return Object.keys(fixedOf(plan))[0] || 'INR';
+}
+
+/** The visitor's currency from their device's time zone / region – or US$ when it isn't on sale. */
+function currencyHint({ tz, region } = {}, active) {
+  const countries = [world.ZONES[String(tz || '')], String(region || '').toUpperCase()].filter(Boolean);
+  for (const country of countries) {
+    const c = active.find((x) => x.countries.includes(country));
+    if (c) return c.code;
+  }
+  return DEFAULT_CODE;
 }
 
 module.exports = {
-  CURRENCIES,
-  CODES,
+  WORLD,
+  BY_CODE,
   DEFAULT_CODE,
-  BUILT_IN_RATES,
-  ratesFrom,
+  STARTER,
+  activeCurrencies,
+  ratesOf,
   parsePrice,
+  parseFixed,
+  fixedOf,
   convert,
   format,
   amountFor,
   pricesFor,
   baseCode,
+  currencyHint,
 };

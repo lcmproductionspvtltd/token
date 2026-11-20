@@ -95,6 +95,17 @@ class Native {
     }
   }
 
+  /// The phone's time zone ("Asia/Dubai"), so the server can tell which currency to show; '' if unknown.
+  static Future<String> timeZone() async {
+    try {
+      return await _ch.invokeMethod<String>('timeZone') ?? '';
+    } on MissingPluginException {
+      return '';
+    } on PlatformException {
+      return '';
+    }
+  }
+
   /// "Continue with Google / Apple": shows the sign-in page (iPhone: Apple's secure sheet; Android:
   /// the browser) and returns the bqueebiz://oauth… link it comes back with, or null if closed.
   static Future<String?> webAuth(String url) async {
