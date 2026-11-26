@@ -1,0 +1,223 @@
+/* Booking polish. */
+
+/* ================= booking polish ================= */
+
+/* accent tones mixed from the brand colour, so every salon stays on-brand */
+:root {
+  --tone-rose: color-mix(in srgb, var(--brand) 45%, #ff5d7a);
+  --tone-amber: color-mix(in srgb, var(--brand) 30%, #ffb02e);
+  --tone-teal: color-mix(in srgb, var(--brand) 35%, #19b5a5);
+  --tone-sky: color-mix(in srgb, var(--brand) 40%, #3b82f6);
+}
+
+.flow {
+  background:
+    radial-gradient(60% 40% at 100% 0%, var(--brand-tint), transparent 70%),
+    radial-gradient(50% 35% at 0% 30%, color-mix(in srgb, var(--tone-rose) 10%, #fff), transparent 70%),
+    var(--porcelain);
+  background-attachment: fixed;
+}
+
+.step-chip {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 4px 12px;
+  border-radius: var(--pill);
+  background: var(--brand-tint);
+  color: var(--brand-ink);
+  font-size: var(--t-xs);
+  font-weight: 600;
+}
+
+/* category chips */
+.svc-tools .seg button {
+  min-height: 42px;
+  padding: 8px 16px;
+  box-shadow: 0 1px 2px rgb(34 28 43 / 5%);
+}
+.svc-tools .seg button .i {
+  color: var(--brand);
+}
+.seg button.on {
+  background: linear-gradient(120deg, var(--brand-deep), var(--brand));
+  border-color: transparent;
+  box-shadow: 0 10px 20px -12px var(--brand-glow);
+}
+.seg button.on .i {
+  color: #fff;
+}
+.seg button.on em {
+  background: #fff;
+  color: var(--brand-ink);
+}
+.search {
+  box-shadow: 0 1px 2px rgb(34 28 43 / 5%);
+}
+
+/* service + stylist cards */
+.svc,
+.stylist {
+  border-radius: 20px;
+  border-color: transparent;
+  box-shadow:
+    0 1px 2px rgb(34 28 43 / 5%),
+    0 8px 20px -14px rgb(34 28 43 / 22%);
+  transition:
+    transform 0.2s var(--ease),
+    box-shadow 0.2s,
+    background 0.2s;
+}
+.svc:hover,
+.stylist:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 2px rgb(34 28 43 / 5%),
+    0 16px 28px -16px rgb(34 28 43 / 30%);
+}
+.svc.on,
+.stylist.on {
+  background:
+    linear-gradient(var(--paper), var(--paper)) padding-box,
+    linear-gradient(120deg, var(--brand), var(--tone-rose)) border-box;
+  border: 2px solid transparent;
+  box-shadow: 0 14px 30px -18px var(--brand-glow);
+}
+.svc-thumb.ph {
+  background: linear-gradient(135deg, hsl(var(--h) 70% 94%), hsl(var(--h) 60% 86%));
+}
+.svc-price {
+  color: var(--brand-ink);
+}
+.tick {
+  transition:
+    background 0.2s,
+    transform 0.25s var(--ease);
+}
+.on > .tick {
+  background: linear-gradient(135deg, var(--brand), var(--tone-rose));
+  border-color: transparent;
+  transform: scale(1.08);
+  animation: tick-pop 0.35s var(--ease);
+}
+@keyframes tick-pop {
+  40% {
+    transform: scale(1.3);
+  }
+}
+.stylist .avatar.lg {
+  box-shadow:
+    0 0 0 2px var(--paper),
+    0 0 0 4px var(--brand-tint);
+}
+.stylist.any .any-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--tone-amber), var(--tone-rose));
+  color: #fff;
+}
+.stylist.any .any-icon .i {
+  width: 24px;
+  height: 24px;
+}
+
+/* details step */
+.field.with-icon {
+  position: relative;
+}
+.field-icon {
+  position: absolute;
+  left: 15px;
+  top: 41px;
+  color: var(--ink-3);
+  pointer-events: none;
+}
+.field.with-icon input {
+  padding-left: 44px !important;
+  min-height: 50px !important;
+  border-radius: 14px !important;
+}
+.field.with-icon:focus-within .field-icon {
+  color: var(--brand);
+}
+.trust {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 16px 18px;
+  display: grid;
+  gap: 8px;
+  max-width: 520px;
+  border-radius: var(--r);
+  background: color-mix(in srgb, var(--tone-teal) 9%, #fff);
+  color: color-mix(in srgb, var(--tone-teal) 70%, #000);
+  font-size: var(--t-sm);
+}
+.trust li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.trust .i {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.4;
+}
+
+/* the token being built: coloured top */
+.draft .ticket-top {
+  background:
+    linear-gradient(160deg, var(--brand-deep), var(--brand) 55%, color-mix(in srgb, var(--brand) 60%, var(--tone-rose)))
+      top / 100% 100px no-repeat,
+    var(--paper);
+}
+.draft .draft-head {
+  color: #fff;
+  min-height: 56px;
+  margin-bottom: 34px;
+}
+.draft .draft-head span {
+  color: rgb(255 255 255 / 80%);
+}
+.draft .draft-head b {
+  color: #fff;
+  font-size: 2.2rem;
+}
+.draft-sum dd {
+  color: var(--brand-ink);
+}
+.flow-side-next {
+  min-height: 56px !important;
+  border-radius: 18px !important;
+  font-size: 1.05rem !important;
+  background: linear-gradient(120deg, var(--brand-deep), var(--brand)) !important;
+  border: 0 !important;
+  box-shadow: 0 16px 30px -16px var(--brand-glow);
+}
+
+/* phone bottom bar */
+@media (max-width: 960px) {
+  .flow-bar {
+    left: 10px;
+    right: 10px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    padding: 10px 10px 10px 18px;
+    border-radius: 20px;
+    border: 0;
+    background: linear-gradient(120deg, var(--ink), color-mix(in srgb, var(--brand-deep) 70%, var(--ink)));
+    color: #fff;
+    box-shadow: 0 18px 40px -16px rgb(34 28 43 / 55%);
+  }
+  .flow-bar small {
+    color: rgb(255 255 255 / 70%);
+  }
+  .flow-bar .btn.primary {
+    --b-bg: #fff;
+    --b-fg: var(--brand-ink);
+    --b-line: #fff;
+    min-height: 46px;
+  }
+}

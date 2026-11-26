@@ -1,0 +1,215 @@
+/* Owner: branches, offers and reviews. */
+
+/* ---------- branches ---------- */
+
+.branch-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+.branch-row {
+  display: flex;
+  gap: 22px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+}
+.branch-row:first-child {
+  border-top: 0;
+  padding-top: 4px;
+}
+.branch-qr {
+  flex: none;
+  width: 124px;
+  height: 124px;
+  padding: 8px;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.branch-qr svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.branch-info {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+.branch-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.branch-title h3 {
+  font-family: var(--serif);
+  font-size: var(--t-xl);
+}
+.prefix {
+  font-size: var(--t-xs);
+  padding: 2px 8px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--line-2);
+  color: var(--ink-2);
+}
+.branch-info p {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+}
+.branch-link {
+  font-size: var(--t-sm);
+  color: var(--brand);
+  word-break: break-all;
+}
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+@container dash (max-width: 560px) {
+  .branch-row {
+    flex-direction: column;
+    gap: 14px;
+  }
+}
+
+/* ---------- offers + reviews ---------- */
+
+.offer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+}
+.offer-item {
+  display: grid;
+  gap: 10px;
+  width: 380px;
+  max-width: 100%;
+}
+.offer-item .coupon {
+  width: 100%;
+  max-width: none;
+}
+.offer-item.faded .coupon {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+}
+.offer-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.grow {
+  flex: 1;
+}
+.offer-preview {
+  display: flex;
+  justify-content: center;
+  padding: 18px;
+  margin: -4px 0 4px;
+  border-radius: var(--r);
+  background: var(--porcelain);
+}
+.offer-preview .coupon {
+  width: 380px;
+}
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 0;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%);
+  position: relative;
+  padding: 0;
+}
+.swatch.on {
+  box-shadow:
+    0 0 0 2px var(--paper),
+    0 0 0 4px var(--ink);
+}
+.swatch.custom {
+  background: conic-gradient(#e33, #ec3, #3c5, #3be, #63e, #e3a, #e33);
+  cursor: pointer;
+  overflow: hidden;
+}
+.swatch.custom input {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.swatches code {
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+}
+
+.review-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.review-list li {
+  display: flex;
+  gap: 14px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+.review-list li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.review-list li.faded {
+  opacity: 0.6;
+}
+.review-body {
+  flex: 1;
+  min-width: 0;
+}
+.review-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+.review-top small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.review-body p {
+  margin-top: 6px;
+  font-family: var(--serif);
+  color: var(--ink-2);
+  max-width: 72ch;
+}
+.review-list .actions {
+  display: flex;
+  align-items: flex-start;
+}
+.rating-pick {
+  display: flex;
+  gap: 2px;
+}
+.rating-pick button {
+  border: 0;
+  background: none;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--line-2);
+  padding: 0 2px;
+}
+.rating-pick button.on {
+  color: #e2a20c;
+}

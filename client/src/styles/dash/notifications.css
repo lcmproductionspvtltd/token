@@ -1,0 +1,108 @@
+/* The notification bell in the dashboard top bar */
+.bell {
+  position: relative;
+}
+.bell-btn {
+  position: relative;
+}
+.bell-count {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--bad-fg, #c62828);
+  color: #fff;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+.bell-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 40;
+  width: min(360px, calc(100vw - 24px));
+  max-height: min(70vh, 520px);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: var(--lift-hi);
+  animation: rise 0.16s var(--ease);
+}
+.bell-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.bell-alerts {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--brand);
+  font-size: var(--t-xs);
+  font-weight: 600;
+}
+.bell-empty {
+  padding: 22px 16px;
+  color: var(--ink-3);
+  font-size: var(--t-sm);
+}
+.bell-list {
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  overflow-y: auto;
+}
+.bell-item {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  text-align: left;
+  color: var(--ink);
+}
+.bell-item:hover {
+  background: var(--porcelain);
+}
+.bell-item span {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  overflow-wrap: anywhere;
+}
+.bell-item small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+@media (max-width: 560px) {
+  .bell-panel {
+    position: fixed;
+    top: 64px;
+    right: 12px;
+  }
+}
+/* Phones: the top bar keeps the bell; "New token" stays in the menu and as the button on the page */
+@media (max-width: 560px) {
+  .topbar-actions {
+    gap: 4px;
+  }
+  .topbar .topbar-new {
+    display: none;
+  }
+  .bell-btn {
+    width: 34px;
+    height: 34px;
+  }
+}

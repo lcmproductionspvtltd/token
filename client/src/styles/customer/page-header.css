@@ -1,0 +1,71 @@
+/* Booking and token page header. */
+
+/* ================= booking + token page shared header ================= */
+.flow,
+.tp {
+  min-height: 100dvh;
+  background: var(--porcelain);
+}
+
+.flow-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flow-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--t-sm);
+  color: var(--ink-3);
+}
+
+.flow-steps li + li::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: var(--line-2);
+  margin-right: 2px;
+}
+
+.flow-steps span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  background: var(--paper);
+}
+
+.flow-steps .i {
+  width: 14px;
+  height: 14px;
+}
+
+.flow-steps em {
+  font-style: normal;
+}
+
+.flow-steps li.on {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.flow-steps li.on span {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.flow-steps li.done span {
+  background: var(--brand-tint);
+  border-color: transparent;
+  color: var(--brand-ink);
+}

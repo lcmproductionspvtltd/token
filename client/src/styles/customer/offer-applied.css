@@ -1,0 +1,147 @@
+/* Offer applied to a booking or token. */
+
+/* ---------- offer applied to a booking / token ---------- */
+.offer-applied {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 12px 12px 12px 14px;
+  border-radius: 18px;
+  background:
+    radial-gradient(80% 120% at 100% 0%, color-mix(in srgb, #db2777 14%, transparent), transparent 70%),
+    linear-gradient(120deg, color-mix(in srgb, var(--brand) 12%, #fff), #fff);
+  border: 1.5px dashed color-mix(in srgb, var(--brand) 40%, #fff);
+  animation: rise 0.3s var(--ease);
+}
+.offer-applied-ico,
+.live-offer-ico {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(140deg, var(--brand), color-mix(in srgb, var(--brand) 50%, #db2777));
+  color: #fff;
+  box-shadow: 0 8px 16px -8px var(--brand-glow);
+}
+.offer-applied-text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.offer-applied-text b {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+.offer-applied-text b em,
+.live-offer em,
+.draft-offer em {
+  font-style: normal;
+}
+.offer-applied-text b em {
+  padding: 2px 9px;
+  border-radius: var(--pill);
+  background: #15803d;
+  color: #fff;
+  font-size: var(--t-xs);
+  font-weight: 600;
+}
+.offer-applied-text small {
+  color: var(--ink-2);
+  font-size: var(--t-xs);
+}
+.offer-applied-x {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 70%);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.offer-applied-x:hover {
+  background: #fff;
+  color: var(--bad-fg, #b42318);
+}
+.draft-offer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--brand) 8%, #fff);
+  color: var(--brand-ink);
+  font-size: var(--t-sm);
+  font-weight: 500;
+}
+.draft-offer span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.draft-offer em,
+.live-offer em {
+  color: #15803d;
+  font-weight: 700;
+}
+.draft-was,
+.live-was {
+  margin-right: 6px;
+  color: var(--ink-3);
+  font-weight: 400;
+  font-size: 0.85em;
+}
+.live-offer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 4px;
+  padding: 12px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--brand) 10%, #fff), #fff);
+  border: 1.5px dashed color-mix(in srgb, var(--brand) 35%, #fff);
+}
+.live-offer > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.live-offer small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.offer-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: var(--pill);
+  background: color-mix(in srgb, #db2777 10%, #fff);
+  color: #9d174d;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.offer-tag .i {
+  width: 12px;
+  height: 12px;
+}
+.table td small.disc {
+  color: #15803d;
+}
+.disc-seg {
+  margin: 10px 0 12px;
+}

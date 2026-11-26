@@ -1,0 +1,20 @@
+/* Super admin: account requests. */
+
+/* Super admin → Account requests */
+.req-effect {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--porcelain, #f5f4f7);
+  color: var(--ink-2, #4b4458);
+  line-height: 1.45;
+}
+.req-effect.bad {
+  background: #fbe1e1;
+  color: #a11d1d;
+}
+.req-text {
+  display: block;
+  max-width: 280px;
+  white-space: normal;
+}

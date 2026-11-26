@@ -1,0 +1,22 @@
+# /etc/systemd/system/bquee.service
+#   sudo systemctl daemon-reload && sudo systemctl enable --now bquee
+# Settings (DATABASE_URL etc.) are read from /opt/bquee/.env
+[Unit]
+Description=BQuee token booking
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=bquee
+WorkingDirectory=/opt/bquee
+ExecStart=/opt/bquee/runtime/linux-x64/bin/node /opt/bquee/server.js
+Environment=NODE_ENV=production
+Environment=TRUST_PROXY=1
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=full
+ReadWritePaths=/opt/bquee/storage /opt/bquee/backups
+
+[Install]
+WantedBy=multi-user.target

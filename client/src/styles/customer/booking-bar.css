@@ -1,0 +1,225 @@
+/* Booking: phone bar and live list. */
+
+.flow-bar {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .flow-steps em {
+    display: none;
+  }
+
+  .flow-steps li + li::before {
+    width: 12px;
+  }
+
+  .flow-grid {
+    grid-template-columns: 1fr;
+    padding-bottom: 120px;
+  }
+
+  .flow-side {
+    display: none;
+    position: static;
+  }
+
+  .flow-side.show {
+    display: grid;
+  }
+
+  .flow-side-next {
+    display: none;
+  }
+
+  .flow-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: fixed;
+    z-index: 30;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px var(--gutter) max(12px, env(safe-area-inset-bottom));
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -10px 30px -18px rgb(34 28 43 / 30%);
+  }
+
+  .flow-bar > span {
+    display: grid;
+    min-width: 0;
+  }
+
+  .flow-bar b {
+    font-weight: 600;
+  }
+
+  .flow-bar small {
+    font-size: var(--t-xs);
+    color: var(--ink-3);
+  }
+}
+@media (max-width: 560px) {
+  .svc,
+  .stylist {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .svc-thumb {
+    width: 48px;
+    height: 48px;
+  }
+
+  .stylist .avatar.lg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .stylist .wait-tag {
+    display: none;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+.token-ticket {
+  --notch: 15px;
+}
+
+.tt-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 18px;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+}
+
+.tt-tip .i {
+  color: var(--brand);
+  margin-top: 2px;
+}
+
+.staff-act {
+  padding: 16px 18px;
+  border-radius: var(--r-lg);
+  background: var(--ink);
+  color: #fff;
+}
+
+.staff-act-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-xs);
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+
+.staff-act > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.staff-act > div > span {
+  flex: 1;
+  display: grid;
+  min-width: 0;
+}
+
+.staff-act small {
+  opacity: 0.7;
+  font-size: var(--t-xs);
+}
+
+.live-panel {
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.live-items {
+  list-style: none;
+  margin: 0;
+  padding: 6px 22px;
+}
+
+.live-items li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.live-items span:not(.avatar):not(.pill):not(.mark) {
+  flex: 1;
+  display: grid;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.live-items b {
+  font-weight: 500;
+}
+
+.live-items small {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+
+.live-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 22px 14px;
+  font-size: var(--t-md);
+}
+
+.live-total b {
+  font-weight: 600;
+}
+
+.live-updated {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 22px;
+  border-top: 1px solid var(--line);
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+
+.tp-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  font-size: var(--t-sm);
+}
+
+.tp-links a:not(.btn) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.tp-links a:not(.btn):hover {
+  color: var(--brand);
+}
+@media (max-width: 420px) {
+  .ticket-top,
+  .ticket-bottom {
+    padding: 18px;
+  }
+}

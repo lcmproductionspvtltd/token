@@ -1,0 +1,113 @@
+/* Long forms in steps (core/Steps.jsx): numbered bar, step title. */
+
+.form-steps {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-steps li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.form-steps li:first-child {
+  flex: none;
+}
+
+/* the line joining one step to the next */
+.form-steps li + li::before {
+  content: '';
+  flex: 1 1 12px;
+  min-width: 8px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--line-2);
+}
+
+.form-steps li.on::before,
+.form-steps li.done::before {
+  background: var(--brand);
+}
+
+.form-steps button {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 6px 4px 4px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: var(--t-sm);
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.form-steps button:disabled {
+  cursor: default;
+}
+
+.form-steps button:not(:disabled):hover {
+  background: var(--brand-tint);
+}
+
+.form-steps .num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.form-steps .num .i {
+  width: 14px;
+  height: 14px;
+}
+
+.form-steps em {
+  font-style: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.form-steps li.on button {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.form-steps li.on .num {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.form-steps li.done .num {
+  background: var(--brand-tint);
+  border-color: transparent;
+  color: var(--brand-ink);
+}
+
+/* phones: only the current step keeps its name */
+@media (max-width: 640px) {
+  .form-steps li:not(.on) em {
+    display: none;
+  }
+
+  .form-steps li.on button {
+    flex: none;
+  }
+}

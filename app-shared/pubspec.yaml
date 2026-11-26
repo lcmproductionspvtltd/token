@@ -1,0 +1,16 @@
+name: bquee_shared
+description: Code both BQuee apps share – server connection, formatting, phone features, QR, theme, icons, widgets and the account request screen.
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: '>=3.14.0 <4.0.0'
+  flutter: '>=3.50.0'
+
+# Self-contained: only Flutter itself and our own copy of material_ui, nothing from pub.dev.
+dependencies:
+  flutter:
+    sdk: flutter
+  # Flutter's official Material widgets – our own copy in ../material_ui (no download).
+  material_ui:
+    path: ../material_ui

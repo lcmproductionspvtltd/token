@@ -1,0 +1,95 @@
+/* The ticket (signature element). */
+
+/* Customer pages: landing, booking, token page, plus sign-in and the product home page. */
+
+/* ================= the ticket (signature element) ================= */
+.ticket {
+  --notch: 13px;
+  --t-bg: var(--paper);
+  position: relative;
+  filter: drop-shadow(0 1px 1px rgb(34 28 43 / 6%)) drop-shadow(0 16px 26px rgb(34 28 43 / 14%));
+}
+
+.ticket-top,
+.ticket-bottom {
+  background: var(--t-bg);
+  padding: 22px 24px;
+}
+
+.ticket-top {
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  -webkit-mask:
+    radial-gradient(circle at 0 100%, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)) 0 0 / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 100%, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)) 100% 0 / 51% 100%
+      no-repeat;
+  mask:
+    radial-gradient(circle at 0 100%, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)) 0 0 / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 100%, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)) 100% 0 / 51% 100%
+      no-repeat;
+}
+
+.ticket-top:only-child {
+  border-radius: var(--r-lg);
+  -webkit-mask: none;
+  mask: none;
+}
+
+.ticket-bottom {
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  position: relative;
+  -webkit-mask:
+    radial-gradient(circle at 0 0, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)) 0 0 / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 0, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)) 100% 0 / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle at 0 0, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)) 0 0 / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 0, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)) 100% 0 / 51% 100% no-repeat;
+}
+
+.ticket-bottom::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(var(--notch) + 10px);
+  right: calc(var(--notch) + 10px);
+  border-top: 2px dashed var(--line-2);
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22a35a;
+  box-shadow: 0 0 0 0 rgb(34 163 90 / 50%);
+  animation: beacon 2s infinite;
+  flex: none;
+}
+
+.live-dot.off {
+  background: var(--ink-3);
+  animation: none;
+}
+
+@keyframes beacon {
+  70% {
+    box-shadow: 0 0 0 8px rgb(34 163 90 / 0%);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgb(34 163 90 / 0%);
+  }
+}
+.wait-tag {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: var(--pill);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  background: var(--wait-bg);
+  color: var(--wait-fg);
+  white-space: nowrap;
+}
+
+.wait-tag.free {
+  background: var(--done-bg);
+  color: var(--done-fg);
+}

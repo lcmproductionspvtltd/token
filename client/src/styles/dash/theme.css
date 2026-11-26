@@ -1,0 +1,285 @@
+/* Dashboard theme: deep brand sidebar, tinted canvas, coloured figures. */
+
+/* =====================================================================
+   Dashboard theme – deep brand sidebar, tinted canvas, coloured figures.
+   Applies to every dashboard (super admin, team, service owner, staff).
+   ===================================================================== */
+
+body.is-dash {
+  background:
+    radial-gradient(1200px 420px at 85% -120px, color-mix(in srgb, var(--brand) 14%, transparent), transparent 70%),
+    radial-gradient(900px 380px at 10% -160px, color-mix(in srgb, var(--tone-teal) 10%, transparent), transparent 70%),
+    color-mix(in srgb, var(--brand) 3%, #f6f5f9);
+  background-attachment: fixed;
+}
+
+/* sidebar */
+.side {
+  --side-ink: rgb(255 255 255 / 72%);
+  background:
+    radial-gradient(260px 220px at 0% 0%, rgb(255 255 255 / 10%), transparent 70%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--brand) 62%, #160b22) 0%,
+      color-mix(in srgb, var(--brand) 38%, #0d0716) 100%
+    );
+  border-right: 0;
+  color: #fff;
+  box-shadow: 8px 0 30px -24px rgb(20 8 32 / 60%);
+}
+.side-brand {
+  margin: 0 -2px 10px;
+  padding: 6px 8px 16px;
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+}
+.side-brand .mark {
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 18%);
+}
+.side-name {
+  color: #fff;
+}
+.side-sec-name {
+  color: rgb(255 255 255 / 45%);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.side-item {
+  color: var(--side-ink);
+  border-radius: 12px;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.side-item:hover {
+  background: rgb(255 255 255 / 8%);
+  color: #fff;
+}
+.side-item.on {
+  background: linear-gradient(100deg, rgb(255 255 255 / 20%), rgb(255 255 255 / 8%));
+  color: #fff;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 14%),
+    0 6px 18px -10px rgb(0 0 0 / 50%);
+}
+.side-item.on::before {
+  left: -12px;
+  width: 4px;
+  background: #fff;
+  box-shadow: 0 0 12px rgb(255 255 255 / 70%);
+}
+.side-item.on .i {
+  filter: drop-shadow(0 0 6px rgb(255 255 255 / 45%));
+}
+.side-badge,
+.side-item.on .side-badge {
+  background: rgb(255 255 255 / 16%);
+  color: #fff;
+}
+.side-collapse {
+  color: rgb(255 255 255 / 55%);
+  border-top: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 0;
+  margin: 8px -12px -14px;
+  padding: 0 24px;
+  min-height: 52px;
+}
+.side-collapse:hover {
+  background: rgb(255 255 255 / 6%);
+  color: #fff;
+}
+.side .icon-btn {
+  color: #fff;
+}
+.collapsed .side-badge {
+  background: var(--tone-rose);
+}
+
+/* top bar */
+.topbar {
+  background: rgb(255 255 255 / 72%);
+  border-bottom: 1px solid color-mix(in srgb, var(--brand) 8%, var(--line));
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 60%),
+    0 10px 30px -28px color-mix(in srgb, var(--brand) 60%, transparent);
+}
+.topbar-title h1 {
+  background: linear-gradient(100deg, var(--ink) 30%, var(--brand-ink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.account-btn {
+  background: #fff;
+  box-shadow: 0 4px 14px -10px rgb(30 10 50 / 40%);
+}
+
+/* figures: one coloured card each */
+.figures {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  gap: 14px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+.figures > div {
+  --fig: var(--brand);
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: 'ico label' 'ico value';
+  align-items: center;
+  column-gap: 14px;
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px solid color-mix(in srgb, var(--fig) 14%, var(--line));
+  border-radius: 18px;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--fig) 9%, #fff), #fff 62%);
+  box-shadow:
+    0 1px 2px rgb(20 10 40 / 4%),
+    0 14px 28px -24px color-mix(in srgb, var(--fig) 70%, transparent);
+  overflow: hidden;
+}
+.figures > div::after {
+  content: '';
+  position: absolute;
+  right: -26px;
+  top: -26px;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--fig) 9%, transparent);
+}
+.figures > .t-brand {
+  --fig: var(--brand);
+}
+.figures > .t-teal {
+  --fig: #0f9b8e;
+}
+.figures > .t-amber {
+  --fig: #d97706;
+}
+.figures > .t-sky {
+  --fig: #2563eb;
+}
+.figures > .t-rose {
+  --fig: #db2777;
+}
+.figures > .wait {
+  --fig: #d97706;
+}
+.figures > .serve {
+  --fig: #2563eb;
+}
+.figures > .done {
+  --fig: #15803d;
+}
+.fig-ico {
+  grid-area: ico;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(140deg, var(--fig), color-mix(in srgb, var(--fig) 65%, #000));
+  color: #fff;
+  box-shadow: 0 8px 16px -8px var(--fig);
+}
+.fig-ico .i {
+  width: 22px;
+  height: 22px;
+}
+.figures dt {
+  grid-area: label;
+  align-self: end;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.figures dt::before {
+  display: none;
+}
+.figures dd {
+  grid-area: value;
+  align-self: start;
+  margin: 2px 0 0;
+  color: color-mix(in srgb, var(--fig) 55%, var(--ink));
+  font-size: clamp(1.35rem, 1.1rem + 0.6vw, 1.75rem);
+  position: relative;
+  z-index: 1;
+}
+
+/* panels */
+.panel {
+  border: 1px solid color-mix(in srgb, var(--brand) 7%, var(--line));
+  border-radius: 20px;
+  box-shadow:
+    0 1px 2px rgb(20 10 40 / 4%),
+    0 18px 36px -30px color-mix(in srgb, var(--brand) 55%, transparent);
+}
+.panel-head h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -0.01em;
+}
+.panel-head h2::before {
+  content: '';
+  width: 4px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--grad);
+}
+.panel.flush > .panel-head {
+  padding: 18px 22px 16px;
+}
+
+/* tables */
+.table th {
+  background: color-mix(in srgb, var(--brand) 5%, #fafafb);
+  color: var(--ink-2);
+  font-weight: 600;
+  border-bottom-color: color-mix(in srgb, var(--brand) 10%, var(--line));
+}
+.table tbody tr {
+  transition: background 0.12s;
+}
+.table tbody tr:hover {
+  background: color-mix(in srgb, var(--brand) 4%, #fff);
+}
+
+/* setup checklist banner */
+.setup {
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, #f59e0b 16%, #fff),
+    color-mix(in srgb, var(--tone-rose) 10%, #fff)
+  );
+  border: 1px solid color-mix(in srgb, #f59e0b 25%, var(--line));
+}
+
+@media (max-width: 900px) {
+  .side {
+    box-shadow: 20px 0 50px -20px rgb(0 0 0 / 50%);
+  }
+  .collapsed .side-badge {
+    background: rgb(255 255 255 / 16%);
+    color: #fff;
+  }
+}
+@media (max-width: 560px) {
+  .figures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .figures > div {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'ico' 'label' 'value';
+    row-gap: 8px;
+    padding: 14px;
+  }
+  .fig-ico {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+}
