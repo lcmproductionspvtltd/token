@@ -1,0 +1,93 @@
+/* Referral links and who onboarded each business. */
+
+.ref-lead {
+  margin: 0 0 18px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.ref-qr {
+  padding: 10px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.ref-qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.ref-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 12px;
+  border-radius: 12px;
+  background: var(--porcelain);
+  border: 1px solid var(--line);
+  margin-bottom: 6px;
+}
+.ref-link span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--t-sm);
+}
+.ref-team {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.ref-team h4 {
+  margin: 0 0 10px;
+  font-size: var(--t-sm);
+}
+.ref-team td small {
+  display: block;
+  color: var(--ink-3);
+}
+@media (max-width: 560px) {
+  .ref-qr {
+    max-width: 200px;
+  }
+}
+.onboard-chip {
+  display: inline-block;
+  max-width: 150px;
+  margin-top: 6px;
+  padding: 3px 9px 3px 6px;
+  border-radius: 10px;
+  background: var(--brand-wash);
+  color: var(--brand-ink);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.onboard-chip .i {
+  width: 13px;
+  height: 13px;
+  margin-right: 4px;
+  vertical-align: -2px;
+}
+.onboard-chip.signup {
+  background: #e0f2fe;
+  color: #075985;
+}
+.onboard-chip.referral {
+  background: #fce7f3;
+  color: #9d174d;
+}
+.onboard-chip em {
+  margin-left: 4px;
+  font-style: normal;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 70%);
+  font-size: 0.66rem;
+}
+@media (max-width: 720px) {
+  .ref-btn > span {
+    display: none;
+  }
+}

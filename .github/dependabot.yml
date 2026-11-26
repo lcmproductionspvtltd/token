@@ -1,0 +1,14 @@
+# Weekly checks for updates (audit 4.5). Each update arrives as a pull request that must pass the
+# GitHub checks before anyone merges it – nothing updates by itself.
+version: 2
+updates:
+  - package-ecosystem: npm # the web build tools (esbuild, react) – never used by the running server
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+  - package-ecosystem: github-actions # the pinned actions in .github/workflows
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3

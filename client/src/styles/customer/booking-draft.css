@@ -1,0 +1,92 @@
+/* Booking: the token preview that fills in. */
+
+.draft-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.draft-head span {
+  font-size: var(--t-sm);
+  color: var(--ink-3);
+}
+
+.draft-head b {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--brand);
+}
+
+.draft-items {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  display: grid;
+  gap: 12px;
+}
+
+.draft-items li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: fade 0.25s;
+}
+
+.draft-items span:not(.avatar):not(.pill):not(.mark) {
+  flex: 1;
+  display: grid;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.draft-items b {
+  font-weight: 500;
+  font-size: var(--t-sm);
+}
+
+.draft-items small {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+
+.draft-items em {
+  font-style: normal;
+  font-size: var(--t-sm);
+  font-weight: 500;
+}
+
+.draft-empty {
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: var(--r);
+  border: 1px dashed var(--line-2);
+  color: var(--ink-3);
+  font-size: var(--t-sm);
+  text-align: center;
+}
+
+.draft-for {
+  margin-top: 14px;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+}
+
+.draft-sum {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 4px 0 0;
+}
+
+.draft-sum dt {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+
+.draft-sum dd {
+  margin: 0;
+  font-weight: 600;
+  font-size: var(--t-md);
+}

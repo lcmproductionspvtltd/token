@@ -1,0 +1,69 @@
+/* Booked! celebration. */
+
+/* ================= booked! celebration ================= */
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 50;
+}
+.confetti i {
+  position: absolute;
+  top: -20px;
+  width: 9px;
+  height: 14px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: confetti-fall 2.6s var(--d) cubic-bezier(0.25, 0.6, 0.4, 1) forwards;
+}
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--x), 105vh, 0) rotate(var(--r));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confetti {
+    display: none;
+  }
+}
+
+/* offline / busy stylists in booking */
+.stylist.offline {
+  opacity: 0.5;
+  filter: grayscale(0.9) blur(0.6px);
+  cursor: not-allowed;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+.stylist.offline:hover {
+  transform: none;
+  box-shadow: none;
+}
+.svc.unavailable {
+  opacity: 0.5;
+  filter: grayscale(0.8);
+  cursor: not-allowed;
+}
+.svc.unavailable:hover {
+  transform: none;
+}
+.wait-tag.busy {
+  background: #fff1d6;
+  color: #8a5200;
+}
+.wait-tag.off {
+  background: var(--off-bg);
+  color: var(--off-fg);
+}
+.stylist .presence::after {
+  width: 15px;
+  height: 15px;
+  border-width: 3px;
+}

@@ -1,0 +1,124 @@
+/* Forms inside dashboards. */
+
+/* ---------- forms in dashboards ---------- */
+
+.fieldset {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 14px 16px 16px;
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+.fieldset legend {
+  padding: 0 6px;
+  font-size: var(--t-sm);
+  font-weight: 600;
+}
+.link-btn {
+  border: 0;
+  background: none;
+  color: var(--brand);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  margin-left: 10px;
+  padding: 0;
+}
+.settings {
+  display: grid;
+  gap: 22px;
+  max-width: 1100px;
+}
+.settings-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 32px;
+  align-items: start;
+}
+.brand-preview {
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: var(--porcelain);
+}
+.bp-photo {
+  height: 130px;
+  background: url(/img/default-cover.svg) center / cover;
+  background-size: cover;
+  background-position: center;
+}
+.bp-body {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  padding: 0 18px 18px;
+  margin-top: -28px;
+}
+.bp-body .mark {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r);
+  border: 3px solid var(--paper);
+  margin-bottom: 6px;
+  font-size: var(--t-lg);
+}
+.bp-body b {
+  font-family: var(--serif);
+  font-size: var(--t-lg);
+}
+.bp-body small {
+  color: var(--ink-3);
+}
+.bp-btn {
+  margin-top: 10px;
+  padding: 8px 16px;
+  border-radius: var(--pill);
+  color: #fff;
+  font-size: var(--t-sm);
+  font-weight: 500;
+}
+.plan-line {
+  font-size: var(--t-md);
+}
+.muted-text {
+  color: var(--ink-3);
+  font-size: var(--t-sm);
+  margin-top: 4px;
+}
+.save-bar {
+  position: sticky;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 12px 12px 20px;
+  border-radius: var(--r-lg);
+  background: var(--ink);
+  color: #fff;
+  box-shadow: var(--lift-hi);
+  font-size: var(--t-sm);
+}
+.save-bar > span {
+  opacity: 0.75;
+}
+@container dash (max-width: 760px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+  /* the note only – the Save button's own label stays */
+  .save-bar > span {
+    display: none;
+  }
+  .save-bar .btn {
+    flex: 1;
+  }
+}
+
+/* Business profile → Unused tokens: preset choice + the hours themselves */
+.expiry-pick {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px auto;
+  gap: 8px;
+  align-items: center;
+}

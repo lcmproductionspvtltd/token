@@ -1,0 +1,8 @@
+# Built, copied or generated – not formatted by hand
+public/app/
+material_ui/
+cupertino_ui/
+app-packages/
+runtime/
+storage/
+docs/DATABASE.md

@@ -1,0 +1,31 @@
+/* Service form: a price per branch. */
+
+/* Service form: a price per branch */
+.branch-prices {
+  display: grid;
+  gap: 8px;
+}
+.branch-price {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.branch-price span {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.price-varies {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--ink-3, #6b6478);
+  font-weight: 500;
+}
+.field .checks + .checks {
+  margin-top: 8px;
+}

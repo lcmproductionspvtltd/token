@@ -1,0 +1,91 @@
+# Store screenshots of the real BQuee Biz and BQuee (customer) apps – Google Play, iPhone and iPad sizes. Run by hand:
+# Actions → "Store screenshots" → Run workflow. The app's own screens are drawn by Flutter against a
+# local BQuee server with the demo business (scripts/seed.js) – nothing touches bquee.com.
+# The PNGs (shots/<app>/<android|iphone|ipad>/) are in the run's "store-screenshots" download and on a temporary
+# "store-shots" branch.
+name: Store screenshots
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write # puts the PNGs on a temporary "store-shots" branch (delete it after copying them)
+
+env:
+  FLUTTER_VERSION: '3.50.0'
+
+jobs:
+  shots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: bquee
+          POSTGRES_PASSWORD: bquee
+          POSTGRES_DB: bquee_shots
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U bquee"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgres://bquee:bquee@localhost:5432/bquee_shots
+      TZ: Asia/Kolkata
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+
+      - name: Demo server (local only)
+        run: |
+          node scripts/seed.js
+          node scripts/shots-more-businesses.js
+          APP_SECRET="$(openssl rand -hex 32)" PUBLIC_URL=https://bquee.com PUBLIC_HOSTS=127.0.0.1 PORT=3000 NODE_ENV=development node server.js > server.log 2>&1 &
+          for i in $(seq 1 30); do curl -fs http://127.0.0.1:3000/api/health && break; sleep 1; done
+          node scripts/shots-demo-queue.js http://127.0.0.1:3000
+
+      - name: Flutter
+        run: |
+          git clone --depth 1 -b "$FLUTTER_VERSION" https://github.com/flutter/flutter.git "$HOME/flutter"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+
+      - name: Screenshots – BQuee Biz
+        working-directory: mobile
+        run: |
+          flutter pub get
+          for size in android iphone ipad; do
+            flutter test test_shots/play_store_test.dart --dart-define=SHOTS_SERVER=http://127.0.0.1:3000 --dart-define=SHOTS_SIZE=$size
+          done
+          mkdir -p ../shots/biz && cp -R build/shots/* ../shots/biz/
+
+      - name: Screenshots – BQuee (customers)
+        working-directory: customer
+        run: |
+          flutter pub get
+          for size in android iphone ipad; do
+            flutter test test_shots/store_test.dart --dart-define=SHOTS_SERVER=http://127.0.0.1:3000 --dart-define=SHOTS_SIZE=$size
+          done
+          mkdir -p ../shots/customer && cp -R build/shots/* ../shots/customer/
+          find ../shots -name '*.png' | sort
+
+      - name: Server log (if something failed)
+        if: failure()
+        run: tail -50 server.log
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: store-screenshots
+          path: shots/
+
+      - name: Also on a temporary branch (for downloading with git)
+        run: |
+          mkdir -p /tmp/shots-branch && cp -R shots/* /tmp/shots-branch/
+          cd /tmp/shots-branch
+          git init -q -b store-shots
+          git config user.name "BQuee screenshots"
+          git config user.email "info@bquee.com"
+          git add . && git commit -qm "Store screenshots"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" store-shots

@@ -1,0 +1,605 @@
+/* Sign in / sign up page. */
+
+/* ---------- sign in / sign up ---------- */
+.acct {
+  color: #fff;
+  background:
+    linear-gradient(105deg, rgb(20 8 32 / 92%) 0%, rgb(20 8 32 / 70%) 50%, rgb(20 8 32 / 45%) 100%),
+    url('/img/site-auth.jpg') center / cover no-repeat,
+    #1d0f2e;
+}
+.acct-in {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+  min-height: calc(100dvh - 40px);
+  padding-block: 120px 64px;
+}
+.acct-copy h2 {
+  margin-top: 20px;
+  font-size: clamp(2rem, 1.2rem + 2.4vw, 3.3rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  max-width: 15ch;
+  color: #fff;
+}
+.acct .acct-points {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+}
+.acct-points li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: rgb(255 255 255 / 88%);
+}
+.acct-points li span {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 12%);
+  border: 1px solid rgb(255 255 255 / 18%);
+}
+.acct-points .i {
+  width: 19px;
+  height: 19px;
+}
+.acct-card {
+  min-width: 0;
+  padding: 10px;
+  border-radius: 28px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 40px 80px -36px rgb(0 0 0 / 70%);
+}
+.acct-tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 20px;
+  background: var(--porcelain);
+  border: 1px solid var(--line);
+}
+.acct-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  border: 0;
+  border-radius: 15px;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.acct-tabs button .i {
+  width: 18px;
+  height: 18px;
+}
+.acct-tabs button.on {
+  background: var(--paper);
+  color: var(--brand-ink);
+  box-shadow: 0 6px 16px -8px rgb(40 12 70 / 35%);
+}
+.acct-tabs button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.acct-form {
+  padding: 24px 18px 8px;
+}
+.acct-form h1 {
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  line-height: 1.2;
+  font-weight: 600;
+}
+.acct-sub {
+  margin: 6px 0 20px;
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+}
+.acct-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  margin-bottom: 14px;
+}
+.acct-label {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.acct-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 6px 0 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line-2);
+  background: #fbf9fd;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
+}
+.acct-input:focus-within {
+  border-color: var(--brand);
+  background: var(--paper);
+  box-shadow: 0 0 0 4px var(--brand-tint);
+}
+.acct-input > .i {
+  flex: none;
+  width: 19px;
+  height: 19px;
+  color: var(--ink-3);
+}
+.acct-input:focus-within > .i {
+  color: var(--brand);
+}
+.acct-input input,
+.acct-input select {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0 8px 0 0;
+  border: 0;
+  outline: none;
+  background-color: transparent;
+  font: inherit;
+  font-size: var(--t-md);
+  color: var(--ink);
+}
+.acct-input select {
+  cursor: pointer;
+}
+.acct-hint {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.acct-eye {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.acct-eye:hover {
+  background: var(--brand-wash);
+  color: var(--brand-ink);
+}
+.acct-eye .i {
+  width: 19px;
+  height: 19px;
+}
+.acct-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 12px;
+}
+.acct-form .auth-error {
+  margin-bottom: 14px;
+}
+.acct-form .btn.lg {
+  margin-top: 4px;
+  min-height: 52px;
+  border-radius: 14px;
+}
+.acct-fine {
+  margin-top: 14px;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  text-align: center;
+  line-height: 1.5;
+}
+.acct-switch {
+  margin: 4px 0 0;
+  padding: 14px 18px 12px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+}
+.acct-switch:empty {
+  display: none;
+}
+.acct-switch button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--brand-ink);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.acct-done {
+  text-align: center;
+  padding-bottom: 20px;
+}
+.acct-done-ico {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 18px;
+  border-radius: 50%;
+  background: var(--ok-bg, #dcfce7);
+  color: var(--ok-fg, #15803d);
+}
+.acct-done-ico .i {
+  width: 30px;
+  height: 30px;
+}
+.acct-done .btn {
+  margin-top: 22px;
+}
+.hp {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  pointer-events: none;
+}
+
+/* sign-up in steps: Back and Next / Create side by side */
+.acct-step-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.acct-step-actions .btn.block {
+  flex: 1;
+}
+
+.acct-form .form-steps {
+  margin: 4px 0 2px;
+}
+
+/* Continue with Google / Apple – full-width buttons, one under the other */
+.acct-social {
+  display: grid;
+  gap: 14px;
+  margin: 6px 0 4px;
+}
+.social-stack {
+  display: grid;
+  gap: 12px;
+}
+/* Google and Apple on one line: just "Google" / "Apple" next to the marks */
+.social-stack.two {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+.social-stack.two .social-verb {
+  display: none;
+}
+.social-stack.two .social-btn {
+  grid-template-columns: 32px minmax(0, 1fr) 18px;
+  gap: 6px;
+  min-height: 54px;
+  padding: 0 12px 0 12px;
+}
+.social-stack.two .social-mark {
+  width: 32px;
+  height: 32px;
+}
+.social-stack.two .social-mark svg {
+  width: 22px;
+  height: 22px;
+}
+.social-stack.two .social-go {
+  width: 16px;
+  height: 16px;
+}
+.social-btn {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 0 16px 0 18px;
+  border-radius: 999px;
+  font-size: 1.02rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.social-btn:hover {
+  transform: translateY(-1px);
+}
+.social-btn:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+}
+/* Google: white with a thin four-colour edge */
+.social-btn.google {
+  color: var(--ink);
+  border: 2px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(100deg, #ea4335, #fbbc05 22%, #34a853 45%, #4285f4 68%, var(--brand)) border-box;
+  box-shadow: 0 10px 24px -14px rgb(66 133 244 / 55%);
+}
+.social-btn.google:hover {
+  box-shadow: 0 14px 28px -14px rgb(66 133 244 / 70%);
+}
+.social-btn.apple {
+  color: #fff;
+  background: linear-gradient(180deg, #1d1d1f, #000);
+  border: 2px solid #000;
+  box-shadow: 0 12px 24px -14px rgb(0 0 0 / 70%);
+}
+.social-btn.apple:hover {
+  box-shadow: 0 16px 28px -14px rgb(0 0 0 / 80%);
+}
+.social-mark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+}
+.social-label {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.social-go {
+  width: 20px;
+  height: 20px;
+}
+.social-btn.google .social-go {
+  color: var(--brand);
+}
+.acct-or {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 8px 0 4px;
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+}
+.acct-or::before,
+.acct-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.acct-social-note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: var(--brand-wash);
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+}
+.acct-social-note > span {
+  min-width: 0;
+}
+.acct-social-note b {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+.acct-social-note .i {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  color: var(--brand);
+}
+
+/* Email code at sign-up and "Forgot password" (pages/EmailCode.jsx) */
+.email-code {
+  margin-bottom: 4px;
+}
+.email-code .acct-field {
+  margin-bottom: 8px;
+}
+.email-code .acct-input .btn {
+  flex: none;
+}
+.email-code-note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0 0 12px;
+  color: var(--ink-3);
+  font-size: var(--t-sm);
+}
+.email-code-note .i {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  color: var(--brand);
+}
+.email-code .mfa-field {
+  margin-bottom: 14px;
+}
+.acct-form .mfa-field {
+  margin-bottom: 14px;
+}
+
+/* ---------- sign-in / sign-up card: bold title, gradient tab and button, round step dots ---------- */
+.acct-card {
+  padding: 12px;
+  border-radius: 32px;
+}
+.acct-tabs {
+  padding: 6px;
+  border-radius: 999px;
+  border: 0;
+  background: color-mix(in srgb, var(--brand) 5%, #f1eff4);
+}
+.acct-tabs button {
+  height: 50px;
+  border-radius: 999px;
+  font-size: 1.02rem;
+  color: var(--ink-2);
+}
+.acct-tabs button.on {
+  background: var(--grad-btn);
+  color: #fff;
+  box-shadow: 0 12px 24px -12px var(--brand-glow);
+}
+.acct-form h1 {
+  font-family: var(--sans);
+  font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.acct-sub {
+  margin: 8px 0 22px;
+  font-size: var(--t-md);
+}
+.acct-label {
+  color: var(--ink);
+  font-weight: 700;
+}
+.acct-input {
+  height: 54px;
+  border: 1.5px solid color-mix(in srgb, var(--brand) 12%, var(--line));
+  background: color-mix(in srgb, var(--brand) 3%, #fff);
+}
+/* the outer box shows focus; no second outline on the field inside it */
+.acct-input input:focus-visible,
+.acct-input select:focus-visible,
+.acct-input textarea:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.acct-form .btn.primary.lg {
+  min-height: 56px;
+  border-radius: 999px;
+  background: var(--grad-btn);
+  font-size: 1.05rem;
+  box-shadow: 0 14px 28px -14px var(--brand-glow);
+}
+.acct-step-actions .btn.quiet.lg {
+  border-radius: 999px;
+}
+.acct-fine {
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+}
+.acct-switch {
+  border-top: 0;
+  font-weight: 700;
+  color: var(--ink);
+}
+.acct-switch button {
+  margin-left: 4px;
+  font-weight: 700;
+  color: var(--brand);
+  text-decoration-thickness: 2px;
+}
+
+/* numbered steps: round dots joined by lines, the current one filled */
+.acct-form .form-steps {
+  margin: 10px 4px 18px;
+  gap: 0;
+}
+.acct-form .form-steps li {
+  gap: 0;
+}
+.acct-form .form-steps li + li::before {
+  margin: 0 12px;
+  height: 2px;
+}
+.acct-form .form-steps button {
+  padding: 0;
+  gap: 0;
+}
+.acct-form .form-steps em {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.acct-form .form-steps .num {
+  width: 38px;
+  height: 38px;
+  border: 1.5px solid color-mix(in srgb, var(--brand) 25%, var(--line-2));
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+.acct-form .form-steps li.on .num {
+  border-color: transparent;
+  background: var(--grad-btn);
+  color: #fff;
+  box-shadow: 0 8px 18px -8px var(--brand-glow);
+}
+.acct-form .form-steps li.done .num {
+  border-color: transparent;
+  background: var(--brand-tint);
+  color: var(--brand-ink);
+}
+
+.acct-step-actions {
+  margin-top: 16px;
+}
+/* Back + "Create my business account" on one line: the long label wraps instead of spilling out */
+.acct-step-actions .btn.block {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.acct-step-actions .btn.block > span {
+  white-space: normal;
+  line-height: 1.2;
+  text-align: center;
+}
+.acct-step-actions .btn.quiet.lg {
+  flex: none;
+  padding-inline: 16px;
+}
+@media (max-width: 480px) {
+  /* phones: the main button full width, Back under it */
+  .acct-step-actions {
+    flex-direction: column-reverse;
+    gap: 6px;
+  }
+  .acct-step-actions .btn.block {
+    flex: none;
+    width: 100%;
+    padding-inline: 18px;
+    font-size: 0.98rem;
+  }
+  .acct-step-actions .btn.quiet.lg {
+    align-self: center;
+  }
+}

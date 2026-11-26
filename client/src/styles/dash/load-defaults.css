@@ -1,0 +1,83 @@
+/* Owner: loading the default services. */
+
+/* ---------- load default services (owner) ---------- */
+.empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.center-pad {
+  display: grid;
+  place-items: center;
+  padding: 40px 0;
+}
+.defaults-intro {
+  margin: 0 0 14px;
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+}
+.defaults-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: var(--t-sm);
+}
+.defaults-list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.defaults-list li + li {
+  border-top: 1px solid var(--line);
+}
+.defaults-list label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.defaults-list label:hover {
+  background: var(--porcelain);
+}
+.defaults-list label.is-added {
+  cursor: default;
+  opacity: 0.6;
+}
+.defaults-list label.is-added:hover {
+  background: none;
+}
+.defaults-list input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand);
+}
+.defaults-name {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+.defaults-name small,
+.defaults-meta small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.defaults-name small {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.defaults-meta {
+  flex: none;
+  display: grid;
+  text-align: right;
+  font-size: var(--t-sm);
+}

@@ -1,0 +1,142 @@
+/* Appointment tokens: the "Now / Appointment" choice in the booking form, the appointment line on the
+   draft ticket and the token page, and the appointment badge in token lists (owner and staff). */
+
+.when-pick {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.when-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.when-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1.5px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s;
+}
+.when-tabs button > .i {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--brand-wash);
+  color: var(--brand);
+}
+.when-tabs button span {
+  display: grid;
+  min-width: 0;
+}
+.when-tabs button small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.when-tabs button.on {
+  border-color: var(--brand);
+  background: var(--brand-wash);
+  box-shadow: 0 10px 22px -16px var(--brand-glow);
+}
+.when-tabs button.on > .i {
+  background: var(--brand);
+  color: #fff;
+}
+.when-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--brand-line);
+}
+.when-fields .field {
+  margin: 0;
+}
+.when-fields input {
+  width: 100%;
+}
+.when-note {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+}
+.when-note .i {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  color: var(--brand);
+}
+@media (max-width: 420px) {
+  .when-tabs button {
+    padding: 12px;
+    gap: 10px;
+  }
+  .when-tabs button > .i {
+    width: 34px;
+    height: 34px;
+    padding: 8px;
+  }
+}
+
+/* the appointment line on the draft ticket and the token page */
+.draft-appt,
+.tp-appt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--tone-amber, #f5a524) 14%, #fff);
+  color: var(--ink);
+  font-size: var(--t-sm);
+}
+.draft-appt .i,
+.tp-appt .i {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: color-mix(in srgb, var(--tone-amber, #f5a524) 80%, #000);
+}
+
+/* appointment badge in the owner's and staff token lists */
+.appt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: var(--pill);
+  background: color-mix(in srgb, var(--tone-amber, #f5a524) 18%, #fff);
+  color: color-mix(in srgb, var(--tone-amber, #f5a524) 75%, #000);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.appt-badge .i {
+  width: 13px;
+  height: 13px;
+}
+.is-appt {
+  box-shadow: inset 4px 0 0 color-mix(in srgb, var(--tone-amber, #f5a524) 80%, #000);
+}

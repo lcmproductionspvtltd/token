@@ -1,0 +1,203 @@
+/* Shared customer pieces. */
+
+/* ================= shared customer pieces ================= */
+@keyframes ticket-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px) rotate(-2deg);
+  }
+}
+
+/* horizontal rail of fixed-width cards (offers, reviews) */
+.rail {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 6px var(--gutter) 22px;
+  margin: 0 calc(var(--gutter) * -1);
+  scroll-padding: 0 var(--gutter);
+  scrollbar-width: thin;
+}
+
+.rail > * {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.coupon {
+  width: 380px;
+  max-width: 84vw;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  color: #fff;
+  box-shadow: var(--lift);
+  -webkit-mask:
+    radial-gradient(circle at calc(100% - 112px) 0, #0000 11px, #000 11.5px) top / 100% 51% no-repeat,
+    radial-gradient(circle at calc(100% - 112px) 100%, #0000 11px, #000 11.5px) bottom / 100% 51% no-repeat;
+  mask:
+    radial-gradient(circle at calc(100% - 112px) 0, #0000 11px, #000 11.5px) top / 100% 51% no-repeat,
+    radial-gradient(circle at calc(100% - 112px) 100%, #0000 11px, #000 11.5px) bottom / 100% 51% no-repeat;
+}
+
+.coupon h3 {
+  font-family: var(--serif);
+  font-size: var(--t-lg);
+  font-weight: 600;
+}
+
+.coupon p {
+  font-size: var(--t-sm);
+  opacity: 0.9;
+}
+
+.coupon small {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: var(--t-xs);
+  opacity: 0.8;
+}
+
+.coupon-code {
+  flex: 1;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 2px;
+  padding: 12px 8px;
+  border: 0;
+  background: none;
+  text-align: center;
+}
+
+.coupon-code span {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+
+.coupon-code b {
+  font-size: var(--t-md);
+  letter-spacing: 0.04em;
+  color: var(--c1);
+  word-break: break-all;
+}
+
+.coupon-code.plain b {
+  font-size: var(--t-sm);
+  letter-spacing: 0;
+}
+
+.coupon-code em {
+  font-style: normal;
+  font-size: 0.7rem;
+  color: var(--ink-3);
+}
+
+.coupon-code.copied em {
+  color: var(--done-fg);
+}
+
+.coupon-book {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 6px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--c1);
+}
+
+.coupon-book:hover {
+  background: var(--porcelain);
+}
+
+.review {
+  width: 340px;
+  max-width: 84vw;
+  margin: 0;
+  padding: 24px;
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  color: var(--line-2);
+}
+
+.stars .i {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+  stroke: none;
+}
+
+.stars .on {
+  color: #e2a20c;
+}
+
+.review blockquote {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.08rem;
+  line-height: 1.55;
+  flex: 1;
+}
+
+.review figcaption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--t-sm);
+}
+
+.review figcaption span {
+  display: grid;
+}
+
+.review small {
+  color: var(--ink-3);
+}
+
+.branch-pick {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.branch-pick a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  text-decoration: none;
+}
+
+.branch-pick a:hover {
+  border-color: var(--brand);
+}
+
+.branch-pick a > span:first-child {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.branch-pick small {
+  color: var(--ink-3);
+}

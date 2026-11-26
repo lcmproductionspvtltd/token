@@ -1,0 +1,336 @@
+/*
+ * home-polish.css – home page finish: one card style everywhere (white, thin border, soft lift on
+ * hover, a brand line along the top), the "Replace paper tokens" cards with the fix highlighted,
+ * location cards with a pin badge, and the contact section as a brand panel beside the form.
+ * Loaded last in site.css.
+ */
+
+/* ---------- one card style ---------- */
+.site-feature,
+.site-why-list li,
+.site-places-grid article {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 2px rgb(30 10 50 / 4%);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+.site-feature::before,
+.site-why-list li::before,
+.site-places-grid article::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--grad-btn);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.site-feature:hover,
+.site-why-list li:hover,
+.site-places-grid article:hover {
+  transform: translateY(-3px);
+  border-color: var(--brand-line);
+  box-shadow: 0 24px 44px -28px var(--brand-glow);
+}
+.site-feature:hover::before,
+.site-why-list li:hover::before,
+.site-places-grid article:hover::before {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-feature,
+  .site-why-list li,
+  .site-places-grid article {
+    transition: none;
+  }
+}
+
+/* features: a little more room */
+.site-feature {
+  padding: 28px 26px;
+}
+.site-feature h3 {
+  margin-top: 20px;
+}
+
+/* problem → fix: the old way crossed out quietly, the fix on a tinted strip */
+.site-why-list li {
+  align-content: start;
+  gap: 0;
+  padding: 0;
+}
+.site-why-list .site-why-problem {
+  padding: 20px 22px 14px;
+  font-size: 0.95rem;
+}
+.site-why-list .site-why-solution {
+  flex: 1;
+  margin: 0 10px 10px;
+  padding: 14px 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ecfbf1, color-mix(in srgb, var(--brand) 5%, #fff));
+  font-weight: 600;
+}
+
+/* locations: pin badge, places in a softer colour */
+.site-places-grid article {
+  padding: 22px;
+}
+.site-places-grid h3 {
+  gap: 12px;
+}
+.site-places-grid h3 svg {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 9px;
+  border-radius: 12px;
+  background: var(--brand-wash);
+  color: var(--brand);
+}
+.site-places-grid p {
+  margin-top: 12px;
+}
+
+/* ---------- contact: brand panel + form, side by side ---------- */
+.site-contact-sec {
+  background: var(--paper);
+}
+.site-contact-grid,
+.site-contact-grid.form-only {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 22px;
+  align-items: stretch;
+}
+.site-contact-side {
+  display: grid;
+  align-content: start;
+  gap: 22px;
+  padding: clamp(26px, 3vw, 40px);
+  border-radius: 28px;
+  color: #fff;
+  background:
+    radial-gradient(70% 60% at 100% 0%, color-mix(in srgb, var(--tone-rose, #d0459a) 35%, transparent), transparent 70%),
+    linear-gradient(160deg, var(--brand-deep), #160c22);
+  box-shadow: 0 30px 60px -36px rgb(40 12 70 / 60%);
+}
+.site-contact-side .site-sec-head {
+  margin: 0;
+}
+.site-contact-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.site-contact-points li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.site-contact-tick {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 12%);
+  border: 1px solid rgb(255 255 255 / 18%);
+}
+.site-contact-tick .i {
+  width: 19px;
+  height: 19px;
+}
+.site-contact-points span:last-child {
+  display: grid;
+  gap: 2px;
+}
+.site-contact-points small {
+  color: rgb(255 255 255 / 72%);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+}
+/* the business's own contact details, as glass tiles on the panel */
+.site-contact-side .site-contact {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.site-contact-side .site-contact > * {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgb(255 255 255 / 8%);
+  border: 1px solid rgb(255 255 255 / 16%);
+  color: #fff;
+}
+.site-contact-side .site-contact a:hover {
+  background: rgb(255 255 255 / 14%);
+  border-color: rgb(255 255 255 / 28%);
+}
+.site-contact-side .site-contact .i {
+  width: 38px;
+  height: 38px;
+  padding: 9px;
+  background: #fff;
+  color: var(--brand-ink);
+}
+.site-contact-side .site-contact small {
+  color: rgb(255 255 255 / 65%);
+}
+
+/* the form as a roomy card with soft fields and a full-width button */
+.site-contact-grid .site-form {
+  align-content: start;
+  gap: 14px;
+  padding: clamp(22px, 3vw, 34px);
+  border-radius: 28px;
+  box-shadow: 0 30px 60px -40px rgb(40 12 70 / 35%);
+}
+.site-contact-grid .site-form input,
+.site-contact-grid .site-form textarea {
+  border-radius: 14px;
+  border: 1.5px solid color-mix(in srgb, var(--brand) 12%, var(--line));
+  background: color-mix(in srgb, var(--brand) 3%, #fff);
+}
+.site-contact-grid .site-form input:focus,
+.site-contact-grid .site-form textarea:focus {
+  border-color: var(--brand);
+  background: var(--paper);
+}
+.site-contact-grid .site-form textarea {
+  min-height: 130px;
+}
+.site-contact-grid .site-form > .btn {
+  justify-self: stretch;
+  min-height: 52px;
+  border-radius: 999px;
+}
+@media (max-width: 860px) {
+  .site-contact-grid,
+  .site-contact-grid.form-only {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* the call-to-action band sits half on the white contact section, half on the footer */
+.site-contact-sec + .site-cta-sec {
+  background: linear-gradient(to bottom, var(--paper) 50%, #15101d 50%);
+}
+
+/* ---------- colour for every section after the hero (the hero itself is unchanged) ---------- */
+/* each section has its own soft tint and its own label colour; cards pick up that colour too */
+.site-why {
+  background:
+    radial-gradient(45% 60% at 100% 0%, color-mix(in srgb, var(--tone-rose) 16%, transparent), transparent 70%),
+    radial-gradient(40% 55% at 0% 100%, color-mix(in srgb, var(--tone-amber) 14%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--brand-wash), #fff);
+}
+.site-features-sec {
+  background:
+    radial-gradient(45% 60% at 0% 0%, color-mix(in srgb, var(--tone-sky) 14%, transparent), transparent 70%),
+    radial-gradient(40% 55% at 100% 100%, color-mix(in srgb, var(--tone-teal) 14%, transparent), transparent 70%),
+    #f6f9fc;
+}
+.site-places {
+  background:
+    radial-gradient(45% 60% at 100% 0%, color-mix(in srgb, var(--tone-amber) 15%, transparent), transparent 70%),
+    radial-gradient(40% 55% at 0% 100%, color-mix(in srgb, var(--tone-teal) 12%, transparent), transparent 70%),
+    #fbf8f3;
+}
+.site-pricing-sec {
+  background:
+    radial-gradient(50% 60% at 50% 0%, color-mix(in srgb, var(--brand) 14%, transparent), transparent 70%),
+    linear-gradient(180deg, #faf6fd, #fff);
+}
+.site-reviews {
+  background:
+    radial-gradient(45% 60% at 0% 0%, color-mix(in srgb, var(--tone-rose) 13%, transparent), transparent 70%),
+    radial-gradient(40% 55% at 100% 100%, color-mix(in srgb, var(--tone-amber) 12%, transparent), transparent 70%),
+    #fdf7f9;
+}
+.site-faq-sec {
+  background:
+    radial-gradient(45% 60% at 100% 0%, color-mix(in srgb, var(--tone-teal) 13%, transparent), transparent 70%),
+    radial-gradient(40% 55% at 0% 100%, color-mix(in srgb, var(--tone-sky) 12%, transparent), transparent 70%),
+    #f4faf9;
+}
+
+/* section labels in the section's colour */
+.site-features-sec .site-kicker {
+  --k: var(--tone-sky);
+}
+.site-places .site-kicker {
+  --k: var(--tone-amber);
+}
+.site-reviews .site-kicker {
+  --k: var(--tone-rose);
+}
+.site-faq-sec .site-kicker {
+  --k: var(--tone-teal);
+}
+.site-features-sec .site-kicker,
+.site-places .site-kicker,
+.site-reviews .site-kicker,
+.site-faq-sec .site-kicker {
+  background: color-mix(in srgb, var(--k) 10%, #fff);
+  border-color: color-mix(in srgb, var(--k) 35%, #fff);
+  color: color-mix(in srgb, var(--k) 70%, #1b1622);
+}
+
+/* feature icons and location pins in a run of colours */
+.site-feature:nth-child(6n + 2) .site-ico {
+  background: linear-gradient(140deg, var(--tone-teal), color-mix(in srgb, var(--tone-teal) 60%, #000));
+}
+.site-feature:nth-child(6n + 3) .site-ico {
+  background: linear-gradient(140deg, var(--tone-rose), color-mix(in srgb, var(--tone-rose) 60%, #000));
+}
+.site-feature:nth-child(6n + 4) .site-ico {
+  background: linear-gradient(140deg, var(--tone-amber), color-mix(in srgb, var(--tone-amber) 60%, #000));
+}
+.site-feature:nth-child(6n + 5) .site-ico {
+  background: linear-gradient(140deg, var(--tone-sky), color-mix(in srgb, var(--tone-sky) 60%, #000));
+}
+.site-feature:nth-child(6n + 6) .site-ico {
+  background: linear-gradient(140deg, color-mix(in srgb, var(--tone-teal) 50%, var(--tone-sky)), #1f4f7a);
+}
+.site-places-grid article:nth-child(4n + 2) h3 svg {
+  background: color-mix(in srgb, var(--tone-amber) 14%, #fff);
+  color: color-mix(in srgb, var(--tone-amber) 80%, #000);
+}
+.site-places-grid article:nth-child(4n + 3) h3 svg {
+  background: color-mix(in srgb, var(--tone-teal) 14%, #fff);
+  color: color-mix(in srgb, var(--tone-teal) 80%, #000);
+}
+.site-places-grid article:nth-child(4n + 4) h3 svg {
+  background: color-mix(in srgb, var(--tone-rose) 14%, #fff);
+  color: color-mix(in srgb, var(--tone-rose) 80%, #000);
+}
+
+/* ---------- FAQ: heading centred, questions in two equal columns ---------- */
+.site-faq-wrap {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+.site-faq {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 12px 16px;
+}
+.site-faq details {
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgb(30 10 50 / 4%);
+}
+.site-faq summary {
+  min-height: 78px; /* two-line questions too, so both columns line up */
+}
+@media (max-width: 760px) {
+  .site-faq {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

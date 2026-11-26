@@ -1,0 +1,150 @@
+/* Final polish of the business page (loaded last): a clearly visible cover photo under a deep,
+   elegant overlay; compact contact tiles; a footer that reaches the bottom of the page. */
+
+/* ---------- hero: the business's photo, clearly visible ---------- */
+.ld-hero.v2 {
+  color: #fff;
+  background: var(--brand-deep);
+}
+.ld-hero.v2 .ld-hero-photo {
+  background-color: var(--brand-deep);
+}
+.ld-hero.v2 .ld-hero-photo::after {
+  background:
+    /* readable text on the left, the photo open on the right */
+    linear-gradient(
+      100deg,
+      rgb(12 9 18 / 86%) 0%,
+      rgb(12 9 18 / 66%) 38%,
+      rgb(12 9 18 / 22%) 72%,
+      rgb(12 9 18 / 8%) 100%
+    ),
+    /* a soft brand-coloured glow and a fade into the page at the bottom */
+    radial-gradient(120% 90% at 0% 100%, color-mix(in srgb, var(--brand) 38%, transparent), transparent 60%),
+    linear-gradient(180deg, rgb(12 9 18 / 30%) 0%, transparent 22%, transparent 70%, rgb(12 9 18 / 45%) 100%);
+}
+.ld-hero.v2 .ld-eyebrow {
+  color: rgb(255 255 255 / 86%);
+}
+.ld-hero.v2 h1 {
+  color: #fff;
+}
+.ld-hero.v2 h1 .grad {
+  background: linear-gradient(100deg, #fff 0%, color-mix(in srgb, var(--brand) 32%, #fff) 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.ld-hero.v2 .ld-tagline {
+  color: #fff;
+}
+.ld-hero.v2 .ld-lede {
+  color: rgb(255 255 255 / 84%);
+}
+.ld-hero.v2 .ld-lede em {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--brand) 60%, #fff);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.ld-hero.v2 .ld-hero-copy h1,
+.ld-hero.v2 .ld-tagline,
+.ld-hero.v2 .ld-eyebrow,
+.ld-hero.v2 .ld-lede {
+  text-shadow: 0 2px 22px rgb(0 0 0 / 35%);
+}
+/* the white booking card keeps dark text */
+.ld-hero.v2 .ld-bookcard {
+  color: var(--ink);
+  text-shadow: none;
+}
+@media (max-width: 860px) {
+  .ld-hero.v2 .ld-hero-photo::after {
+    background:
+      linear-gradient(180deg, rgb(12 9 18 / 48%) 0%, rgb(12 9 18 / 58%) 40%, rgb(12 9 18 / 76%) 100%),
+      radial-gradient(120% 70% at 0% 100%, color-mix(in srgb, var(--brand) 34%, transparent), transparent 65%);
+  }
+}
+
+/* ---------- Call us / Email tiles: icon next to the words, no empty space ---------- */
+.ld-tile {
+  min-height: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-content: center;
+  column-gap: 16px;
+  row-gap: 2px;
+  padding: 20px 52px 20px 20px;
+}
+.ld-tile-icon {
+  position: static;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+.ld-tile b,
+.ld-tile small {
+  grid-column: 2;
+}
+.ld-tile b {
+  align-self: end;
+  line-height: 1.2;
+}
+.ld-tile small {
+  align-self: start;
+}
+.ld-tile .go {
+  top: 50%;
+  margin-top: -9px;
+}
+.ld-tiles.stack,
+.ld-tiles.stack.n1 {
+  grid-auto-rows: auto;
+  align-content: center;
+}
+@media (max-width: 640px) {
+  .ld-tile {
+    min-height: 0;
+    padding: 16px 44px 16px 16px;
+    column-gap: 14px;
+  }
+  .ld-tile .go {
+    top: 50%;
+  }
+}
+
+/* ---------- footer reaches the bottom of the page ---------- */
+.ld-footer {
+  margin-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+@media (max-width: 640px) {
+  /* room for the "Book" bar fixed at the bottom, inside the footer instead of an empty strip */
+  .ld-footer {
+    margin-bottom: 0;
+    padding-bottom: 96px;
+  }
+}
+
+/* ---------- footer brand: the logo on its own line, the name under it (never squeezed) ---------- */
+.ld-foot-brand {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.ld-footer .ld-foot-logo.mark.img {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: #fff;
+  overflow: visible;
+}
+.ld-footer .ld-foot-logo.mark.img img {
+  width: auto;
+  height: 40px;
+  max-width: 190px;
+  object-fit: contain;
+}

@@ -1,0 +1,380 @@
+/*
+ * home-style.css – the branch landing page in the same style as the BQuee home page:
+ * full-width section bands (grey, white, a deep brand band for "How it works"), a small pill
+ * label above each plain bold heading, white cards with a thin border, a stats card like the
+ * home page numbers, and a dark full-width footer. Colours follow the business's own brand.
+ * Loaded after align.css.
+ */
+
+/* same content width as the home page (1200px) */
+.ld {
+  --ld-edge: max(var(--gutter), calc((100% - 1200px) / 2));
+}
+
+/* ---------- section bands ---------- */
+.ld-main {
+  gap: 0;
+  padding-bottom: 0;
+}
+.ld-main::before {
+  display: none;
+}
+.ld-main > .ld-sec {
+  position: relative;
+  padding-block: clamp(48px, 5.5vw, 76px);
+  scroll-margin-top: 90px;
+  /* the band's colour reaches both screen edges while the content keeps the shared edge */
+  box-shadow: 0 0 0 100vmax var(--band, var(--porcelain));
+  clip-path: inset(0 -100vmax);
+  background: var(--band, var(--porcelain));
+}
+.ld-main > .ld-facts + .ld-sec {
+  padding-top: clamp(44px, 5vw, 64px);
+}
+.ld-main > .ld-band,
+.ld-main > .ld-visit {
+  --band: var(--paper);
+}
+.ld-main > .ld-band {
+  margin: 0;
+  padding-inline: 0;
+  border-radius: 0;
+}
+.ld-main > .ld-getapp {
+  --band: var(--porcelain);
+  margin-block: clamp(32px, 4vw, 52px);
+  padding-block: clamp(24px, 3vw, 36px);
+  box-shadow: none;
+  clip-path: none;
+  background: var(--brand-wash);
+}
+
+/* ---------- section headings: pill label + plain bold title ---------- */
+.ld-head {
+  gap: 0;
+  max-width: 640px;
+  margin-bottom: clamp(26px, 3.5vw, 42px);
+}
+.ld-kicker {
+  justify-self: start;
+  display: inline-block;
+  width: fit-content;
+  margin-bottom: 12px;
+  padding: 5px 12px;
+  border-radius: var(--pill);
+  background: var(--brand-wash);
+  border: 1px solid var(--brand-line);
+  color: var(--brand-ink);
+  font-size: var(--t-xs);
+  font-weight: 600;
+}
+.ld-kicker.light,
+.ld-head.light .ld-kicker {
+  background: rgb(255 255 255 / 10%);
+  border-color: rgb(255 255 255 / 22%);
+  color: color-mix(in srgb, var(--brand) 18%, #fff);
+}
+.ld-head h2,
+.ld-score h2 {
+  font-family: var(--sans);
+  font-size: clamp(1.9rem, 1.2rem + 2vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+.ld-head h2 {
+  background: none;
+  color: var(--ink);
+  padding-bottom: 0;
+}
+.ld-head h2::after {
+  display: none;
+}
+.ld-head p {
+  margin-top: 12px;
+  color: var(--ink-2);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+.ld-head.light h2 {
+  color: #fff;
+}
+.ld-head.light p {
+  color: rgb(255 255 255 / 75%);
+}
+
+/* ---------- hero label: a glass pill like the home page badge ---------- */
+.ld-hero.v2 .ld-eyebrow {
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: var(--pill);
+  background: rgb(255 255 255 / 12%);
+  border: 1px solid rgb(255 255 255 / 24%);
+  color: #fff;
+  font-size: var(--t-sm);
+  letter-spacing: 0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.ld-hero.v2 .ld-eyebrow i {
+  display: none;
+}
+
+/* ---------- key facts: one white card with dividers, like the home page numbers ---------- */
+.ld-facts {
+  gap: 0;
+  padding: 10px;
+  border-radius: 24px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: 0 30px 60px -34px color-mix(in srgb, var(--brand) 45%, rgb(40 12 70 / 45%));
+}
+.ld-facts > div,
+.ld-facts > div:nth-child(n),
+.ld-facts > div:hover {
+  display: grid;
+  grid-template-columns: none;
+  align-content: center;
+  gap: 4px;
+  padding: 20px 24px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.ld-facts > div + div {
+  border-left: 1px solid var(--line);
+}
+.ld-facts .ld-fact-icon {
+  display: none;
+}
+.ld-facts dd {
+  order: -1;
+  margin: 0;
+  font-size: clamp(1.8rem, 1.2rem + 1.4vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.ld-facts > div:nth-child(n) dd .num {
+  background: var(--grad-btn);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.ld-facts dt {
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+}
+@media (max-width: 960px) {
+  .ld-facts > div:nth-child(3) {
+    border-left: 0;
+  }
+  .ld-facts > div:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* ---------- how it works: numbered cards on a deep brand band ---------- */
+.ld-main > .ld-how {
+  --band: var(--brand-deep);
+  color: #fff;
+}
+.ld-how .ld-steps::before {
+  display: none;
+}
+.ld-how .ld-steps {
+  gap: 20px;
+  counter-reset: step;
+}
+.ld-how .ld-step,
+.ld-how .ld-step:nth-child(n),
+.reveal.in.ld-how .ld-step:hover {
+  position: relative;
+  padding: 24px 22px 26px;
+  border-radius: 22px;
+  background: rgb(255 255 255 / 6%);
+  border: 1px solid rgb(255 255 255 / 13%);
+  box-shadow: none;
+  counter-increment: step;
+  overflow: hidden;
+}
+.ld-how .ld-step::before {
+  content: counter(step, decimal-leading-zero);
+  left: auto;
+  right: 16px;
+  top: 4px;
+  height: auto;
+  background: none;
+  font-size: 4.2rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: rgb(255 255 255 / 7%);
+  pointer-events: none;
+}
+.ld-how .ld-step::after {
+  display: none;
+}
+.ld-how .ld-step-top {
+  justify-content: flex-start;
+  gap: 12px;
+}
+.ld-how .ld-steps .ld-step:nth-child(n) .ld-step-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
+  background: linear-gradient(140deg, #fff, color-mix(in srgb, var(--brand) 12%, #fff));
+  color: var(--brand-ink);
+  box-shadow: 0 14px 26px -14px rgb(0 0 0 / 60%);
+}
+.ld-how .ld-steps .ld-step:nth-child(n) .ld-step-n {
+  padding: 4px 10px;
+  border-radius: var(--pill);
+  background: rgb(255 255 255 / 12%);
+  font-family: var(--sans);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: color-mix(in srgb, var(--brand) 18%, #fff);
+}
+.ld-how .ld-step h3 {
+  margin-top: 20px;
+  font-size: 1.12rem;
+  color: #fff;
+}
+.ld-how .ld-step p {
+  margin-top: 8px;
+  color: rgb(255 255 255 / 72%);
+  line-height: 1.6;
+}
+.ld-how .ld-how-cta > span {
+  color: rgb(255 255 255 / 72%);
+}
+.ld-how .ld-how-cta .btn.primary,
+.ld-how .ld-how-cta .btn.primary:hover {
+  --b-fg: var(--brand-ink);
+  background: #fff;
+  color: var(--brand-ink);
+}
+
+/* ---------- white cards with a thin border, as on the home page ---------- */
+.ld-reviews .review,
+.ld-tile,
+.ld-tile:hover {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: 0 1px 2px rgb(30 10 50 / 4%);
+}
+.ld-tile:hover,
+.ld-reviews .review:hover {
+  border-color: var(--brand-line);
+  box-shadow: 0 24px 44px -28px var(--brand-glow);
+}
+.ld-tile-icon,
+.ld-tile:nth-child(n) .ld-tile-icon {
+  border-radius: 15px;
+}
+.ld-score,
+.ld-visit-card {
+  border-radius: 22px;
+}
+
+/* ---------- footer: dark and full width, like the home page ---------- */
+.ld-footer {
+  margin: 0;
+  padding: 56px var(--ld-edge) 22px;
+  border-radius: 0;
+  background: #15101d;
+  color: rgb(255 255 255 / 80%);
+}
+@media (max-width: 640px) {
+  .ld-footer {
+    padding-bottom: 96px;
+  }
+}
+
+@media (max-width: 760px) {
+  .ld-how .ld-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* phones: same card layout as wide screens (icon and step label on one line, text below) */
+  .ld-how .ld-step,
+  .ld-how .ld-step:nth-child(n) {
+    display: block;
+  }
+  .ld-how .ld-step-top {
+    flex-direction: row;
+    align-items: center;
+  }
+  .ld-how .ld-steps .ld-step:nth-child(n) .ld-step-n {
+    font-size: var(--t-xs);
+  }
+  .ld-how .ld-step h3 {
+    margin-top: 18px;
+  }
+}
+
+/* phones: contact tiles one per row so names and numbers aren't cut off */
+@media (max-width: 480px) {
+  .ld-tiles,
+  .ld-tiles.many {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Visit us: a shorter address card, contact tiles lined up with it ---------- */
+.ld-visit-grid {
+  align-items: stretch;
+}
+.ld-visit-card {
+  gap: 12px;
+  padding: clamp(24px, 2.6vw, 36px);
+}
+.ld-visit-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  margin-bottom: 4px;
+  box-shadow: 0 0 0 6px rgb(255 255 255 / 8%);
+}
+.ld-visit-mark .i {
+  width: 20px;
+  height: 20px;
+}
+.ld-address {
+  font-size: clamp(1.2rem, 0.95rem + 0.8vw, 1.55rem);
+  line-height: 1.3;
+}
+.ld-about {
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+.ld-about.clamp {
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+.ld-visit-card .ld-directions {
+  margin-top: 4px;
+}
+/* one or two contacts: the tiles share the card's height, top and bottom edges line up */
+.ld-tiles.stack {
+  grid-auto-rows: 1fr;
+  align-content: stretch;
+}
+.ld-tiles.stack.n1 {
+  grid-auto-rows: auto;
+  align-content: start;
+}
+.ld-tiles.stack .ld-tile {
+  min-height: 0;
+  height: 100%;
+  align-content: center;
+}
+@media (max-width: 960px) {
+  .ld-tiles.stack {
+    grid-auto-rows: auto;
+  }
+}
+.ld-tiles.stack .ld-tile .go {
+  top: calc(50% - 8px);
+}

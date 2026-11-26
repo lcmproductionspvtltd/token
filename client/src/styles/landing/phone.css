@@ -1,0 +1,267 @@
+/* Phone widths. */
+
+/* ---------- phone ---------- */
+
+@media (max-width: 640px) {
+  .ld-nav-book {
+    display: none;
+  }
+  .ld-hero {
+    border-radius: 0 0 28px 28px;
+  }
+  .ld-hero h1 {
+    margin-top: 18vh;
+  }
+  .ld-quick {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .gauge {
+    width: 112px;
+    height: 112px;
+  }
+  .ld-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 6px;
+    border-radius: var(--r-lg);
+  }
+  .ld-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px;
+    row-gap: 2px;
+  }
+  .ld-fact-icon {
+    grid-row: auto;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+  .ld-fact-icon .i {
+    width: 18px;
+    height: 18px;
+  }
+  .ld-fact-icon {
+    order: -2;
+  }
+  .ld-step {
+    padding: 22px;
+  }
+  .ld-step-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+  }
+  .ld-band {
+    border-radius: 32px;
+  }
+  .ld-rail-nav .ld-arrows {
+    display: none;
+  }
+  .ld-rail .coupon {
+    width: min(320px, 84vw);
+  }
+  .ld .review {
+    width: min(320px, 82vw);
+    min-height: 230px;
+    padding: 22px;
+  }
+  .ld-tiles {
+    gap: 12px;
+  }
+  .ld-tile {
+    min-height: 132px;
+    padding: 16px;
+  }
+  .ld-tile-icon {
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+  }
+  .ld-tile b {
+    font-size: var(--t-md);
+  }
+  .ld-tile .go {
+    top: 20px;
+    right: 16px;
+  }
+  .ld-main {
+    padding-bottom: 48px;
+  }
+  .ld-footer {
+    margin-bottom: 96px;
+  }
+  .ld-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: fixed;
+    z-index: 30;
+    left: 10px;
+    right: 10px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    padding: 10px 10px 10px 18px;
+    border-radius: var(--r-lg);
+    background: color-mix(in srgb, var(--ink) 92%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #fff;
+    box-shadow: var(--lift-hi);
+    transform: translateY(140%);
+    transition: transform 0.4s var(--ease);
+  }
+  .ld-bar.show {
+    transform: none;
+  }
+  .ld-bar > span {
+    display: grid;
+    min-width: 0;
+    font-size: var(--t-sm);
+  }
+  .ld-bar b {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ld-bar small {
+    opacity: 0.7;
+    font-size: var(--t-xs);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal .ld-step {
+    opacity: 1;
+    transform: none;
+  }
+  .ld-bars em {
+    transform: none;
+  }
+}
+
+/* salon logo in header and footer */
+.ld-logo.mark {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+}
+.ld-nav.solid .ld-logo.mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+.ld-foot-logo.mark {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 18%);
+}
+.ld-logo.mark.img,
+.ld-foot-logo.mark.img {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 46px;
+  padding: 5px;
+}
+.ld-logo.mark.img img {
+  height: 36px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  border-radius: 9px;
+}
+.ld-nav.solid .ld-logo.mark.img img {
+  height: 30px;
+}
+.ld-nav.solid .ld-logo.mark.img {
+  min-width: 40px;
+}
+.ld-foot-logo.mark.img {
+  min-width: 64px;
+  padding: 6px;
+}
+.ld-foot-logo.mark.img img {
+  height: 52px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+/* Logo alone in the header (no name next to it): a little bigger, no frame, never squeezed. */
+.ld-brand:has(.ld-logo.only) {
+  flex: none;
+}
+.ld-nav .ld-logo.only.mark.img {
+  flex: none;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  padding: 0;
+  overflow: visible;
+  background: none;
+  box-shadow: none;
+}
+.ld-logo.only.mark.img img {
+  height: 44px;
+  max-width: 220px;
+  border-radius: 10px;
+}
+.ld-nav.solid .ld-logo.only.mark.img img {
+  height: 38px;
+}
+@media (max-width: 640px) {
+  .ld-logo.mark.img img {
+    max-width: 120px;
+  }
+  .ld-logo.only.mark.img img {
+    max-width: 160px;
+  }
+}
+
+@keyframes book-glow {
+  50% {
+    box-shadow:
+      0 0 0 12px rgb(255 255 255 / 10%),
+      0 22px 44px -16px rgb(0 0 0 / 55%);
+  }
+}
+.ld-nav-book .short {
+  display: none;
+}
+@media (max-width: 640px) {
+  .ld-nav-book {
+    display: inline-flex !important;
+  }
+  .ld-nav-book .long {
+    display: none;
+  }
+  .ld-nav-book .short {
+    display: inline;
+  }
+  .ld-hero h1 {
+    margin-top: 10vh;
+  }
+}
+
+.ld-tiles.many .ld-tile {
+  min-height: 112px;
+  padding: 16px 18px;
+}
+.ld-tiles.many .ld-tile-icon {
+  top: 16px;
+  left: 18px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+.ld-tiles.many .ld-tile b {
+  font-size: var(--t-md);
+}

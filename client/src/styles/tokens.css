@@ -1,0 +1,103 @@
+/* Design tokens. Every tint is derived from --brand (the salon's colour, set at runtime). */
+
+@font-face {
+  font-family: Poppins;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/Poppins-Regular.woff) format('woff');
+}
+@font-face {
+  font-family: Poppins;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/fonts/Poppins-Medium.woff) format('woff');
+}
+@font-face {
+  font-family: Poppins;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url(/fonts/Poppins-Bold.woff) format('woff');
+}
+@font-face {
+  font-family: Lora;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(/fonts/Lora-Variable.woff) format('woff');
+}
+
+:root {
+  /* neutrals – cool porcelain, not cream */
+  --ink: #221c2b;
+  --ink-2: #4b4558;
+  --ink-3: #777085;
+  --line: #e7e3ec;
+  --line-2: #d7d2df;
+  --porcelain: #f5f4f7;
+  --paper: #ffffff;
+
+  /* brand (runtime) and its derived tints */
+  --brand: #7b2c9e;
+  --brand-ink: color-mix(in srgb, var(--brand) 76%, #120d18);
+  --brand-deep: color-mix(in srgb, var(--brand) 55%, #120d18);
+  --brand-wash: color-mix(in srgb, var(--brand) 6%, #fff);
+  --brand-tint: color-mix(in srgb, var(--brand) 13%, #fff);
+  --brand-line: color-mix(in srgb, var(--brand) 30%, #fff);
+  --brand-glow: color-mix(in srgb, var(--brand) 35%, transparent);
+
+  /* status signals */
+  --wait-bg: #fdf0d5;
+  --wait-fg: #8a4b06;
+  --serve-bg: #dde8fd;
+  --serve-fg: #1e3fa8;
+  --done-bg: #dcf3e4;
+  --done-fg: #146c37;
+  --bad-bg: #fbe1e1;
+  --bad-fg: #a11d1d;
+  --off-bg: #ecebf0;
+  --off-fg: #5d596b;
+
+  /* type */
+  --sans: Poppins, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --serif: Lora, Georgia, 'Times New Roman', serif;
+  --t-xs: 0.78rem;
+  --t-sm: 0.875rem;
+  --t-md: 1rem;
+  --t-lg: 1.25rem;
+  --t-xl: 1.5625rem;
+  --t-2xl: 1.953rem;
+  --t-3xl: 2.441rem;
+  --t-4xl: 3.052rem;
+
+  /* shape – radius follows hierarchy: controls < panels < tickets */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --pill: 999px;
+
+  --lift: 0 1px 2px rgb(34 28 43 / 6%), 0 10px 28px -14px rgb(34 28 43 / 22%);
+  --lift-hi: 0 2px 4px rgb(34 28 43 / 6%), 0 24px 48px -20px rgb(34 28 43 / 32%);
+  --focus: 0 0 0 3px var(--paper), 0 0 0 5px var(--brand);
+
+  --gutter: clamp(18px, 4.6vw, 88px);
+
+  /* accent tones and gradients, all mixed from the brand colour */
+  --tone-rose: color-mix(in srgb, var(--brand) 45%, #ff5d7a);
+  --tone-amber: color-mix(in srgb, var(--brand) 30%, #ffb02e);
+  --tone-teal: color-mix(in srgb, var(--brand) 35%, #19b5a5);
+  --tone-sky: color-mix(in srgb, var(--brand) 40%, #3b82f6);
+  --grad: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--brand) 55%, var(--tone-rose)) 0%,
+    var(--brand) 55%,
+    color-mix(in srgb, var(--brand) 60%, #c14ce0) 100%
+  );
+  --grad-btn: linear-gradient(
+    100deg,
+    var(--brand-deep),
+    var(--brand) 55%,
+    color-mix(in srgb, var(--brand) 55%, var(--tone-rose))
+  );
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}

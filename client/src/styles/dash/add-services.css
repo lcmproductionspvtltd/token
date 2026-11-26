@@ -1,0 +1,206 @@
+/* Adding services to a token. */
+
+/* ---------- add services to a token ---------- */
+
+.add-svc .dialog-foot {
+  align-items: center;
+}
+.add-svc-total {
+  flex: 1;
+  display: grid;
+  min-width: 0;
+  line-height: 1.3;
+}
+.add-svc-total b {
+  font-weight: 600;
+  color: var(--brand-ink);
+}
+.add-svc-total small {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.add-svc-who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+.add-svc-who span {
+  font-weight: 400;
+  color: var(--ink-3);
+  font-size: var(--t-sm);
+}
+.add-svc-search {
+  max-width: none;
+  min-height: 42px;
+  margin-bottom: 12px;
+}
+.add-svc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.add-svc-list > li {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+.add-svc-list > li.on {
+  border-color: var(--brand);
+  background: var(--brand-wash);
+}
+.add-svc-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 10px 10px;
+  border: 0;
+  background: none;
+  text-align: left;
+  font-size: var(--t-sm);
+}
+.add-svc-row .num {
+  font-weight: 600;
+}
+.add-svc-name {
+  flex: 1;
+  display: grid;
+  min-width: 0;
+}
+.add-svc-name b {
+  font-weight: 500;
+  font-size: var(--t-md);
+}
+.add-svc-name small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.add-svc-list .tick {
+  width: 28px;
+  height: 28px;
+}
+.add-svc-list li.on .tick {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+.add-svc-staff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 12px 12px 50px;
+}
+.staff-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 5px;
+  border-radius: var(--pill);
+  border: 1px solid var(--line-2);
+  background: var(--paper);
+  font-size: var(--t-sm);
+  text-align: left;
+  line-height: 1.2;
+}
+.staff-chip span {
+  display: grid;
+}
+.staff-chip small {
+  font-size: 0.7rem;
+  color: var(--ink-3);
+}
+.staff-chip.on {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand);
+  background: var(--paper);
+}
+.add-svc-note {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: var(--wait-bg);
+  color: var(--wait-fg);
+  font-size: var(--t-sm);
+}
+.add-svc-note .i {
+  flex: none;
+  margin-top: 2px;
+}
+@media (max-width: 560px) {
+  .add-svc .dialog-foot {
+    flex-wrap: wrap;
+  }
+  .add-svc-total {
+    flex-basis: 100%;
+  }
+  .add-svc-staff {
+    padding-left: 12px;
+  }
+}
+
+.presence-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: var(--r-lg);
+  background: var(--done-bg);
+  color: var(--done-fg);
+}
+.presence-card.busy {
+  background: #fff3dc;
+  color: #8a5200;
+}
+.presence-card.off {
+  background: var(--off-bg);
+  color: var(--off-fg);
+}
+.presence-dot.big {
+  width: 14px;
+  height: 14px;
+}
+.presence-text {
+  flex: 1;
+  display: grid;
+  min-width: 0;
+}
+.presence-text b {
+  font-size: var(--t-md);
+  font-weight: 600;
+}
+.presence-text small {
+  font-size: var(--t-xs);
+  opacity: 0.85;
+}
+.presence-card .switch-text {
+  font-weight: 600;
+  min-width: 52px;
+}
+.staff-load li.is-offline {
+  opacity: 0.55;
+}
+.staff-chip.offline {
+  opacity: 0.45;
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+@media (max-width: 560px) {
+  .presence-card {
+    flex-wrap: wrap;
+  }
+  .presence-text {
+    flex-basis: calc(100% - 40px);
+  }
+  .topbar .presence-pill {
+    padding: 5px 9px;
+  }
+}

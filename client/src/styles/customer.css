@@ -1,0 +1,18 @@
+/* customer.css – loads the pieces below in this exact order (later rules win in CSS, so the order matters). */
+
+@import './customer/ticket.css';
+@import './customer/shared.css';
+@import './customer/page-header.css';
+@import './customer/booking-choices.css';
+@import './customer/booking-draft.css';
+@import './customer/booking-bar.css';
+@import './customer/sign-in.css';
+@import './customer/product-home.css';
+@import './customer/salon-sign-in.css';
+@import './customer/booking-polish.css';
+@import './customer/booked.css';
+@import './customer/token-page.css';
+@import './customer/pill-header.css';
+@import './customer/offer-applied.css';
+@import './customer/offer-voucher.css';
+@import './customer/appointments.css';

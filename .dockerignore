@@ -1,0 +1,11 @@
+.git
+.env
+node_modules
+runtime
+storage
+backups
+certs
+tests
+*.log
+mobile
+releases

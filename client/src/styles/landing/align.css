@@ -1,0 +1,111 @@
+/*
+ * align.css – one shared left/right edge for the branch landing page.
+ *
+ * The header, the hero and every section below now start and end on the same line
+ * (the page gutter, capped at a 1280px wide column on big screens). On wide screens the
+ * hero is two columns: the business name on the left, the booking card on the right.
+ */
+
+.ld {
+  --ld-edge: max(var(--gutter), calc((100% - 1280px) / 2));
+}
+
+/* header pill sits on the shared edge */
+.ld-nav.v2,
+.ld-nav.v2.solid {
+  padding-left: var(--ld-edge);
+  padding-right: var(--ld-edge);
+}
+.ld-nav.v2 .ld-nav-end {
+  gap: 8px;
+}
+.ld-nav.v2 .ld-nav-book .i {
+  width: 16px;
+  height: 16px;
+}
+.ld-nav.v2 .ld-menu {
+  width: 44px;
+  height: 44px;
+}
+
+/* hero and sections use the same edge */
+.ld-hero.v2 .ld-hero-inner {
+  max-width: none;
+  margin: 0;
+  padding-left: var(--ld-edge);
+  padding-right: var(--ld-edge);
+}
+.ld-main {
+  padding-left: var(--ld-edge);
+  padding-right: var(--ld-edge);
+}
+.ld-hero.v2 .ld-bookcard {
+  max-width: none;
+}
+
+/* wide screens: name on the left, booking card on the right */
+@media (min-width: 1100px) {
+  .ld-hero.v2 .ld-hero-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(420px, 480px);
+    align-items: center;
+    gap: clamp(40px, 5vw, 80px);
+    padding-top: clamp(130px, 11vw, 160px);
+  }
+  .ld-hero.v2 .ld-hero-copy {
+    max-width: 680px;
+  }
+  .ld-hero.v2 .ld-bookcard {
+    margin-top: 0;
+  }
+  .ld-hero.v2 .ld-bookcard-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ld-hero.v2 .ld-bookcard-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ld-hero.v2 .ld-bookcard-tile {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+  .ld-hero.v2 .ld-bookcard-icon {
+    width: 42px;
+    height: 42px;
+  }
+  .ld-hero.v2 .ld-bookcard-icon .i {
+    width: 20px;
+    height: 20px;
+  }
+  .ld-hero.v2 .ld-bookcard-tile b {
+    font-size: 0.98rem;
+    -webkit-line-clamp: 3; /* long opening hours wrap instead of being cut off */
+  }
+}
+
+/* contact icons: a quiet row under a hairline, not floating on their own */
+.ld-hero.v2 .ld-bookcard-foot {
+  margin-top: 16px;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--line);
+}
+.ld-hero.v2 .ld-bookcard-foot:empty {
+  display: none;
+}
+.ld-hero.v2 .ld-quick {
+  justify-content: center;
+  gap: 10px;
+}
+.ld-hero.v2 .ld-quick a {
+  width: 44px;
+  height: 44px;
+}
+
+/* key facts: two per row on tablets so numbers and labels don't wrap */
+.ld-facts dd {
+  white-space: nowrap;
+}
+@media (min-width: 641px) and (max-width: 960px) {
+  .ld-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

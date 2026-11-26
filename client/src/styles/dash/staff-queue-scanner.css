@@ -1,0 +1,300 @@
+/* Staff queue and the QR scanner. */
+
+/* ---------- staff queue ---------- */
+
+.scan-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 18px 20px;
+  border-radius: var(--r-lg);
+  border: 0;
+  background: var(--brand);
+  color: #fff;
+  text-align: left;
+  box-shadow: 0 14px 30px -16px var(--brand-glow);
+}
+.scan-hero:hover {
+  background: var(--brand-ink);
+}
+.scan-hero > span:nth-child(2) {
+  flex: 1;
+  display: grid;
+}
+.scan-hero b {
+  font-size: var(--t-lg);
+  font-weight: 600;
+}
+.scan-hero small {
+  opacity: 0.85;
+}
+.scan-hero-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--r);
+  background: rgb(255 255 255 / 16%);
+}
+.scan-hero-icon .i {
+  width: 26px;
+  height: 26px;
+}
+.now-panel {
+  border-color: var(--serve-fg);
+  box-shadow: 0 0 0 1px var(--serve-fg);
+}
+.queue {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.queue li {
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--line);
+}
+.queue li:last-child {
+  border-bottom: 0;
+}
+.q-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.q-no {
+  flex: none;
+  min-width: 84px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--brand);
+}
+.q-info {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+.q-info > b {
+  font-weight: 500;
+}
+.q-info > b small {
+  font-weight: 400;
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.q-services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+}
+/* A service with its own Start / Finish button (businesses that start each service separately). */
+.q-services > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.q-wait {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.q-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+@container dash (max-width: 560px) {
+  .q-row {
+    flex-wrap: wrap;
+  }
+  .q-no {
+    min-width: 0;
+    font-size: 1.25rem;
+  }
+  .q-actions {
+    width: 100%;
+  }
+  .q-actions .btn:first-child {
+    flex: 1;
+  }
+}
+
+/* ---------- scanner ---------- */
+
+.scan-view {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: #120d18;
+  display: grid;
+  place-items: center;
+}
+.scan-view video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.scan-off {
+  width: 48px;
+  height: 48px;
+  color: rgb(255 255 255 / 40%);
+}
+.scan-frame {
+  position: absolute;
+  inset: 12%;
+}
+.scan-frame i {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 4px solid #fff;
+}
+.scan-frame i:nth-child(1) {
+  top: 0;
+  left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-radius: 14px 0 0 0;
+}
+.scan-frame i:nth-child(2) {
+  top: 0;
+  right: 0;
+  border-left: 0;
+  border-bottom: 0;
+  border-radius: 0 14px 0 0;
+}
+.scan-frame i:nth-child(3) {
+  bottom: 0;
+  left: 0;
+  border-right: 0;
+  border-top: 0;
+  border-radius: 0 0 0 14px;
+}
+.scan-frame i:nth-child(4) {
+  bottom: 0;
+  right: 0;
+  border-left: 0;
+  border-top: 0;
+  border-radius: 0 0 14px 0;
+}
+.scan-frame b {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  height: 2px;
+  background: var(--brand-line);
+  box-shadow: 0 0 12px var(--brand);
+  animation: sweep 2.2s ease-in-out infinite alternate;
+}
+@keyframes sweep {
+  from {
+    top: 6%;
+  }
+  to {
+    top: 94%;
+  }
+}
+.scan-msg {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  padding: 8px 12px;
+  border-radius: var(--r-sm);
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  font-size: var(--t-sm);
+  text-align: center;
+}
+.scan-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px 0 6px;
+}
+.scan-note {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  text-align: center;
+}
+.scan-manual {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.scan-manual input {
+  flex: 1;
+  min-width: 0;
+  min-height: 42px;
+  padding: 8px 16px;
+  border-radius: var(--pill);
+  border: 1px solid var(--line-2);
+}
+.scan-manual input:focus {
+  outline: none;
+  border-color: var(--brand);
+}
+
+/* Staff "New token": the staff member is fixed, then the services they do */
+.newtok-staff {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--porcelain);
+}
+.newtok-staff span {
+  display: grid;
+  flex: 1;
+}
+.newtok-staff small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.newtok-staff > .i {
+  color: var(--ink-3);
+}
+.newtok-services {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.newtok-services legend {
+  margin-bottom: 6px;
+  font-size: var(--t-sm);
+  font-weight: 600;
+}
+.newtok-services label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+.newtok-services label.on {
+  border-color: var(--brand);
+  background: var(--brand-soft, var(--porcelain));
+}
+.newtok-services span {
+  display: grid;
+}
+.newtok-services small {
+  color: var(--ink-3);
+}

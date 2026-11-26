@@ -1,0 +1,250 @@
+/* Super admin: business categories. */
+
+/* ---------- business categories ---------- */
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  padding: 2px 9px 2px 7px;
+  border-radius: var(--pill);
+  background: color-mix(in srgb, var(--cat) 12%, white);
+  color: color-mix(in srgb, var(--cat) 80%, black);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.cat-chip .i {
+  width: 12px;
+  height: 12px;
+}
+.cat-chip.none {
+  --cat: #64748b;
+}
+.cell-with-thumb .cat-chip {
+  margin: 2px 0;
+}
+.for-you {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: var(--pill);
+  background: var(--brand-tint);
+  color: var(--brand-ink);
+  font-size: 0.68rem;
+  font-weight: 600;
+  vertical-align: 2px;
+}
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 18px;
+}
+.cat-card {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 20px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--cat) 10%, white), white 60%);
+  border: 1px solid color-mix(in srgb, var(--cat) 18%, var(--line));
+  box-shadow: 0 10px 24px -18px color-mix(in srgb, var(--cat) 60%, transparent);
+  overflow: hidden;
+}
+.cat-card::after {
+  content: '';
+  position: absolute;
+  right: -30px;
+  top: -30px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--cat) 10%, transparent);
+  pointer-events: none;
+}
+.cat-card h3 {
+  margin: 4px 0 0;
+  font-size: 1.05rem;
+}
+.cat-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  z-index: 1;
+}
+.cat-card-ico {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(140deg, var(--cat), color-mix(in srgb, var(--cat) 70%, black));
+  color: #fff;
+  box-shadow: 0 8px 16px -8px var(--cat);
+}
+.cat-card-ico .i {
+  width: 22px;
+  height: 22px;
+}
+.cat-card-actions {
+  display: flex;
+  gap: 2px;
+}
+.cat-card-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cat-card-stats button {
+  border: 0;
+  padding: 4px 10px;
+  border-radius: var(--pill);
+  background: color-mix(in srgb, var(--cat) 9%, white);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: var(--t-xs);
+  cursor: pointer;
+}
+.cat-card-stats button:hover {
+  background: color-mix(in srgb, var(--cat) 16%, white);
+}
+.cat-card-stats b {
+  color: color-mix(in srgb, var(--cat) 80%, black);
+}
+.cat-card.add {
+  --cat: #7b2c9e;
+  justify-items: center;
+  text-align: center;
+  align-content: center;
+  min-height: 160px;
+  border: 2px dashed color-mix(in srgb, var(--cat) 25%, var(--line));
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--ink);
+}
+.cat-card.add:hover {
+  background: var(--brand-wash);
+}
+.cat-card.add small {
+  color: var(--ink-3);
+  font-size: var(--t-xs);
+}
+.cat-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--cat) 8%, white);
+}
+.icon-pick {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 42px);
+  gap: 8px;
+}
+.icon-pick button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.icon-pick button.on {
+  border-color: var(--brand);
+  background: var(--brand-tint);
+  color: var(--brand-ink);
+  box-shadow: 0 0 0 2px var(--brand-tint);
+}
+.cat-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cat-pick-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 6px;
+  border-radius: var(--pill);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font: inherit;
+  font-size: var(--t-sm);
+  color: var(--ink);
+  cursor: pointer;
+}
+.cat-pick-item .cat-ico {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--cat) 14%, white);
+  color: var(--cat);
+}
+.cat-pick-item .cat-ico .i {
+  width: 15px;
+  height: 15px;
+}
+.cat-pick-item.on {
+  border-color: var(--cat);
+  background: color-mix(in srgb, var(--cat) 9%, white);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--cat) 20%, transparent);
+  font-weight: 600;
+}
+.cat-pick-item.on .cat-ico {
+  background: var(--cat);
+  color: #fff;
+}
+.filter-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.filter-chips button {
+  --cat: var(--brand);
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--pill);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font: inherit;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.filter-chips button .i {
+  width: 15px;
+  height: 15px;
+  color: var(--cat);
+}
+.filter-chips button .num {
+  padding: 0 7px;
+  border-radius: var(--pill);
+  background: var(--porcelain);
+  font-size: var(--t-xs);
+}
+.filter-chips button.on {
+  border-color: var(--cat);
+  background: var(--cat);
+  color: #fff;
+}
+.filter-chips button.on .i {
+  color: #fff;
+}
+.filter-chips button.on .num {
+  background: rgba(255, 255, 255, 0.25);
+}

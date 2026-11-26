@@ -1,0 +1,7 @@
+Fonts in this folder are Latin subsets, served from this server (no font CDN):
+
+  Poppins (Regular, Medium, Bold) – Copyright 2020 The Poppins Project Authors
+  Lora (variable)                 – Copyright 2011 The Lora Project Authors
+
+Both are licensed under the SIL Open Font License, Version 1.1
+https://openfontlicense.org

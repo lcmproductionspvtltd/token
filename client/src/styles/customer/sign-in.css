@@ -1,0 +1,184 @@
+/* Sign in. */
+
+/* ================= sign in ================= */
+.auth {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  background: var(--paper);
+}
+
+.auth-side {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 36px clamp(28px, 4vw, 64px);
+  background: var(--brand-deep);
+  color: #fff;
+}
+
+.auth-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
+.auth-side .mark.ph {
+  background: rgb(255 255 255 / 14%);
+}
+
+.auth-stack {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+  padding: 20px 0;
+}
+
+.mini-ticket {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 22px;
+  border-radius: var(--r);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 18px 38px -16px rgb(0 0 0 / 50%);
+  -webkit-mask:
+    radial-gradient(circle at 92px 0, #0000 8px, #000 8.5px) top / 100% 51% no-repeat,
+    radial-gradient(circle at 92px 100%, #0000 8px, #000 8.5px) bottom / 100% 51% no-repeat;
+  mask:
+    radial-gradient(circle at 92px 0, #0000 8px, #000 8.5px) top / 100% 51% no-repeat,
+    radial-gradient(circle at 92px 100%, #0000 8px, #000 8.5px) bottom / 100% 51% no-repeat;
+}
+
+.mini-ticket span {
+  width: 70px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-ticket em {
+  font-style: normal;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+  padding-left: 18px;
+  border-left: 2px dashed var(--line-2);
+}
+
+.mini-ticket.t1 {
+  transform: translateX(0) rotate(-1.5deg);
+}
+
+.mini-ticket.t1 span {
+  color: var(--brand);
+}
+
+.mini-ticket.t2 {
+  transform: translateX(36px) rotate(1deg);
+  opacity: 0.92;
+}
+
+.mini-ticket.t3 {
+  transform: translateX(72px) rotate(-0.5deg);
+  opacity: 0.8;
+}
+
+.auth-quote {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  line-height: 1.35;
+  max-width: 22ch;
+}
+
+.auth-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  padding: 48px 24px;
+}
+
+.auth-form {
+  width: min(400px, 100%);
+  display: grid;
+  gap: 18px;
+}
+
+.auth-form h1 {
+  font-family: var(--serif);
+  font-size: var(--t-3xl);
+  letter-spacing: -0.015em;
+}
+
+.auth-sub {
+  color: var(--ink-2);
+  margin-top: -10px;
+}
+
+.pw {
+  position: relative;
+  display: block;
+}
+
+.pw input {
+  padding-right: 48px !important;
+}
+
+.pw .icon-btn {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}
+
+.auth-error {
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  background: var(--bad-bg);
+  color: var(--bad-fg);
+  font-size: var(--t-sm);
+}
+
+.auth-help {
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+
+.auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+@media (max-width: 860px) {
+  .auth {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-side {
+    padding: 22px var(--gutter);
+    gap: 10px;
+  }
+
+  .auth-stack,
+  .auth-quote {
+    display: none;
+  }
+
+  .auth-main {
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+}
